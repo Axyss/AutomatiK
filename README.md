@@ -1,4 +1,4 @@
-<img src="https://raw.githubusercontent.com/Axyss/AutomatiK/master/AutomatiK%20files/assets/ak_logo.png" align="right" alt="automatik_logo" width="180" height="180"></img>
+<img src="https://raw.githubusercontent.com/Axyss/AutomatiK/master/AutomatiK%20files/assets/ak_logo.png" align="right" width="180" height="180"></img>
 <h1>AutomatiK</h1>
 </br>
 <h2>What is AutomatiK?</h2>
