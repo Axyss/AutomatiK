@@ -196,12 +196,12 @@ async def helpme(ctx):
                          "\n!mk stop - Stops the main process." +
                          "\n"
                          "\n!mk enable - Global command to enable diverse AutomatiK" +
-                         " services (epic/humble/mention)."
+                         " services (Epic/Humble/Mention)."
                          "\n!mk disable - Global command to disable diverse AutomatiK services" +
-                         " (epic/humble/mention)."
+                         " (Epic/Humble/Mention)."
                          "\n"
                          "\n!mk mention (role) - Select which role will be mentioned in Automatik's messages. " +
-                         "Example: '!mk role @MyRank'." +
+                         "Example: '!mk mention @MyRank'." +
                          "\n!mk notify (name) (link) - Notify games from non-supported platforms manually.```",
                          inline=False)
 
