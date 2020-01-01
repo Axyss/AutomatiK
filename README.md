@@ -1,5 +1,5 @@
 <img src="https://i.imgur.com/GfImWOy.png" alt="automatik_logo" align="right" width="180" height="180"></img>
-<h1>AutomatiK</h1>
+<h1>AutomatiK</h1><img src="https://img.shields.io/badge/version-1.2-brightgreen"></img> <img src="https://img.shields.io/github/license/Axyss/-bin"></img> <img src="https://img.shields.io/badge/compatible-osu!lazer-ff69b4"></img>
 </br>
 <h2>What is AutomatiK?</h2>
 AutomatiK is a <b>Discord bot</b> whose task is to notify users about free games from multiple platforms. It's completely automatic and has some <b>configuration options</b> and a built-in database where game data is stored.
@@ -18,7 +18,7 @@ First of all we have to download the repository and extract It in a folder, then
 
 Once we've done It we have to link our local copy of AutomatiK with our new bot, to do so we will copy our bot's secret token (be careful not to copy the application's token instead) and paste It in the first line of the file <i>SToken.txt</i> located in the directory where we extracted the program before.
 
-In last place we will invite the bot to our server, follow <a href="https://discordpy.readthedocs.io/en/latest/discord.html#inviting-your-bot">this</a> guide to do so. <b>Make sure to give It administrator privileges.</b>
+In the next place we will invite the bot to our server, follow <a href="https://discordpy.readthedocs.io/en/latest/discord.html#inviting-your-bot">this</a> guide to do so. <b>Make sure to give It administrator privileges.</b>
 
 Now let's execute the bot from the terminal/console (<a href="https://www.python.org/downloads/">Python 3.6 or higher required</a>)
 <h4>Windows</h4>
@@ -32,7 +32,7 @@ Now let's execute the bot from the terminal/console (<a href="https://www.python
 <i>If we've done everything correctly we will see a message like this:</i> `[INFO]: AutomatiK bot now online`
 </br>
 </br>
-Now let's start the principal process of the bot, use <b><i>!mk start</i></b> in the text channel where you want the notifications to show up, you will recieve a confirmation message and that's It.
+The last part is to start the principal process of the bot, use <b><i>!mk start</i></b> in the text channel where you want the notifications to show up, you will recieve a confirmation message and that's It.
 </br>
 </br>
 <img src="https://i.imgur.com/d2Pc8iP.png" align="bottom"></img>
