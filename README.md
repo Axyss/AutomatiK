@@ -28,6 +28,7 @@ Now let's execute the bot from the terminal/console (<a href="https://www.python
 
 `python3 bot.py`
 </br>
+</br>
 <i>If we've done everything correctly we will see a message like this:</i> `[INFO]: AutomatiK bot now online`
 </br>
 </br>
