@@ -32,7 +32,7 @@ Now let's execute the bot from the terminal/console (<a href="https://www.python
 <i>If we've done everything correctly we will see a message like this:</i> `[INFO]: AutomatiK bot now online`
 </br>
 </br>
-Now let's start the principal process of the bot, use <i>!mk start</i> in the text channel where you want the notifications to appear, then you will recieve a confirmation message and that's It AutomatiK is fully working now.
+Now let's start the principal process of the bot, use <b><i>!mk start</i></b> in the text channel where you want the notifications to show up, you will recieve a confirmation message and that's It.
 </br>
 <h2>Commands</h2>
 Automatik works with the prefix <b><i>!mk</i></b>. 
