@@ -35,3 +35,7 @@ Now let's execute the bot from the terminal/console (<a href="https://www.python
 Automatik works with the prefix <b><i>!mk</i></b>. 
 You can see all the available commands using <b><i>!mk helpme</i></b>
 <h3>Example:</h3> <img src="https://i.imgur.com/R5fG9GI.png" alt="helpme_ss"></img>
+<h2>License</h2>
+All the <b>software</b> is licensed under the MIT license, while the all the graphical content and logos are licensed under Creative Commons 4.0
+
+<a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"><img alt="Licencia de Creative Commons" style="border-width:0" src="https://i.imgur.com/X9WYkk1.png" /></a><a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"></a>
