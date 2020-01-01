@@ -32,6 +32,6 @@ Now let's execute the bot from the terminal/console (<a href="https://www.python
 <i>If we've done everything correctly we will see a message like this:</i> `[INFO]: AutomatiK bot now online`
 
 <h2>Commands</h2>
-Automatik works with the prefix <i>!mk</i>. 
-You can see all the available commands using <i>!mk helpme</i>
+Automatik works with the prefix <b><i>!mk</i></b>. 
+You can see all the available commands using <b><i>!mk helpme</i></b>
 <h3>Example:</h3> <img src="https://i.imgur.com/gDYdQdp.png" alt="helpme_ss"></img>
