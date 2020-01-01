@@ -401,9 +401,11 @@ try:
 except FileExistsError:
     pass
 
-else:  # If there weren't any exceptions, the file will be created
+else:  # If there weren't any exceptions, the file will be written
+    
     STokenFile = open("SToken.txt", "w")
     STokenFile.write("Introduce your bot's secret token in this line.")
+    STokenFile.close()
 
 
 with open("SToken.txt", "r") as f:  # Reads the secret token and starts the bot
