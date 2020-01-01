@@ -36,5 +36,6 @@ Automatik works with the prefix <b><i>!mk</i></b>.
 You can see all the available commands using <b><i>!mk helpme</i></b>
 <h3>Example:</h3> <img src="https://i.imgur.com/R5fG9GI.png" alt="helpme_ss"></img>
 <h2>License</h2>
-All the <b>software</b> is licensed under the MIT license, while the <b>all the graphical content and logos</b> are licensed under Creative Commons Attribution-ShareAlike 4.0 International <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"><img alt="Licencia de Creative Commons" style="border-width:0" src="https://i.imgur.com/X9WYkk1.png" width="150" height="50"></a><a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"></a>
+All the <b>software</b> is licensed under the MIT license, while the <b>all the graphical content and logos</b> are licensed under Creative Commons Attribution-ShareAlike 4.0 International
 
+<a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"><img alt="Licencia de Creative Commons" src="https://i.imgur.com/X9WYkk1.png" width="120" height="40" align="top"></a>
