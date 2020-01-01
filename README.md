@@ -34,6 +34,7 @@ Now let's execute the bot from the terminal/console (<a href="https://www.python
 </br>
 Now let's start the principal process of the bot, use <b><i>!mk start</i></b> in the text channel where you want the notifications to show up, you will recieve a confirmation message and that's It.
 </br>
+</br>
 <img src="https://i.imgur.com/d2Pc8iP.png" align="bottom"></img>
 </br>
 <h2>Commands</h2>
