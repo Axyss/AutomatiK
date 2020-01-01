@@ -4,6 +4,7 @@
 <h2>What is AutomatiK?</h2>
 AutomatiK is a <b>Discord bot</b> whose task is to notify users about free games from multiple platforms. It's completely automatic and has some <b>configuration options</b> and a built-in database where game data is stored.
 </br>
+</br>
 The currently supported platforms are:
 
 - Epic Games
@@ -13,6 +14,8 @@ The currently supported platforms are:
 
 <h2>How can I use It?</h2>
 
-First of all we have to clone this repository and extract It in a folder, then we will proceed to create a bot account, If you have never done It, then follow <a href="https://discordpy.readthedocs.io/en/latest/discord.html">this</a> tutorial. 
+First of all we have to clone this repository and extract It in a folder, then we will proceed to create a bot account, If you have never done It, then follow <a href="https://discordpy.readthedocs.io/en/latest/discord.html#creating-a-bot-account">this</a> tutorial. 
 
-Once we've done It we have to link our local copy of AutomatiK with our new bot, to do so we will copy our bot's secret token (be careful not to copy the application's token instead) and paste It in the first line
+Once we've done It we have to link our local copy of AutomatiK with our new bot, to do so we will copy our bot's secret token (be careful not to copy the application's token instead) and paste It in the first line of the file "SToken.txt" located in the directory where we extracted the program before.
+
+In last place we will invite the bot to our server, follow <a href="https://discordpy.readthedocs.io/en/latest/discord.html#inviting-your-bot">this</a> guide to do so. <b>Make sure to give It administrator privileges.</b>
