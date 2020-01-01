@@ -34,4 +34,4 @@ Now let's execute the bot from the terminal/console (<a href="https://www.python
 <h2>Commands</h2>
 Automatik works with the prefix <b><i>!mk</i></b>. 
 You can see all the available commands using <b><i>!mk helpme</i></b>
-<h3>Example:</h3> <img src="https://i.imgur.com/gDYdQdp.png" alt="helpme_ss"></img>
+<h3>Example:</h3> <img src="https://i.imgur.com/R5fG9GI.png" alt="helpme_ss"></img>
