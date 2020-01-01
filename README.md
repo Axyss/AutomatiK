@@ -42,4 +42,5 @@ All the <b>software</b> is licensed under the MIT license, while <b>all the grap
 <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"><img alt="Licencia de Creative Commons" src="https://i.imgur.com/X9WYkk1.png" width="120" height="40"></a>
 <h2>Suggestions</h2>
 <b>Do you have any suggestion? Do you think AutomatiK should support an specific platform?</b>
+</br>
 Open a pull request, I'll be more than happy to hear your ideas.
