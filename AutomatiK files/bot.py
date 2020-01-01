@@ -67,7 +67,7 @@ def check_config_changes():
             continue
 
         else:
-            edit_config(i, dataTemplate[i])  # Add the element using the value from the template
+            edit_config(i, dataTemplate[i])  # Adds the element using the value from the template
 
 
 def load_config():
@@ -181,7 +181,8 @@ async def helpme(ctx):
 
     embed_help.set_footer(text="Project page: github.com/Axyss/AutomatiK",
                           icon_url="https://avatars3.githubusercontent.com/u/55812692"
-                         )
+                          )
+
     embed_help.set_thumbnail(
         url="https://raw.githubusercontent.com/Axyss/AutomatiK/master/AutomatiK%20files/assets/ak_logo.png"
     )
@@ -393,20 +394,22 @@ async def disable(ctx, service):
     print(get_time() + f"[INFO]: {service.capitalize()} module disabled")
     await ctx.channel.send(u"\u2705 " + f"{service.capitalize()} module disabled.")
 
-
+# Creates the file where the secret token will be stored
 try:
     open("SToken.txt", "x")
 
 except FileExistsError:
     pass
 
-else:
+else:  # If there weren't any exceptions, the file will be created
     STokenFile = open("SToken.txt", "w")
     STokenFile.write("Introduce your bot's secret token in this line.")
 
 
 with open("SToken.txt", "r") as f:  # Reads the secret token and starts the bot
+
     try:
-        client.run(str(f.readlines()[0]))
-    except:
+        client.run(str(f.readlines()[0]))  # Runs the bot using the token stored in the first line of SToken.txt
+
+    except discord.errors.LoginFailure:  # Handles the error produced by an incorrect secret token
         print(get_time() + "[ERROR]: Please, enter a valid secret token in SToken.txt")
