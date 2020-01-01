@@ -184,7 +184,7 @@ async def helpme(ctx):
                           )
 
     embed_help.set_thumbnail(
-        url="https://raw.githubusercontent.com/Axyss/AutomatiK/master/AutomatiK%20files/assets/ak_logo.png"
+        url="https://i.imgur.com/GfImWOy.png"
     )
 
     embed_help.add_field(name="Commands", value="```!mk helpme - Shows all available commands." +
@@ -402,7 +402,7 @@ except FileExistsError:
     pass
 
 else:  # If there weren't any exceptions, the file will be written
-    
+
     STokenFile = open("SToken.txt", "w")
     STokenFile.write("Introduce your bot's secret token in this line.")
     STokenFile.close()
