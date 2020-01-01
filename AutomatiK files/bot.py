@@ -41,12 +41,12 @@ def get_time():
 def generate_message(title, link, service):
     """Generates some messages the bot sends"""
     # If third parameter True, then the message is for discord
-    # This lets the function knows where the message is going to be sent and add the mention if required
+    # This lets the function knows where the message is going to be sent and adds the mention if required
 
     global dataConfig
     draft = title + " is currently free on " + link + "."
 
-    if dataConfig["role_mention"] and service:  # If role_mention is True, then add the role parameter from config
+    if dataConfig["role_mention"] and service:  # If role_mention is True, then adds the role parameter from config
         draft = dataConfig["role"] + " " + draft
 
     return draft
@@ -71,7 +71,7 @@ def check_config_changes():
 
 
 def load_config():
-    """Loads the config from the file (Don't execute It more than 1 time)"""
+    """Loads the config from the file"""
 
     global dataConfig
     global dataTemplate
