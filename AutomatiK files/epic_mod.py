@@ -129,7 +129,8 @@ class Scraping:
                     return None
 
             except IndexError:
-                print("[ERROR]: Empty database")
+                print(time.strftime('[%Y/%m/%d]' + '[%H:%M]') +
+                      "[ERROR]: Empty database")
 
             # Adds the register of the game to the DB
             pointer.execute("INSERT INTO TABLA_1 VALUES (NULL,?,?)", self.gameData)

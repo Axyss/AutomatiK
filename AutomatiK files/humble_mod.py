@@ -81,7 +81,8 @@ class Scraping:
                         self.validGameData.append(i)  # Adds the data to a new list
 
             except IndexError:
-                print("[ERROR]: Empty database")
+                print(time.strftime('[%Y/%m/%d]' + '[%H:%M]') +
+                      "[ERROR]: Empty database")
 
             if not self.validGameData:  # If validGameData empty return
                 return None
