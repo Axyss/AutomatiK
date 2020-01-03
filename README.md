@@ -45,7 +45,7 @@ You can see all the available commands using <b><i>!mk helpme</i></b>
 All the <b>software</b> of this repository is licensed under the MIT license, while <b>all the graphical content and logos</b> are licensed under Creative Commons Attribution-ShareAlike 4.0 International, click the logo down below to know more about the limitations of this license.
 </br>
 </br>
-<a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"><img alt="Licencia de Creative Commons" src="https://i.imgur.com/X9WYkk1.png" width="120" height="40"></a>
+<a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"><img alt="Licencia de Creative Commons" src="http://www.axyss.ovh/automatik/cc_license.png" width="120" height="40"></a>
 <h2>Suggestions</h2>
 <b>Do you have any suggestion? Do you think AutomatiK should support an specific platform?</b>
 </br>
