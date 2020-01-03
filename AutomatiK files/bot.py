@@ -15,12 +15,14 @@ client = commands.Bot(command_prefix="!mk ", self_bot=False)
 mainLoopStatus = False  # Variable which starts or stops the main loop
 
 dataConfig = None  # Loaded configuration
+langM = None
 
 # Template of the config
 dataTemplate = {"role": "<@&1234>",
                 "role_mention": False,
                 "epic_status": True,
-                "humble_status": True}
+                "humble_status": True,
+                "lang": "en_EN"}
 
 # -----------------------REGULAR FUNCTIONS-----------------------
 
@@ -38,15 +40,17 @@ def get_time():
     return time.strftime('[%Y/%m/%d]' + '[%H:%M]')
 
 
-def generate_message(title, link, service):
+def generate_message(title, link):
     """Generates some messages the bot sends"""
     # If third parameter True, then the message is for discord
     # This lets the function knows where the message is going to be sent and adds the mention if required
 
     global dataConfig
-    draft = title + " is currently free on " + link + "."
+    global langM
 
-    if dataConfig["role_mention"] and service:  # If role_mention is True, then adds the role parameter from config
+    draft = langM["procedural_message"].format(title, link)
+
+    if dataConfig["role_mention"]:  # If role_mention is True, then adds the role parameter from config
         draft = dataConfig["role"] + " " + draft
 
     return draft
@@ -104,6 +108,32 @@ def edit_config(key, value):
     file.close()
 
 
+def load_lang():
+    """Loads the language file based on the 'lang' option from config.json"""
+
+    global dataConfig
+    global langM
+
+    file = open(f"lang/{dataConfig['lang']}.json", "r", encoding="utf-8")
+    langM = json.load(file)["messages"]
+    file.close()
+
+
+def get_available_languages():
+    """Obtains a list containing all the available languages for AutomatiK"""
+
+    language_list = os.listdir("lang/")  # Obtains the name of the files in lang to generate a list
+
+    parsed_language_list = []
+
+    for i in language_list:  # Adds to the new list the file names without their extensions
+        parsed_language_list.append(i[0:i.rindex(".")])
+
+    # Converts all the parsed list into a string with separators
+    parsed_language_list = "/".join(parsed_language_list)
+
+    return parsed_language_list
+
 # -----------------------EVENTS-----------------------
 
 
@@ -113,6 +143,7 @@ async def on_ready():
     print(get_time() + "[INFO]: AutomatiK bot now online")
 
     load_config()
+    load_lang()
 
     check_config_changes()
 
@@ -124,11 +155,12 @@ async def on_ready():
 @client.event
 async def on_command_error(ctx, error):  # The second parameter is the error's information
     """Function used for error handling"""
+    global langM
 
     if isinstance(error, discord.ext.commands.MissingPermissions):
         """In case the user who tries to run the command does not have administrator perms, run this"""
 
-        await ctx.channel.send(u"\u274C You don't have enough permissions to execute this command.")
+        await ctx.channel.send(langM["missing_permissions"])
 
 
 # -----------------------COMMANDS-----------------------
@@ -136,6 +168,8 @@ async def on_command_error(ctx, error):  # The second parameter is the error's i
 @client.command()
 @commands.has_permissions(administrator=True)
 async def notify(ctx, *args):
+
+    global langM
 
     if pm(ctx.channel):
         return None
@@ -152,7 +186,7 @@ async def notify(ctx, *args):
     await ctx.channel.purge(limit=1)
 
     await ctx.channel.send(generate_message(
-        gameName, link, True) + f"\nThanks for notifying <@!{ctx.author.id}>."  # Adds politeness
+        gameName, link) + langM["notify_thanks"].format(ctx.author.id)  # Adds politeness
     )
 
 
@@ -160,6 +194,8 @@ async def notify(ctx, *args):
 @commands.has_permissions(administrator=True)
 async def mention(ctx, roleid):
     """Manages the mentions of the bot's messages"""
+
+    global langM
 
     if pm(ctx.channel):
         return None
@@ -170,39 +206,30 @@ async def mention(ctx, roleid):
         edit_config("role", roleid)
 
         print(get_time() + "[INFO]: AutomatiK will now mention:", roleid)
-        await ctx.channel.send(u"\u2705 Role successfully established.")
+        await ctx.channel.send(langM["mention_established"])
 
 
 @client.command()
 async def helpme(ctx):
     """Help command that uses embeds"""
+    global langM
 
     embed_help = discord.Embed(title="AutomatiK Help", color=0x00BFFF)
 
-    embed_help.set_footer(text="Project page: github.com/Axyss/AutomatiK",
+    embed_help.set_footer(text=langM["embed_footer"],
                           icon_url="https://avatars3.githubusercontent.com/u/55812692"
                           )
 
     embed_help.set_thumbnail(
-        url="https://i.imgur.com/GfImWOy.png"
+        url="http://www.axyss.ovh/automatik/ak_logo.png"
     )
 
-    embed_help.add_field(name="Commands", value="```!mk helpme - Shows all available commands." +
-                         "\n!mk status - Shows bot's status. ```",
+    embed_help.add_field(name=langM["embed_field1_name"],
+                         value=langM["embed_field1_value"],
                          inline=False)
 
-    embed_help.add_field(name="Admin commands", value="```" +
-                         "\n!mk start - Starts the main process in the channel where the command is executed." +
-                         "\n!mk stop - Stops the main process." +
-                         "\n"
-                         "\n!mk enable - Global command to enable diverse AutomatiK" +
-                         " services (Epic/Humble/Mention)."
-                         "\n!mk disable - Global command to disable diverse AutomatiK services" +
-                         " (Epic/Humble/Mention)."
-                         "\n"
-                         "\n!mk mention (role) - Select which role will be mentioned in Automatik's messages. " +
-                         "Example: '!mk mention @MyRank'." +
-                         "\n!mk notify (name) (link) - Notify games from non-supported platforms manually.```",
+    embed_help.add_field(name=langM["embed_field2_name"],
+                         value=langM["embed_field2_value"].format(get_available_languages()),
                          inline=False)
 
     await ctx.channel.send(embed=embed_help)
@@ -215,12 +242,13 @@ async def start(ctx):
 
     global mainLoopStatus
     global dataConfig  # Gets config values
+    global langM
 
     if pm(ctx.channel):  # Checks if pm
         return None
 
-    if mainLoopStatus:  # If service already stopped
-        await ctx.channel.send(u"\u274C Main service is already started.")
+    if mainLoopStatus:  # If service already started
+        await ctx.channel.send(langM["start_already"])
         return None
 
     print(get_time() +
@@ -228,7 +256,7 @@ async def start(ctx):
           str(ctx.author)
           )
 
-    await ctx.channel.send(u"\u2705 Main service started.")
+    await ctx.channel.send(langM["start_success"])
 
     # Here is where the real function starts
 
@@ -250,7 +278,7 @@ async def start(ctx):
             gD = tuple(epic_mod.obj.gameData)  # Used to abbreviate since "with" did not work
 
             await ctx.channel.send(
-                generate_message(gD[0], gD[1], True)
+                generate_message(gD[0], gD[1])
             )  # Sends message to the guild
 
         # Humble Bundle caller
@@ -260,8 +288,9 @@ async def start(ctx):
             vGD = tuple(humble_mod.obj.validGameData)
 
             for i in vGD:
+
                 await ctx.channel.send(
-                    generate_message(i[0], i[1], True)
+                    generate_message(i[0], i[1])
                 )
 
         await asyncio.sleep(300)  # It will check free games every 5 minutes
@@ -273,12 +302,13 @@ async def stop(ctx):
     """Stops the AutomatiK service"""
 
     global mainLoopStatus
+    global langM
 
     if pm(ctx.channel):
         return None
 
     if not mainLoopStatus:  # If service already stopped
-        await ctx.channel.send(u"\u274C Main service is already stopped.")
+        await ctx.channel.send(langM["stop_already"])
         return None
 
     print(get_time() +
@@ -286,7 +316,7 @@ async def stop(ctx):
           str(ctx.author)
           )
 
-    await ctx.channel.send(u"\u2705 Main service stopped.")
+    await ctx.channel.send(langM["stop_success"])
 
     mainLoopStatus = False  # Stops the loop by changing the boolean which maintains It active
 
@@ -297,42 +327,42 @@ async def status(ctx):
 
     global dataConfig
     global mainLoopStatus
+    global langM
 
     if pm(ctx.channel):
         return None
 
     if mainLoopStatus:
-        mainService = u"ACTIVE \u2611"
+        mainService = langM["status_active"]
     else:
-        mainService = u"INACTIVE \u274C"
+        mainService = langM["status_inactive"]
 
     if dataConfig["epic_status"]:
-        epicModule = u"ACTIVE \u2611"
+        epicModule = langM["status_active"]
     else:
-        epicModule = u"INACTIVE \u274C"
+        epicModule = langM["status_inactive"]
 
     if dataConfig["humble_status"]:
-        humbleModule = u"ACTIVE \u2611"
+        humbleModule = langM["status_active"]
     else:
-        humbleModule = u"INACTIVE \u274C"
+        humbleModule = langM["status_inactive"]
 
     if dataConfig["role_mention"]:
-        roleMention = u"ACTIVE \u2611"
+        roleMention = langM["status_active"]
     else:
-        roleMention = u"INACTIVE \u274C"
+        roleMention = langM["status_inactive"]
 
-    await ctx.channel.send(f"> Main service: {mainService}"
-                           "\n"
-                           "\n>         Modules:"
-                           f"\n> Epic:             {epicModule}"
-                           f"\n> Humble:      {humbleModule}"
-                           f"\n> Mentions:   {roleMention}")
+    await ctx.channel.send(langM["status"].format(
+        mainService, epicModule, humbleModule, roleMention)
+    )
 
 
 @client.command()
 @commands.has_permissions(administrator=True)
 async def enable(ctx, service):
     """Global manager to enable some AutomatiK services"""
+
+    global langM
 
     if pm(ctx.channel):
         return None
@@ -349,23 +379,25 @@ async def enable(ctx, service):
 
         edit_config("role_mention", True)
         print(get_time() + "[INFO]: AutomatiK mentions enabled")
-        await ctx.channel.send(u"\u2705 Mention module enabled.")
+        await ctx.channel.send(langM["mention_enabled"])
         return None
 
     else:
-        await ctx.channel.send(u"\u274C Unknown parameter. Use !mk enable (Epic/Humble/Mention)")
+        await ctx.channel.send(langM["enable_unknown"])
         return None
 
     # This next lines will just be executed in case the command is correct
 
     print(get_time() + f"[INFO]: {service.capitalize()} module enabled")
-    await ctx.channel.send(u"\u2705 " + f"{service.capitalize()} module enabled.")
+    await ctx.channel.send(langM["module_enabled"].format(service.capitalize()))
 
 
 @client.command()
 @commands.has_permissions(administrator=True)
 async def disable(ctx, service):
     """Global manager to disable some AutomatiK services"""
+
+    global langM
 
     if pm(ctx.channel):
         return None
@@ -382,17 +414,31 @@ async def disable(ctx, service):
 
         edit_config("role_mention", False)
         print(get_time() + "[INFO]: AutomatiK mentions disabled")
-        await ctx.channel.send(u"\u2705 Mention module disabled.")
+        await ctx.channel.send(langM["mention_disabled"])
         return None
 
     else:
-        await ctx.channel.send(u"\u274C Unknown parameter. Use !mk disable (Epic/Humble/Mention)")
+        await ctx.channel.send(langM["disable_unknown"])
         return None
 
     # This next lines will just be executed in case the command is correct
 
     print(get_time() + f"[INFO]: {service.capitalize()} module disabled")
-    await ctx.channel.send(u"\u2705 " + f"{service.capitalize()} module disabled.")
+    await ctx.channel.send(langM["module_disabled"].format(service.capitalize()))
+
+
+@client.command()
+@commands.has_permissions(administrator=True)
+async def language(ctx, langcode):
+
+    global langM
+
+    edit_config("lang", langcode)  # Edits the config value which contains what lang is going to be loaded
+    load_lang()  # Reloads the language
+
+    print(get_time() + f"[INFO]: Language changed to {langcode}")
+    await ctx.channel.send(langM["language_changed"])
+
 
 # Creates the file where the secret token will be stored
 try:
