@@ -1,4 +1,4 @@
-<img src="https://i.imgur.com/GfImWOy.png" alt="automatik_logo" align="right" width="180" height="180"></img>
+<img src="http://www.axyss.ovh/automatik/ak_logo.png" alt="automatik_logo" align="right" width="180" height="180"></img>
 <h1>AutomatiK</h1>
 </br>
 <h2>What is AutomatiK?</h2>
@@ -35,12 +35,12 @@ Now let's execute the bot from the terminal/console (<a href="https://www.python
 The last part is to start the principal process of the bot, use <b><i>!mk start</i></b> in the text channel where you want the notifications to show up, you will recieve a confirmation message and that's It.
 </br>
 </br>
-<img src="https://i.imgur.com/d2Pc8iP.png" align="bottom"></img>
+<img src="http://www.axyss.ovh/automatik/command_success.png" align="bottom"></img>
 </br>
 <h2>Commands</h2>
 Automatik works with the prefix <b><i>!mk</i></b>. 
 You can see all the available commands using <b><i>!mk helpme</i></b>
-<h3>Example:</h3> <img src="https://i.imgur.com/R5fG9GI.png" alt="helpme_ss"></img>
+<h3>Example:</h3> <img src="http://www.axyss.ovh/automatik/helpme.png" alt="helpme_ss"></img>
 <h2>License</h2>
 All the <b>software</b> of this repository is licensed under the MIT license, while <b>all the graphical content and logos</b> are licensed under Creative Commons Attribution-ShareAlike 4.0 International, click the logo down below to know more about the limitations of this license.
 </br>
