@@ -1,0 +1,38 @@
+{
+    "language": "English",
+    "author": "Axyss",
+    "messages": {
+
+      "missing_permissions": "\u274C  You don't have enough permissions to execute this command.",
+      "notify_thanks": "\nThanks for notifying <@!{}>.",
+      "language_changed": "\u2705 Language changed to English.",
+
+      "status": "> Main service: {}\n\n>         Modules:\n> Epic:             {}\n> Humble:      {}\n> Mentions:   {}",
+      "status_active": "ACTIVE \u2611",
+      "status_inactive": "INACTIVE \u274C",
+
+      "mention_established": "\u2705 Role successfully established.",
+      "mention_enabled": "\u2705 Mention module enabled.",
+      "mention_disabled": "\u2705 Mention module disabled.",
+
+      "module_enabled": "\u2705 {} module enabled.",
+      "module_disabled": "\u2705 {} module disabled.",
+      "enable_unknown": "\u274C Unknown parameter. Use !mk enable (Epic/Humble/Mention)",
+      "disable_unknown": "\u274C Unknown parameter. Use !mk disable (Epic/Humble/Mention)",
+
+      "start_already": "\u274C Main service is already started.",
+      "start_success": "\u2705 Main service started.",
+
+      "stop_already": "\u274C Main service is already stopped.",
+      "stop_success": "\u2705 Main service stopped.",
+
+      "embed_footer": "Project page: github.com/Axyss/AutomatiK",
+      "embed_field1_name": "Commands",
+      "embed_field1_value": "```!mk helpme - Shows all available commands.\n!mk status - Shows bot's status. ```",
+
+      "embed_field2_name": "Administrator commands",
+      "embed_field2_value": "```\n!mk start - Starts the main process in the channel where the command is executed.\n!mk stop - Stops the main process.\n\n!mk enable (Epic/Humble/Mention) - Global command to enable diverse AutomatiK services.\n!mk disable (Epic/Humble/Mention) - Global command to disable diverse AutomatiK services.\n\n!mk mention (role) - Select which role will be mentioned in Automatik's messages. Example: '!mk mention @MyRole'.\n!mk notify (name) (link) - Notify games from non-supported platforms manually.\n\n!mk language ({}) - Change the language of the messages.```",
+      "procedural_message": "{} is currently free on {}."
+
+    }
+}

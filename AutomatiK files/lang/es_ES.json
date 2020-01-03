@@ -1,0 +1,38 @@
+{
+    "language": "Español",
+    "author": "Axyss",
+    "messages": {
+
+      "missing_permissions": "\u274C No tienes suficientes permisos para ejecutar este comando.",
+      "notify_thanks": "\nGracias por avisar <@!{}>.",
+      "language_changed": "\u2705 Idioma cambiado a español.",
+
+      "status": "> Servicio principal: {}\n\n>         Módulos:\n> Epic:             {}\n> Humble:      {}\n> Mentions:   {}",
+      "status_active": "ACTIVO \u2611",
+      "status_inactive": "INACTIVO \u274C",
+
+      "mention_established": "\u2705 Rol establecido con éxito.",
+      "mention_enabled": "\u2705 Se ha activado el módulo Mention.",
+      "mention_disabled": "\u2705 Se ha desactivado el módulo Mention.",
+
+      "module_enabled": "\u2705 Se ha activado el módulo {}.",
+      "module_disabled": "\u2705 Se ha activado el módulo {}.",
+      "enable_unknown": "\u274C Parámetro desconocido. Usa !mk enable (Epic/Humble/Mention)",
+      "disable_unknown": "\u274C Parámetro desconocido. Use !mk disable (Epic/Humble/Mention)",
+
+      "start_already": "\u274C El servicio principal ya se encuentra iniciado.",
+      "start_success": "\u2705 Se ha iniciado el servicio principal.",
+
+      "stop_already": "\u274C El servicio principal ya se encuentra parado.",
+      "stop_success": "\u2705 Se ha parado el servicio principal.",
+
+      "embed_footer": "Página del proyecto: github.com/Axyss/AutomatiK",
+      "embed_field1_name": "Comandos",
+      "embed_field1_value": "```!mk helpme - Muestra todos los comandos disponibles.\n!mk status - Muestra el estado del bot.```",
+
+      "embed_field2_name": "Comandos de administrador",
+      "embed_field2_value": "```\n!mk start - Inicia el proceso principal en el canal donde el comando sea ejecutado.\n!mk stop - Para el proceso principal.\n\n!mk enable (Epic/Humble/Mention) - Comando global para iniciar diversos servicios de AutomatiK.\n!mk disable (Epic/Humble/Mention) - Comando global para parar diversos servicios de AutomatiK.\n\n!mk mention (role) - Elige qué rol será mencionado en los mensajes de AutomatiK. Ejemplo: '!mk mention @MiRol'.\n!mk notify (name) (link) - Notifica juegos manualmente desde donde el bot no lo hace.\n\n!mk language ({}) - Cambia el idioma de los mensajes.```",
+      "procedural_message": "{} se encuentra gratis en {}."
+
+    }
+}
