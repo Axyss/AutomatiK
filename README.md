@@ -14,13 +14,16 @@ The currently supported platforms are:
 
 <h2>How can I use It?</h2>
 
+<b>Prerequisites:</b> <a href="https://www.python.org/downloads/">Python 3.6 or higher</a> and <a href="https://pypi.org/project/discord.py/">discord.py</a>.
+</br>
+</br>
 First of all we have to download the repository and extract It in a folder, then we will proceed to create a bot account, If you have never done It, then follow <a href="https://discordpy.readthedocs.io/en/latest/discord.html#creating-a-bot-account">this</a> tutorial. 
 
 Once we've done It we have to link our local copy of AutomatiK with our new bot, to do so we will copy our bot's secret token (be careful not to copy the application's token instead) and paste It in the first line of the file <i>SToken.txt</i> located in the directory where we extracted the program before.
 
 In the next place we will invite the bot to our server, follow <a href="https://discordpy.readthedocs.io/en/latest/discord.html#inviting-your-bot">this</a> guide to do so. <b>Make sure to give It administrator privileges.</b>
 
-Now let's execute the bot from the terminal/console (<a href="https://www.python.org/downloads/">Python 3.6 or higher required</a>)
+Now let's execute the bot from the terminal/console.
 <h4>Windows</h4>
 
 `python bot.py`
