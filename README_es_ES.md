@@ -38,7 +38,6 @@ Ahora ejecutaremos el bot desde el terminal/la consola.
 La última parte consiste en iniciar el proceso principal del bot, usa <b><i>!mk start</i></b> en el canal de texto donde quieras que aparezcan las notificaciones, recibirás un mensaje de confirmación y eso es todo, AutomatiK ya se encuentraría funcionando.
 </br>
 </br>
-</br>
 <img src="http://www.axyss.ovh/automatik/command_success_es_ES.png" align="bottom"></img>
 </br>
 <h2>Comandos</h2>
