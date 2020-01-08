@@ -1,7 +1,7 @@
 <img src="http://www.axyss.ovh/automatik/ak_logo.png" alt="automatik_logo" align="right" width="180" height="180"></img>
 <h1>AutomatiK</h1>
-<b>Language:</b> <a href="https://github.com/Axyss/-bin#bin---keeping-things-simple--v11">English</a>, <a href="https://github.com/Axyss/AutomatiK/blob/master/README_es_ES.md#automatik">Español</a>
 </br>
+<b>Language:</b> <a href="https://github.com/Axyss/AutomatiK#automatik">English</a>, <a href="https://github.com/Axyss/AutomatiK/blob/master/README_es_ES.md#automatik">Español</a>
 <h2>¿Qué es AutomatiK?</h2>
 AutomatiK es un <b>bot de Discord</b> cuya tarea es notificar a los usuarios sobre los juegos gratis de múltiples plataformas. Es completamente automático, tiene algunas <b>opciones configurables</b> y una base de datos integrada donde se almacena la información de los juegos.
 </br>
