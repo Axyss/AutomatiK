@@ -19,11 +19,11 @@ Las plataformas actualmemte soportadas son:
 </br>
 En primer lugar descargaremos el repositorio y lo extraeremos en una carpeta, tras ello, procederemos a crear la cuenta que el bot usará, si nunca lo has hecho sigue <a href="https://discordpy.readthedocs.io/en/latest/discord.html#creating-a-bot-account">este</a> tutorial. 
 
-Once we've done It we have to link our local copy of AutomatiK with our new bot, to do so we will copy our bot's secret token (be careful not to copy the application's token instead) and paste It in the first line of the file <i>SToken.txt</i> located in the directory where we extracted the program before.
+Una vez que lo hayamos hecho tendremos que vincular nuestra copia local de AutomatiK con la cuenta que hemos creado, para hacerlo copiaremos el secret token de nuestro bot (ten cuidado de no copiar el application's token por error) y lo pegaremos en la primera línea del archivo <i>SToken.txt</i> localizado en el directorio donde extrajimos anteriormente el repositorio.
 
-In the next place we will invite the bot to our server, follow <a href="https://discordpy.readthedocs.io/en/latest/discord.html#inviting-your-bot">this</a> guide to do so. <b>Make sure to give It administrator privileges.</b>
+A continuación invitaremos el bot a nuestro servidor, sigue <a href="https://discordpy.readthedocs.io/en/latest/discord.html#inviting-your-bot">esta</a> guía para hacerlo. <b>Asegúrate de proporcionarle permisos de administrador.</b>
 
-Now let's execute the bot from the terminal/console.
+Ahora ejecutaremos el bot desde el terminal/la consola.
 <h4>Windows</h4>
 
 `python bot.py`
@@ -35,15 +35,15 @@ Now let's execute the bot from the terminal/console.
 <i>Si lo hemos hecho todo correctamente veremos un mensaje como este:</i> `[INFO]: AutomatiK bot now online`
 </br>
 </br>
-The last part is to start the principal process of the bot, use <b><i>!mk start</i></b> in the text channel where you want the notifications to show up, you will recieve a confirmation message and that's It.
+La última parte consiste en iniciar el proceso principal del bot, usa <b><i>!mk start</i></b> en el canal de texto donde quieras que aparezcan las notificaciones, recibirás un mensaje de confirmación y eso es todo, AutomatiK ya se encuentraría funcionando.
 </br>
 </br>
 <img src="http://www.axyss.ovh/automatik/command_success.png" align="bottom"></img>
 </br>
 <h2>Comandos</h2>
-Automatik works with the prefix <b><i>!mk</i></b>. 
-You can see all the available commands using <b><i>!mk helpme</i></b>
-<h3>Example:</h3> <img src="http://www.axyss.ovh/automatik/helpme.png" alt="helpme_ss"></img>
+AutomatiK trabaja con el prefijo <b><i>!mk</i></b>. 
+Puedes ver todos los comandos posibles usando <b><i>!mk helpme</i></b>
+<h3>Ejemplo:</h3> <img src="http://www.axyss.ovh/automatik/helpme.png" alt="helpme_ss"></img>
 <h2>Licencia</h2>
 Todo el <b>software</b> de este repositorio se encuentra licenciado bajo la licencia MIT, mientras que <b>todo el contenido gráfico y logos</b> se encuentran licenciados bajo Creative Commons Attribution-ShareAlike 4.0 International, haz click en el logo de debajo para conocer las limitaciones de esta licencia.
 </br>
