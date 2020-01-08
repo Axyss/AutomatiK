@@ -38,12 +38,12 @@ Ahora ejecutaremos el bot desde el terminal/la consola.
 La última parte consiste en iniciar el proceso principal del bot, usa <b><i>!mk start</i></b> en el canal de texto donde quieras que aparezcan las notificaciones, recibirás un mensaje de confirmación y eso es todo, AutomatiK ya se encuentraría funcionando.
 </br>
 </br>
-<img src="http://www.axyss.ovh/automatik/command_success.png" align="bottom"></img>
+<img src="http://www.axyss.ovh/automatik/command_success_es_ES.png" align="bottom"></img>
 </br>
 <h2>Comandos</h2>
 AutomatiK trabaja con el prefijo <b><i>!mk</i></b>. 
 Puedes ver todos los comandos disponibles usando <b><i>!mk helpme</i></b>
-<h3>Ejemplo:</h3> <img src="http://www.axyss.ovh/automatik/helpme.png" alt="helpme_ss"></img>
+<h3>Ejemplo:</h3> <img src="http://www.axyss.ovh/automatik/helpme_es_ES.png" alt="helpme_ss"></img>
 <h2>Licencia</h2>
 Todo el <b>software</b> de este repositorio se encuentra licenciado bajo la licencia MIT, mientras que <b>todo el contenido gráfico y logos</b> se encuentran licenciados bajo Creative Commons Attribution-ShareAlike 4.0 International, haz click en el logo de debajo para conocer las limitaciones de esta licencia.
 </br>
