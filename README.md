@@ -2,7 +2,7 @@
 <h1>AutomatiK</h1>
 </br>
 <h2>What is AutomatiK?</h2>
-AutomatiK is a <b>Discord bot</b> whose task is to notify users about free games from multiple platforms. It's completely automatic and has some <b>configuration options</b> and a built-in database where game data is stored.
+AutomatiK is a <b>Discord bot</b> whose task is to notify users about free games from multiple platforms. It's completely automatic, has some <b>configuration options</b> and a built-in database where game data is stored.
 </br>
 </br>
 The currently supported platforms are:
