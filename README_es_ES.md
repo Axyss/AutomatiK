@@ -10,7 +10,7 @@ Las plataformas actualmemte soportadas son:
 - Epic Games
 - Humble Bundle
 </br>
-<b>Aviso:</b> AutomatiK no fue creado con la intención de ser un bot público, debido a ello, <b>no soporta más de un servidor de Discord a la vez</b>, por lo tanto, evita invitarlo a múltiples servidores.
+<b>Aviso:</b> AutomatiK no fue creado con la intención de ser un bot público, debido a ello, <b>no soporta más de un servidor de Discord a la vez</b>, evita invitarlo a múltiples servidores.
 
 <h2>¿Cómo puedo usarlo?</h2>
 
