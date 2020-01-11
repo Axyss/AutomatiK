@@ -463,3 +463,4 @@ with open("SToken.txt", "r") as f:  # Reads the secret token and starts the bot
 
     except discord.errors.LoginFailure:  # Handles the error produced by an incorrect secret token
         print(get_time() + "[ERROR]: Please, enter a valid secret token in SToken.txt")
+        input("Press enter to close...")  # Avoids the window from closing instantaneously
