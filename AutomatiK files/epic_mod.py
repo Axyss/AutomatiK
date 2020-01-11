@@ -1,105 +1,83 @@
 import requests
-import json
 import sqlite3
 import time
+import json
 
 
 class Scraping:
 
     def __init__(self):
 
-        self.route = ["data",
-                      "Catalog",
-                      "catalogOffer",
-                      "collectionOffers"
-                      ]
+        self.baseUrl = "https://www.epicgames.com/store/es-ES/product/"
         self.gameData = []  # Data from free games (name, link)
-
-        # QUERY VARS
+        self.validGameData = []  # Verified games from the DB method
 
         self.endpoint = "https://graphql.epicgames.com/graphql"
-        self.gamesCollectionQuery = {
-            "query": "\n            query catalogQuery($productNamespace:String!, $offerId:String!, $locale:String, "
-                     "$country:String!) {\n                Catalog {\n                    catalogOffer(namespace: "
-                     "$productNamespace, id: $offerId, locale: $locale) {\n                        title\n            "
-                     "            collectionOffers {\n                            \n          title\n          id\n   "
-                     "       namespace\n          description\n          keyImages {\n            type\n            "
-                     "url\n          }\n          seller {\n              id\n              name\n          }\n       "
-                     "   urlSlug\n          items {\n            id\n            namespace\n          }\n          "
-                     "customAttributes {\n            key\n            value\n          }\n          categories {\n   "
-                     "         path\n          }\n          price(country: $country) {\n            totalPrice {\n    "
-                     "          discountPrice\n              originalPrice\n              voucherDiscount\n           "
-                     "   discount\n              fmtPrice(locale: $locale) {\n                originalPrice\n         "
-                     "       discountPrice\n                intermediatePrice\n              }\n            }\n       "
-                     "     lineOffers {\n              appliedRules {\n                id\n                endDate\n  "
-                     "            }\n            }\n          }\n          linkedOfferId\n          linkedOffer {\n   "
-                     "         effectiveDate\n            customAttributes {\n              key\n              "
-                     "value\n            }\n          }\n        \n                        }\n                        "
-                     "customAttributes {\n                            key\n                            value\n        "
-                     "                }\n                    }\n                }\n            }\n        ",
-            "variables": {
-                "productNamespace": "epic",
-                "offerId": "7f22b3b15abc4821bba634340e2dd1ef",
-                "locale": "es-ES",
-                "country": "EN"
-            }
-        }
-        self.rawData = ""
+
+        self.query = {"query": "\n          query promotionsQuery($namespace: String!, $country: String!, $locale: "
+                               "String!) {\n            Catalog {\n              catalogOffers(namespace: $namespace, "
+                               "locale: $locale, params: {category: \"freegames\", country: $country, "
+                               "sortBy: \"effectiveDate\", sortDir: \"asc\"}) {\n                elements {\n          "
+                               "        title\n                  description\n                  id\n                  "
+                               "namespace\n                  categories {\n                    path\n                  "
+                               "}\n                  linkedOfferNs\n                  linkedOfferId\n                  "
+                               "keyImages {\n                    type\n                    url\n                  }\n  "
+                               "                productSlug\n                  promotions {\n                    "
+                               "promotionalOffers {\n                      promotionalOffers {\n                       "
+                               " startDate\n                        endDate\n                        discountSetting {"
+                               "\n                          discountType\n                          "
+                               "discountPercentage\n                        }\n                      }\n               "
+                               "     }\n                    upcomingPromotionalOffers {\n                      "
+                               "promotionalOffers {\n                        startDate\n                        "
+                               "endDate\n                        discountSetting {\n                          "
+                               "discountType\n                          discountPercentage\n                        "
+                               "}\n                      }\n                    }\n                  }\n               "
+                               " }\n              }\n            }\n          }\n        ",
+                      "variables": {
+                          "namespace": "epic",
+                          "country": "ES",
+                          "locale": "es-ES"}}
         self.data = None
-        self.currentRoute = ""
 
     def reset_request(self):
 
-        # Epic product does not go here
-
         self.gameData = []
-
-        # QUERY VARS
-
-        self.rawData = ""
         self.data = None
-        self.currentRoute = ""
+        self.validGameData = []
 
     def make_request(self):
-        """Makes the request and saves It in a JSON object"""
+        """Makes the request and removes the unnecessary JSON data"""
 
         self.reset_request()
-        # QUERY
+
         try:
-            self.data = requests.post(self.endpoint, headers={"Content-type": "application/json;charset=UTF-8"
-                                                              }, data=json.dumps(self.gamesCollectionQuery))
-            self.rawData = json.loads(self.data.content)
+            self.data = requests.post(self.endpoint,
+                                      headers={"Content-type": "application/json;charset=UTF-8"},
+                                      data=json.dumps(self.query))
+
+            self.data = json.loads(self.data.content)  # Bytes to json object
 
         except:
             print(time.strftime('[%Y/%m/%d]' + '[%H:%M]') +
-                  "[ERROR]: Epic Games request failed!")
+                  "[ERROR]: Humble Bundle request failed!")
 
-        for i in self.route:
+        # Removes the not relevant information from the JSON object
+        self.data = self.data["data"]["Catalog"]["catalogOffers"]["elements"]
 
-            if self.currentRoute == "":
-                """If It's the first iteration, get information from the original JSON file"""
-
-                self.currentRoute = self.rawData[i]
-
-            else:
-                """If not, then start digging the dictionaries and lists inside the JSON file"""
-
-                self.currentRoute = self.currentRoute[i]
-
-        self.currentRoute = self.currentRoute[0]  # Gets info from just 1 game
-
-    def process_request(self):
+    def process_request(self):  # Filters games that are not free
         """Returns the useful information form the request"""
 
-        self.gameData.append(
-            self.currentRoute["title"]
-        )
+        for i in self.data:
 
-        self.gameData.append(
-            "https://www.epicgames.com/store/es-ES/product/" +
-            self.currentRoute["urlSlug"] +
-            "/home"
-        )
+            if i["promotions"] is None:  # Skips ended promotions
+                continue
+
+            if i["promotions"]["promotionalOffers"] != []:  # If promotion is still active
+
+                # Parses relevant data such as name and link and adds It to gameData
+                temp = (i["title"], str(self.baseUrl + i["productSlug"]))
+
+                self.gameData.append(temp)
 
     def check_database(self):
         """Manages the DB"""
@@ -112,35 +90,45 @@ class Scraping:
             # Tries to create the table if doesn't exist
             try:
                 pointer.execute(
-                    "CREATE TABLE TABLA_1 (ID INTEGER PRIMARY KEY AUTOINCREMENT, NOMBRE VARCHAR(50), LINK VARCHAR(100))"
+                    "CREATE TABLE TABLA_2 (ID INTEGER PRIMARY KEY AUTOINCREMENT, NOMBRE VARCHAR(50), LINK VARCHAR(100))"
                 )  # This line will create the table If It didn't already exist
                 conex.commit()
 
             except sqlite3.OperationalError:  # If that table name already exists.
                 pass
 
-            cache = pointer.execute("SELECT NOMBRE FROM TABLA_1 WHERE ID = (SELECT MAX(ID) FROM TABLA_1)")
+            cache = pointer.execute("SELECT NOMBRE FROM TABLA_2 WHERE ID > (SELECT MAX(ID) - 5 FROM TABLA_2)")
             cache = cache.fetchall()
+            cache2 = []  # Here the information from the query is cleaned.
+
+            for i in cache:  # Tuples are removed here
+                cache2.append(i[0])
 
             # If there is no cache or the game is already in the DB then skip...
             try:
 
-                if (cache[0])[0] == self.gameData[0]:  # Compares the last name of the database and the requested
-                    return None
+                for i in self.gameData:
+
+                    if i[0] not in cache2:  # If param 0 does not match any of the DB then It's a new game.
+
+                        self.validGameData.append(i)  # Adds the data to a new list
 
             except IndexError:
                 print(time.strftime('[%Y/%m/%d]' + '[%H:%M]') +
                       "[ERROR]: Empty database")
 
+            if not self.validGameData:  # If validGameData empty return
+                return None
+
             # Adds the register of the game to the DB
-            pointer.execute("INSERT INTO TABLA_1 VALUES (NULL,?,?)", self.gameData)
+            pointer.executemany("INSERT INTO TABLA_2 VALUES (NULL,?,?)", self.validGameData)  # Iterates the
 
             print(time.strftime('[%Y/%m/%d]' + '[%H:%M]') +
                   "[DB]: New register added:",
-                  self.gameData
+                  self.validGameData
                   )
 
-            return True
+            return True  # If there games not registered in the database
 
         # Closes connection under any circumstances
         finally:

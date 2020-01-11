@@ -275,19 +275,21 @@ async def start(ctx):
         # Epic Games caller
         if epic_mod.obj.check_database() and dataConfig["epic_status"]:  # Checks If Epic module is enabled in config
 
-            gD = tuple(epic_mod.obj.gameData)  # Used to abbreviate since "with" did not work
+            evGD = tuple(epic_mod.obj.validGameData)
 
-            await ctx.channel.send(
-                generate_message(gD[0], gD[1])
-            )  # Sends message to the guild
+            for i in evGD:
+
+                await ctx.channel.send(
+                    generate_message(i[0], i[1])
+                )
 
         # Humble Bundle caller
         if humble_mod.obj.check_database() and dataConfig["humble_status"]:  # If Humble module is enabled in config
 
             # Message that will be sent to the guild.
-            vGD = tuple(humble_mod.obj.validGameData)
+            hvGD = tuple(humble_mod.obj.validGameData)
 
-            for i in vGD:
+            for i in hvGD:
 
                 await ctx.channel.send(
                     generate_message(i[0], i[1])
