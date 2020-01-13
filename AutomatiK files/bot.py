@@ -154,7 +154,7 @@ async def on_ready():
     """Start of the version checker"""
 
     obj = updates.Check_Updates(local_version="v1.1_2",
-                                link="https://github.com/Axyss/AutomatiK/releases/")
+                                link="https://github.com/Axyss/AutomatiK/releases")
     threading.Thread(target=obj.start_checking).start()  # Starts thread that checks updates
 
     """End of the version checker"""

@@ -14,6 +14,9 @@ class Check_Updates:
         # IMPORTANT: the url must contain a slash at the end
         self.url = link
 
+        if self.url[-1] != "/":
+            self.url += "/"
+
         self.numberList = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"]
 
     def get_remote_version(self):
