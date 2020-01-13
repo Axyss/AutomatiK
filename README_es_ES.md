@@ -15,7 +15,7 @@ Las plataformas actualmemte soportadas son:
 
 <h2>¿Cómo puedo usarlo?</h2>
 
-<b>Prerrequisitos:</b> <a href="https://www.python.org/downloads/">Python 3.6 o más</a> y <a href="https://pypi.org/project/discord.py/">discord.py</a>.
+<b>Prerrequisitos:</b> <a href="https://www.python.org/downloads/">Python 3.6 o más</a>, <a href="https://pypi.org/project/discord.py/">discord.py</a> y <a href="https://pypi.org/project/beautifulsoup4/">BeautifulSoup4</a>.
 </br>
 </br>
 En primer lugar descargaremos el repositorio y lo extraeremos en una carpeta, tras ello, procederemos a crear la cuenta que el bot usará, si nunca lo has hecho sigue <a href="https://discordpy.readthedocs.io/en/latest/discord.html#creating-a-bot-account">este</a> tutorial. 
