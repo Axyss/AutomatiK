@@ -2,13 +2,17 @@
 
 import discord
 import asyncio
+from discord.ext import commands
+
 import epic_mod
 import humble_mod
+import updates
+
 import time
 import os
 import json
 import re
-from discord.ext import commands
+import threading
 
 client = commands.Bot(command_prefix="!mk ", self_bot=False)
 
@@ -146,6 +150,14 @@ async def on_ready():
     load_lang()
 
     check_config_changes()
+
+    """Start of the version checker"""
+
+    obj = updates.Check_Updates(local_version="v1.1_2",
+                                link="https://github.com/Axyss/AutomatiK/releases/")
+    threading.Thread(target=obj.start_checking).start()  # Starts thread that checks updates
+
+    """End of the version checker"""
 
     await client.change_presence(status=discord.Status.online,  # Changes status to "online"
                                  activity=discord.Game("!mk helpme")  # Changes activity (playing)
