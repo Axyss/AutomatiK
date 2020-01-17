@@ -90,14 +90,14 @@ class Scraping:
             # Tries to create the table if doesn't exist
             try:
                 pointer.execute(
-                    "CREATE TABLE TABLA_2 (ID INTEGER PRIMARY KEY AUTOINCREMENT, NOMBRE VARCHAR(50), LINK VARCHAR(100))"
+                    "CREATE TABLE TABLA_1 (ID INTEGER PRIMARY KEY AUTOINCREMENT, NOMBRE VARCHAR(50), LINK VARCHAR(100))"
                 )  # This line will create the table If It didn't already exist
                 conex.commit()
 
             except sqlite3.OperationalError:  # If that table name already exists.
                 pass
 
-            cache = pointer.execute("SELECT NOMBRE FROM TABLA_2 WHERE ID > (SELECT MAX(ID) - 5 FROM TABLA_2)")
+            cache = pointer.execute("SELECT NOMBRE FROM TABLA_1 WHERE ID > (SELECT MAX(ID) - 8 FROM TABLA_1)")
             cache = cache.fetchall()
             cache2 = []  # Here the information from the query is cleaned.
 
@@ -121,7 +121,7 @@ class Scraping:
                 return None
 
             # Adds the register of the game to the DB
-            pointer.executemany("INSERT INTO TABLA_2 VALUES (NULL,?,?)", self.validGameData)  # Iterates the
+            pointer.executemany("INSERT INTO TABLA_1 VALUES (NULL,?,?)", self.validGameData)  # Iterates the
 
             print(time.strftime('[%Y/%m/%d]' + '[%H:%M]') +
                   "[DB]: New register added:",
