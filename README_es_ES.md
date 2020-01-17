@@ -16,7 +16,7 @@ Las plataformas actualmemte soportadas son:
 <h2>¿Cómo puedo usarlo?</h2>
 
 <b>Prerrequisitos:</b>
-- <a href="https://www.python.org/downloads/">Python 3.6 or higher</a>
+- <a href="https://www.python.org/downloads/">Python 3.6 o superior</a>
 - <a href="https://pypi.org/project/discord.py/">discord.py</a>
 - <a href="https://pypi.org/project/beautifulsoup4/">BeautifulSoup4<a>
 - <a href="https://pypi.org/project/requests/">requests<a>
