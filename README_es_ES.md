@@ -25,7 +25,7 @@ En primer lugar descargaremos el repositorio y lo extraeremos en una carpeta, tr
 
 Una vez que lo hayamos hecho tendremos que vincular nuestra copia local de AutomatiK con la cuenta que hemos creado, para hacerlo copiaremos el secret token de nuestro bot (ten cuidado de no copiar el application's token por error) y lo pegaremos en la primera línea del archivo <i>SToken.txt</i> localizado en el directorio donde extrajimos anteriormente el repositorio.
 
-A continuación invitaremos el bot a nuestro servidor, sigue <a href="https://discordpy.readthedocs.io/en/latest/discord.html#inviting-your-bot">esta</a> guía para hacerlo. <b>Asegúrate de proporcionarle permisos de administrador.</b>
+A continuación invitaremos al bot a nuestro servidor, sigue <a href="https://discordpy.readthedocs.io/en/latest/discord.html#inviting-your-bot">esta</a> guía para hacerlo. <b>Asegúrate de proporcionarle permisos de administrador.</b>
 
 Ahora ejecutaremos el bot desde el terminal/la consola.
 <h4>Windows</h4>
