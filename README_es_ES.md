@@ -15,9 +15,12 @@ Las plataformas actualmemte soportadas son:
 
 <h2>¿Cómo puedo usarlo?</h2>
 
-<b>Prerrequisitos:</b> <a href="https://www.python.org/downloads/">Python 3.6 o más</a>, <a href="https://pypi.org/project/discord.py/">discord.py</a> y <a href="https://pypi.org/project/beautifulsoup4/">BeautifulSoup4</a>.
-</br>
-</br>
+<b>Prerrequisitos:</b>
+- <a href="https://www.python.org/downloads/">Python 3.6 or higher</a>
+- <a href="https://pypi.org/project/discord.py/">discord.py</a>
+- <a href="https://pypi.org/project/beautifulsoup4/">BeautifulSoup4<a>
+- <a href="https://pypi.org/project/requests/">requests<a>
+
 En primer lugar descargaremos el repositorio y lo extraeremos en una carpeta, tras ello, procederemos a crear la cuenta que el bot usará, si nunca lo has hecho sigue <a href="https://discordpy.readthedocs.io/en/latest/discord.html#creating-a-bot-account">este</a> tutorial. 
 
 Una vez que lo hayamos hecho tendremos que vincular nuestra copia local de AutomatiK con la cuenta que hemos creado, para hacerlo copiaremos el secret token de nuestro bot (ten cuidado de no copiar el application's token por error) y lo pegaremos en la primera línea del archivo <i>SToken.txt</i> localizado en el directorio donde extrajimos anteriormente el repositorio.
