@@ -14,29 +14,26 @@ class Scraping:
 
         self.endpoint = "https://graphql.epicgames.com/graphql"
 
-        self.query = {"query": "\n          query promotionsQuery($namespace: String!, $country: String!, $locale: "
-                               "String!) {\n            Catalog {\n              catalogOffers(namespace: $namespace, "
-                               "locale: $locale, params: {category: \"freegames\", country: $country, "
-                               "sortBy: \"effectiveDate\", sortDir: \"asc\"}) {\n                elements {\n          "
-                               "        title\n                  description\n                  id\n                  "
-                               "namespace\n                  categories {\n                    path\n                  "
-                               "}\n                  linkedOfferNs\n                  linkedOfferId\n                  "
-                               "keyImages {\n                    type\n                    url\n                  }\n  "
-                               "                productSlug\n                  promotions {\n                    "
-                               "promotionalOffers {\n                      promotionalOffers {\n                       "
-                               " startDate\n                        endDate\n                        discountSetting {"
-                               "\n                          discountType\n                          "
-                               "discountPercentage\n                        }\n                      }\n               "
-                               "     }\n                    upcomingPromotionalOffers {\n                      "
-                               "promotionalOffers {\n                        startDate\n                        "
-                               "endDate\n                        discountSetting {\n                          "
-                               "discountType\n                          discountPercentage\n                        "
-                               "}\n                      }\n                    }\n                  }\n               "
-                               " }\n              }\n            }\n          }\n        ",
-                      "variables": {
-                          "namespace": "epic",
-                          "country": "ES",
-                          "locale": "es-ES"}}
+        self.query = {
+            "query": "\n          query promotionsQuery($namespace: String!, $country: String!, $locale: String!) {\n "
+                     "           Catalog {\n              catalogOffers(namespace: $namespace, locale: $locale, "
+                     "params: {category: \"freegames\", country: $country, sortBy: \"effectiveDate\", "
+                     "sortDir: \"asc\"}) {\n                elements {\n                  title\n                  "
+                     "description\n                  id\n                  namespace\n                  categories {"
+                     "\n                    path\n                  }\n                  linkedOfferNs\n              "
+                     "    linkedOfferId\n                  keyImages {\n                    type\n                    "
+                     "url\n                  }\n                  productSlug\n                  promotions {\n       "
+                     "             promotionalOffers {\n                      promotionalOffers {\n                   "
+                     "     startDate\n                        endDate\n                        discountSetting {\n    "
+                     "                      discountType\n                          discountPercentage\n              "
+                     "          }\n                      }\n                    }\n                    "
+                     "upcomingPromotionalOffers {\n                      promotionalOffers {\n                        "
+                     "startDate\n                        endDate\n                        discountSetting {\n         "
+                     "                 discountType\n                          discountPercentage\n                   "
+                     "     }\n                      }\n                    }\n                  }\n                "
+                     "}\n              }\n            }\n          }\n        ",
+            "variables": {"namespace": "epic", "country": "ES", "locale": "es-ES"}}
+
         self.data = None
 
     def reset_request(self):
@@ -59,7 +56,7 @@ class Scraping:
 
         except:
             print(time.strftime('[%Y/%m/%d]' + '[%H:%M]') +
-                  "[ERROR]: Humble Bundle request failed!")
+                  "[ERROR]: Epic Games request failed!")
 
         # Removes the not relevant information from the JSON object
         self.data = self.data["data"]["Catalog"]["catalogOffers"]["elements"]
