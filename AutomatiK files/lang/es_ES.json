@@ -16,7 +16,7 @@
       "mention_disabled": "\u2705 Se ha desactivado el módulo Mention.",
 
       "module_enabled": "\u2705 Se ha activado el módulo {}.",
-      "module_disabled": "\u2705 Se ha activado el módulo {}.",
+      "module_disabled": "\u274C Se ha desactivado el módulo {}.",
       "enable_unknown": "\u274C Parámetro desconocido. Usa !mk enable (Epic/Humble/Mention)",
       "disable_unknown": "\u274C Parámetro desconocido. Use !mk disable (Epic/Humble/Mention)",
 
