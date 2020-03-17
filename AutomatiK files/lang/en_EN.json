@@ -5,7 +5,9 @@
 
       "missing_permissions": "\u274C  You don't have enough permissions to execute this command.",
       "notify_thanks": "\nThanks for notifying <@!{}>.",
+
       "language_changed": "\u2705 Language changed to English.",
+      "language_error": "\u274C Language not found.",
 
       "status": "> Main service: {}\n\n>         Modules:\n> Epic:             {}\n> Humble:      {}\n> Mentions:   {}",
       "status_active": "ACTIVE \u2611",
