@@ -145,6 +145,7 @@ def get_available_languages():
 async def on_ready():
 
     print(get_time() + "[INFO]: AutomatiK bot now online")
+    client.remove_command("help")
 
     load_config()
     load_lang()
@@ -153,7 +154,7 @@ async def on_ready():
 
     """Start of the version checker"""
 
-    obj = updates.Check_Updates(local_version="v1.1_4",
+    obj = updates.Check_Updates(local_version="v1.1_5",
                                 link="https://github.com/Axyss/AutomatiK/releases")
     threading.Thread(target=obj.start_checking).start()  # Starts thread that checks updates
 
@@ -447,11 +448,16 @@ async def language(ctx, langcode):
 
     global langM
 
-    edit_config("lang", langcode)  # Edits the config value which contains what lang is going to be loaded
-    load_lang()  # Reloads the language
+    if (langcode + ".json") not in os.listdir("lang"):  # If the language .json does not exist
 
-    print(get_time() + f"[INFO]: Language changed to {langcode}")
-    await ctx.channel.send(langM["language_changed"])
+        await ctx.channel.send(langM["language_error"])
+
+    else:
+        edit_config("lang", langcode)  # Edits the config value which contains what lang is going to be loaded
+        load_lang()  # Reloads the language
+
+        print(get_time() + f"[INFO]: Language changed to {langcode}")
+        await ctx.channel.send(langM["language_changed"])
 
 
 # Creates the file where the secret token will be stored
