@@ -56,4 +56,4 @@ All the <b>software</b> of this repository is licensed under the MIT license, wh
 <h2>Suggestions</h2>
 <b>Do you have any suggestion? Do you think AutomatiK should support an specific platform?</b>
 </br>
-Open a pull request, I'll be more than happy to hear your ideas.
+Open a Issue, I'll be more than happy to hear your ideas.
