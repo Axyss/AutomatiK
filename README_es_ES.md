@@ -56,4 +56,4 @@ Todo el <b>software</b> de este repositorio se encuentra licenciado bajo la lice
 <h2>Sugerencias</h2>
 <b>¿Tienes alguna sugerencia? ¿Crees que AutomatiK debería soportar una plataforma en particular?</b>
 </br>
-Abre una pull request, me encantaría escuchar vuestras ideas.
+Abre un Issue, me encantaría escuchar vuestras ideas.
