@@ -69,12 +69,17 @@ class Scraping:
             if i["promotions"] is None:  # Skips ended promotions
                 continue
 
-            if i["promotions"]["promotionalOffers"] != []:  # If promotion is still active
+            if i["promotions"]["promotionalOffers"]:  # If promotion is still active
 
-                # Parses relevant data such as name and link and adds It to gameData
-                temp = (i["title"], str(self.baseUrl + i["productSlug"]))
+                percentage = i["promotions"]["promotionalOffers"][0]["promotionalOffers"][0]
+                parsedPercentage = percentage["discountSetting"]["discountPercentage"]
 
-                self.gameData.append(temp)
+                if int(parsedPercentage) == 0:  # If the game isn't a pre-order
+
+                    # Parses relevant data such as name and link and adds It to gameData
+                    temp = (i["title"], str(self.baseUrl + i["productSlug"]))
+
+                    self.gameData.append(temp)
 
     def check_database(self):
         """Manages the DB"""
