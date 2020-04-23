@@ -28,9 +28,13 @@ class Check_Updates:
             return False
 
         soup = BeautifulSoup(req.content, 'html.parser')
-        self.remoteVersion = soup.find("span",  # Type of container
-                                       {"class": "css-truncate-target"},  # Additional attrs
-                                       recursive=True).text  # Parameters of the search
+
+        try:
+            self.remoteVersion = soup.find("span",  # Type of container
+                                           {"class": "css-truncate-target"},  # Additional attrs
+                                           recursive=True).text  # Parameters of the search
+        except AttributeError:
+            return False
 
     def convert(self):
         """Converts the complex syntax of a version to an integer"""
