@@ -15,24 +15,35 @@ class Scraping:
         self.endpoint = "https://graphql.epicgames.com/graphql"
 
         self.query = {
-            "query": "\n          query promotionsQuery($namespace: String!, $country: String!, $locale: String!) {\n "
-                     "           Catalog {\n              catalogOffers(namespace: $namespace, locale: $locale, "
-                     "params: {category: \"freegames\", country: $country, sortBy: \"effectiveDate\", "
-                     "sortDir: \"asc\"}) {\n                elements {\n                  title\n                  "
-                     "description\n                  id\n                  namespace\n                  categories {"
-                     "\n                    path\n                  }\n                  linkedOfferNs\n              "
-                     "    linkedOfferId\n                  keyImages {\n                    type\n                    "
-                     "url\n                  }\n                  productSlug\n                  promotions {\n       "
-                     "             promotionalOffers {\n                      promotionalOffers {\n                   "
-                     "     startDate\n                        endDate\n                        discountSetting {\n    "
-                     "                      discountType\n                          discountPercentage\n              "
-                     "          }\n                      }\n                    }\n                    "
-                     "upcomingPromotionalOffers {\n                      promotionalOffers {\n                        "
-                     "startDate\n                        endDate\n                        discountSetting {\n         "
-                     "                 discountType\n                          discountPercentage\n                   "
-                     "     }\n                      }\n                    }\n                  }\n                "
-                     "}\n              }\n            }\n          }\n        ",
-            "variables": {"namespace": "epic", "country": "ES", "locale": "es-ES"}}
+            "query": "query searchStoreQuery($allowCountries: String, $category: String, $count: Int, $country: "
+                     "String!, $keywords: String, $locale: String, $namespace: String, $sortBy: String, "
+                     "$sortDir: String, $start: Int, $tag: String, $withPrice: Boolean = false, $withPromotions: "
+                     "Boolean = false) {\n  Catalog {\n    searchStore(allowCountries: $allowCountries, "
+                     "category: $category, count: $count, country: $country, keywords: $keywords, locale: $locale, "
+                     "namespace: $namespace, sortBy: $sortBy, sortDir: $sortDir, start: $start, tag: $tag) {\n      "
+                     "elements {\n        title\n        id\n        namespace\n        description\n        "
+                     "effectiveDate\n        keyImages {\n          type\n          url\n        }\n        seller {"
+                     "\n          id\n          name\n        }\n        productSlug\n        urlSlug\n        url\n  "
+                     "      items {\n          id\n          namespace\n        }\n        customAttributes {\n       "
+                     "   key\n          value\n        }\n        categories {\n          path\n        }\n        "
+                     "price(country: $country) @include(if: $withPrice) {\n          totalPrice {\n            "
+                     "discountPrice\n            originalPrice\n            voucherDiscount\n            discount\n   "
+                     "         currencyCode\n            currencyInfo {\n              decimals\n            }\n      "
+                     "      fmtPrice(locale: $locale) {\n              originalPrice\n              discountPrice\n   "
+                     "           intermediatePrice\n            }\n          }\n          lineOffers {\n            "
+                     "appliedRules {\n              id\n              endDate\n              discountSetting {\n      "
+                     "          discountType\n              }\n            }\n          }\n        }\n        "
+                     "promotions(category: $category) @include(if: $withPromotions) {\n          promotionalOffers {"
+                     "\n            promotionalOffers {\n              startDate\n              endDate\n             "
+                     " discountSetting {\n                discountType\n                discountPercentage\n          "
+                     "    }\n            }\n          }\n          upcomingPromotionalOffers {\n            "
+                     "promotionalOffers {\n              startDate\n              endDate\n              "
+                     "discountSetting {\n                discountType\n                discountPercentage\n           "
+                     "   }\n            }\n          }\n        }\n      }\n      paging {\n        count\n        "
+                     "total\n      }\n    }\n  }\n}\n",
+            "variables": {"category": "freegames", "sortBy": "effectiveDate", "sortDir": "asc", "count": 1000,
+                          "country": "ES", "allowCountries": "ES", "locale": "es-ES", "withPrice": True,
+                          "withPromotions": True}}
 
         self.data = None
 
@@ -59,27 +70,23 @@ class Scraping:
                   "[ERROR]: Epic Games request failed!")
 
         # Removes the not relevant information from the JSON object
-        self.data = self.data["data"]["Catalog"]["catalogOffers"]["elements"]
+        self.data = self.data["data"]["Catalog"]["searchStore"]["elements"]
 
     def process_request(self):  # Filters games that are not free
         """Returns the useful information form the request"""
 
         for i in self.data:
 
-            if i["promotions"] is None:  # Skips ended promotions
+            originalPrice = i["price"]["totalPrice"]["originalPrice"]
+            discountPrice = i["price"]["totalPrice"]["discount"]
+
+            if (originalPrice != discountPrice) or (originalPrice == discountPrice == 0):  # If the game isn't free
                 continue
 
-            if i["promotions"]["promotionalOffers"]:  # If promotion is still active
+            # Parses relevant data such as name and link and adds It to gameData
+            temp = (i["title"], str(self.baseUrl + i["productSlug"]))
 
-                percentage = i["promotions"]["promotionalOffers"][0]["promotionalOffers"][0]
-                parsedPercentage = percentage["discountSetting"]["discountPercentage"]
-
-                if int(parsedPercentage) == 0:  # If the game isn't a pre-order
-
-                    # Parses relevant data such as name and link and adds It to gameData
-                    temp = (i["title"], str(self.baseUrl + i["productSlug"]))
-
-                    self.gameData.append(temp)
+            self.gameData.append(temp)
 
     def check_database(self):
         """Manages the DB"""
