@@ -2,6 +2,7 @@
 <h1>AutomatiK</h1>
 <b>Language:</b> <a href="README.md#automatik">English</a>, <a href="README_es_ES.md#automatik">Español</a>
 <br>
+<br>
 <b><a href="FUTURE.md">Next updates and the future of this project</a></b>
 </br>
 <h2>What is AutomatiK?</h2>
