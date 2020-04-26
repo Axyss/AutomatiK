@@ -21,5 +21,4 @@ It soon.
 As you have already seen, I release minor updates quite often, and <b>I don't plan to stop doing It any time soon</b>. However, I
 would like to create some major updates to improve some parts and code new modules to make AutomatiK support new platforms.
 
-I also want to remember that If you have any <b>suggestion</b>, you can leave them in the <b>Issue</b> tab and use the
-"suggestion" label.
+I also want to remember that If you have any <b>suggestion</b>, you can leave them in the <b>Issue</b> tab using the "suggestion" label.
