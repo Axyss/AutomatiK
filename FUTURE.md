@@ -9,7 +9,7 @@ the only way the bot has to get the game data is by <b>requesting It directly to
 very susceptible to errors if the structure of the JSON files the web uses to store game information changes. And that's what has been
 ocurring during the past months, minimal changes in the structure that broke completely the detection of free games from Epic.
 
-In other words, imagine you have a friend that moves in requently and you want to visit him, but %&@$, he moved in again and
+In other words, imagine you have a friend that moves in frequently and you want to visit him, but %&@$, he moved in again and
 you need to get his new address or you won't be able to visit him anymore.
 
 The idea to solve this problem?, program an auto-updater in order to make the updating process less tedious. I'll start working on
