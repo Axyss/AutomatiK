@@ -12,38 +12,8 @@ class Scraping:
         self.gameData = []  # Data from free games (name, link)
         self.validGameData = []  # Verified games from the DB method
 
-        self.endpoint = "https://graphql.epicgames.com/graphql"
-
-        self.query = {
-            "query": "query searchStoreQuery($allowCountries: String, $category: String, $count: Int, $country: "
-                     "String!, $keywords: String, $locale: String, $namespace: String, $sortBy: String, "
-                     "$sortDir: String, $start: Int, $tag: String, $withPrice: Boolean = false, $withPromotions: "
-                     "Boolean = false) {\n  Catalog {\n    searchStore(allowCountries: $allowCountries, "
-                     "category: $category, count: $count, country: $country, keywords: $keywords, locale: $locale, "
-                     "namespace: $namespace, sortBy: $sortBy, sortDir: $sortDir, start: $start, tag: $tag) {\n      "
-                     "elements {\n        title\n        id\n        namespace\n        description\n        "
-                     "effectiveDate\n        keyImages {\n          type\n          url\n        }\n        seller {"
-                     "\n          id\n          name\n        }\n        productSlug\n        urlSlug\n        url\n  "
-                     "      items {\n          id\n          namespace\n        }\n        customAttributes {\n       "
-                     "   key\n          value\n        }\n        categories {\n          path\n        }\n        "
-                     "price(country: $country) @include(if: $withPrice) {\n          totalPrice {\n            "
-                     "discountPrice\n            originalPrice\n            voucherDiscount\n            discount\n   "
-                     "         currencyCode\n            currencyInfo {\n              decimals\n            }\n      "
-                     "      fmtPrice(locale: $locale) {\n              originalPrice\n              discountPrice\n   "
-                     "           intermediatePrice\n            }\n          }\n          lineOffers {\n            "
-                     "appliedRules {\n              id\n              endDate\n              discountSetting {\n      "
-                     "          discountType\n              }\n            }\n          }\n        }\n        "
-                     "promotions(category: $category) @include(if: $withPromotions) {\n          promotionalOffers {"
-                     "\n            promotionalOffers {\n              startDate\n              endDate\n             "
-                     " discountSetting {\n                discountType\n                discountPercentage\n          "
-                     "    }\n            }\n          }\n          upcomingPromotionalOffers {\n            "
-                     "promotionalOffers {\n              startDate\n              endDate\n              "
-                     "discountSetting {\n                discountType\n                discountPercentage\n           "
-                     "   }\n            }\n          }\n        }\n      }\n      paging {\n        count\n        "
-                     "total\n      }\n    }\n  }\n}\n",
-            "variables": {"category": "freegames", "sortBy": "effectiveDate", "sortDir": "asc", "count": 1000,
-                          "country": "ES", "allowCountries": "ES", "locale": "es-ES", "withPrice": True,
-                          "withPromotions": True}}
+        self.endpoint = "https://store-site-backend-static.ak.epicgames.com/freeGamesPromotions?locale=es-ES&country" \
+                        "=ES&allowCountries=ES "
 
         self.data = None
 
@@ -59,9 +29,7 @@ class Scraping:
         self.reset_request()
 
         try:
-            self.data = requests.post(self.endpoint,
-                                      headers={"Content-type": "application/json;charset=UTF-8"},
-                                      data=json.dumps(self.query))
+            self.data = requests.get(self.endpoint)
 
             self.data = json.loads(self.data.content)  # Bytes to json object
 
@@ -77,14 +45,13 @@ class Scraping:
 
         for i in self.data:
 
-            originalPrice = i["price"]["totalPrice"]["originalPrice"]
-            discountPrice = i["price"]["totalPrice"]["discount"]
+            discountPrice = i["price"]["totalPrice"]["discountPrice"]
 
-            if (originalPrice != discountPrice) or (originalPrice == discountPrice == 0):  # If the game isn't free
+            if discountPrice != 0 or i["urlSlug"] == "free-games":  # If the game isn't free or listed
                 continue
 
             # Parses relevant data such as name and link and adds It to gameData
-            temp = (i["title"], str(self.baseUrl + i["productSlug"]))
+            temp = (i["title"], str(self.baseUrl + i["urlSlug"]))
 
             self.gameData.append(temp)
 
@@ -146,3 +113,4 @@ class Scraping:
 
 
 obj = Scraping()
+
