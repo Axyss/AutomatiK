@@ -47,7 +47,7 @@ class Scraping:
 
             discountPrice = i["price"]["totalPrice"]["discountPrice"]
 
-            if discountPrice != 0 or i["urlSlug"] == "free-games":  # If the game isn't free or listed
+            if i["productSlug"] == "[]":  # If the game isn't free or listed
                 continue
 
             # Parses relevant data such as name and link and adds It to gameData
@@ -113,4 +113,3 @@ class Scraping:
 
 
 obj = Scraping()
-
