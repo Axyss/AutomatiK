@@ -45,9 +45,10 @@ class Scraping:
 
         for i in self.data:
 
-            discountPrice = i["price"]["totalPrice"]["discountPrice"]
-
-            if i["productSlug"] == "[]":  # If the game isn't free or listed
+            try:
+                if not i["promotions"]["promotionalOffers"]:  # If the game isn't free or listed
+                    continue
+            except TypeError:
                 continue
 
             # Parses relevant data such as name and link and adds It to gameData
