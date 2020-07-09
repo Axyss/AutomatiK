@@ -74,7 +74,7 @@ class Scraping:
             except sqlite3.OperationalError:  # If that table name already exists.
                 pass
 
-            cache = pointer.execute("SELECT NOMBRE FROM TABLA_1 WHERE ID > (SELECT MAX(ID) - 8 FROM TABLA_1)")
+            cache = pointer.execute("SELECT NOMBRE FROM TABLA_1 WHERE ID > (SELECT MAX(ID) - 5 FROM TABLA_1)")
             cache = cache.fetchall()
             cache2 = []  # Here the information from the query is cleaned.
 
