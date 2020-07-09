@@ -44,15 +44,15 @@ class Scraping:
         """Returns the useful information form the request"""
 
         for i in self.data:
-
+            # i["promotions"]["upcomingPromotionalOffers"]
             try:
-                if not i["promotions"]["promotionalOffers"]:  # If the game isn't free or listed
+                if (i["price"]["totalPrice"]["discountPrice"] == i["price"]["totalPrice"]["originalPrice"]) != 0:
                     continue
             except TypeError:
                 continue
 
             # Parses relevant data such as name and link and adds It to gameData
-            temp = (i["title"], str(self.baseUrl + i["urlSlug"]))
+            temp = (i["title"], str(self.baseUrl + i["productSlug"]))
 
             self.gameData.append(temp)
 
