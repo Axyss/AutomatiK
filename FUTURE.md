@@ -6,7 +6,7 @@ recently, how I plan to get rid of the updates and the future of the project.
 
 First of all, let's talk about the updates, the reason why I release so many updates is Epic Games, since they don't have a public API,
 the only way the bot has to get the game data is by <b>requesting It directly to the web page</b>. This makes the requests
-very susceptible to errors if the structure of the JSON files the web uses to store game information changes. And that's what has been
+very susceptible to fail if the structure of the JSON files the web uses to store game information changes. And that's what has been
 ocurring during the past months, minimal changes in the structure that broke completely the detection of free games from Epic.
 
 In other words, imagine you have a friend that moves in frequently and you want to visit him, but %&@$, he moved in again and
