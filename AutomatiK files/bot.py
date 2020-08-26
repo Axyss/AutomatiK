@@ -27,6 +27,7 @@ class Loader:
                 logger.info("Please introduce your bot's secret token: ")
                 token = base64.b64encode(input().encode("utf-8")).decode("utf-8")
                 json.dump({"secret_token": token}, token_file, indent=2)
+                Client.clear_console()
         else:
             with open("Secret Token.json") as token_file:
                 token = json.load(token_file)["secret_token"]
@@ -89,6 +90,13 @@ class Client(commands.Bot, LangManager, ConfigManager):
                                    activity=discord.Game("!mk help")  # Changes activity (playing)
                                    )
         logger.info(f"AutomatiK bot {self.VERSION} now online")
+
+    @staticmethod
+    def clear_console():
+        if os.name == "nt":  # Windows
+            os.system("cls")
+        else:  # Linux/OS X
+            os.system("clear")
 
     def cli(self):
         """Manages the console commands"""
