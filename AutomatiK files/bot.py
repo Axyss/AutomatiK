@@ -26,12 +26,29 @@ class Loader:
    / /\ \| | | | __/ _ \| '_ ` _ \ / _` | __| |  <  
   / ____ \ |_| | || (_) | | | | | | (_| | |_| | . \ 
  /_/    \_\__,_|\__\___/|_| |_| |_|\__,_|\__|_|_|\_\  {}
-                                                    """
+                                               """
+
+    @staticmethod
+    def print_ascii_art():
+        print(Loader.ascii_art.format(Client.VERSION))
+        time.sleep(0.1)
+
+    @staticmethod
+    def start_handler():
+        """Adds the ascii art and other things to the start of the program"""
+        Client.clear_console()
+        Loader.print_ascii_art()
+
+        token = Loader.load_token()
+
+        Client.clear_console()
+        Loader.print_ascii_art()
+        logger.info("Loading...")
+        return token
 
     @staticmethod
     def load_token():
-        Client.clear_console()
-        Loader.print_ascii_art()
+
         if "Secret Token.json" not in os.listdir("."):  # Requests token and writes It in "Secret Token.json"
             with open("Secret Token.json", "w") as token_file:
                 logger.info("Please introduce your bot's secret token: ")
@@ -46,9 +63,6 @@ class Loader:
                     token_file.close()
                     os.remove("Secret Token.json")
                     token = Loader.load_token()
-        Client.clear_console()
-        Loader.print_ascii_art()
-        logger.info("Loading...")
         return token
 
     @staticmethod
@@ -73,11 +87,6 @@ class Loader:
 
         logger.info(f"{len(modules)} modules loaded")
         return modules
-
-    @staticmethod
-    def print_ascii_art():
-        print(Loader.ascii_art.format(Client.VERSION))
-        time.sleep(0.1)
 
 
 class Client(commands.Bot, LangManager, ConfigManager):
@@ -372,7 +381,7 @@ if __name__ == "__main__":
 
     automatik = Client(command_prefix="!mk ", self_bot=False)
     try:
-        automatik.run(base64.b64decode(Loader.load_token().encode("utf-8")).decode("utf-8"))
+        automatik.run(base64.b64decode(Loader.start_handler().encode("utf-8")).decode("utf-8"))
 
     except discord.errors.LoginFailure:
         logger.error("Invalid token, please make sure It's valid. Press enter to exit...")
