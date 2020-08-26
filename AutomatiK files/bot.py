@@ -93,7 +93,7 @@ class Client(commands.Bot, LangManager, ConfigManager):
     def cli(self):
 
         while True:
-            cli_command = input(">")
+            cli_command = input("")
 
             if cli_command == "shutdown":
                 self.main_loop = False
