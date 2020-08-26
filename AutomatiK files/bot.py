@@ -32,13 +32,13 @@ class Loader:
     def load_token():
         Client.clear_console()
         Loader.print_ascii_art()
-        if "Secret Token.json" not in os.listdir("."):
+        if "Secret Token.json" not in os.listdir("."):  # Requests token and writes It in "Secret Token.json"
             with open("Secret Token.json", "w") as token_file:
                 logger.info("Please introduce your bot's secret token: ")
-                token = base64.b64encode(input().encode("utf-8")).decode("utf-8")
+                token = base64.b64encode(input().encode("utf-8")).decode("utf-8")  # Encodes token
                 json.dump({"secret_token": token}, token_file, indent=2)
 
-        else:
+        else:  # Loads token from file
             with open("Secret Token.json") as token_file:
                 try:
                     token = json.load(token_file)["secret_token"]
