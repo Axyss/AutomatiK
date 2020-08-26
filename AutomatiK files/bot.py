@@ -30,12 +30,14 @@ class Loader:
 
     @staticmethod
     def load_token():
+        Client.clear_console()
+        Loader.print_ascii_art()
         if "Secret Token.json" not in os.listdir("."):
             with open("Secret Token.json", "w") as token_file:
                 logger.info("Please introduce your bot's secret token: ")
                 token = base64.b64encode(input().encode("utf-8")).decode("utf-8")
                 json.dump({"secret_token": token}, token_file, indent=2)
-                Client.clear_console()
+
         else:
             with open("Secret Token.json") as token_file:
                 try:
@@ -44,7 +46,9 @@ class Loader:
                     token_file.close()
                     os.remove("Secret Token.json")
                     token = Loader.load_token()
-
+        Client.clear_console()
+        Loader.print_ascii_art()
+        logger.info("Loading...")
         return token
 
     @staticmethod
@@ -70,8 +74,15 @@ class Loader:
         logger.info(f"{len(modules)} modules loaded")
         return modules
 
+    @staticmethod
+    def print_ascii_art():
+        print(Loader.ascii_art.format(Client.VERSION))
+        time.sleep(0.1)
+
 
 class Client(commands.Bot, LangManager, ConfigManager):
+
+    VERSION = "v1.2"
 
     def __init__(self, command_prefix, self_bot):
         commands.Bot.__init__(self, command_prefix=command_prefix, self_bot=self_bot)
@@ -80,15 +91,10 @@ class Client(commands.Bot, LangManager, ConfigManager):
 
         self.main_loop = False  # Variable which starts or stops the main loop
         self.MODULES = None
-        self.VERSION = "v1.2"
         self.LOGO_URL = "https://raw.githubusercontent.com/Axyss/AutomatiK/master/AutomatiK%20files/assets/ak_logo.png"
         self.AVATAR_URL = "https://avatars3.githubusercontent.com/u/55812692"
         self.remove_command("help")
         self.init_commands()
-
-        print(Loader.ascii_art.format(self.VERSION))
-        time.sleep(0.1)
-        logger.info("Loading...")
 
     async def on_ready(self):
         self.MODULES = Loader.load_modules()
@@ -98,14 +104,14 @@ class Client(commands.Bot, LangManager, ConfigManager):
 
         self.load_lang(self.data_config["lang"])
 
-        updater = updates.Updates(local_version=self.VERSION, link="https://github.com/Axyss/AutomatiK/releases")
+        updater = updates.Updates(local_version=Client.VERSION, link="https://github.com/Axyss/AutomatiK/releases")
         threading.Thread(target=updater.start_checking, daemon=True).start()  # Update checker
         threading.Thread(target=self.cli, daemon=True).start()
 
         await self.change_presence(status=discord.Status.online,  # Changes status to "online"
                                    activity=discord.Game("!mk help")  # Changes activity (playing)
                                    )
-        logger.info(f"AutomatiK bot {self.VERSION} now online")
+        logger.info(f"AutomatiK bot {Client.VERSION} now online")
 
     @staticmethod
     def clear_console():
