@@ -353,6 +353,6 @@ if __name__ == "__main__":
         automatik.run(base64.b64decode(Loader.load_token().encode("utf-8")).decode("utf-8"))
 
     except discord.errors.LoginFailure:
-        logger.error("Invalid token, please make sure It's valid")
+        logger.error("Invalid token, please make sure It's valid. Press enter to exit...")
         os.remove("Secret Token.json")
         input()
