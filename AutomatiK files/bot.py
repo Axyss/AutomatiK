@@ -347,3 +347,4 @@ if __name__ == "__main__":
     except discord.errors.LoginFailure:
         logger.error("Invalid token, please make sure It's valid")
         os.remove("Secret Token.json")
+        input()
