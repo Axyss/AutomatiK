@@ -1,484 +1,349 @@
 # coding=utf-8
-
-import discord
-import asyncio
-from discord.ext import commands
-
-import epic_mod
-import humble_mod
-import updates
-
-import time
 import os
-import json
 import re
 import threading
+import asyncio
+import base64
+import json
+import importlib
+import random
+import time
 
-client = commands.Bot(command_prefix="!mk ", self_bot=False)
+import discord
+from discord.ext import commands
 
-mainLoopStatus = False  # Variable which starts or stops the main loop
-
-dataConfig = None  # Loaded configuration
-langM = None
-
-# Template of the config
-dataTemplate = {"role": "<@&1234>",
-                "role_mention": False,
-                "epic_status": True,
-                "humble_status": True,
-                "lang": "en_EN"}
-
-# -----------------------REGULAR FUNCTIONS-----------------------
+from core import updates
+from core.log_manager import logger
+from core.lang_manager import LangManager
+from core.config_manager import ConfigManager
 
 
-def pm(message):
-    """Ignores PM messages"""
+class Loader:
 
-    if "Direct Message with" in str(message):
-        return True
+    @staticmethod
+    def load_token():
+        if "Secret Token.json" not in os.listdir("."):
+            with open("Secret Token.json", "w") as token_file:
+                logger.info("Please introduce your bot's secret token: ")
+                token = base64.b64encode(input().encode("utf-8")).decode("utf-8")
+                json.dump({"secret_token": token}, token_file, indent=2)
+        else:
+            with open("Secret Token.json") as token_file:
+                token = json.load(token_file)["secret_token"]
+
+        return token
+
+    @staticmethod
+    def load_modules():
+        """Imports and instances all the modules automagically"""
+        modules = []
+
+        for i in os.listdir("modules"):
+            module_name = os.path.splitext(i)[0]
+            module_extension = os.path.splitext(i)[1]
+
+            if module_extension == ".py" and module_name != "__init__":
+                class_name = module_name.split("_")[0].capitalize()
+                try:
+                    # noinspection PyPep8Naming
+                    Klass = getattr(importlib.import_module(f"modules.{module_name}"), str(class_name))
+                    modules.append(Klass())
+                except AttributeError:
+                    logger.exception(f"Module '{module_name}' couldn't be loaded")
+                except:
+                    logger.exception("Unexpected error")
+
+        logger.info(f"{len(modules)} modules loaded")
+        return modules
 
 
-def get_time():
-    """Generates a string with the neccessary date and time format"""
+class Client(commands.Bot, LangManager, ConfigManager):
 
-    return time.strftime('[%Y/%m/%d]' + '[%H:%M]')
+    def __init__(self, command_prefix, self_bot):
+        commands.Bot.__init__(self, command_prefix=command_prefix, self_bot=self_bot)
+        LangManager.__init__(self, lang_dir="lang/")
+        ConfigManager.__init__(self, config_name="config.json")
 
+        self.main_loop = False  # Variable which starts or stops the main loop
+        self.MODULES = None
+        self.VERSION = "v1.2"
+        self.LOGO_URL = "https://raw.githubusercontent.com/Axyss/AutomatiK/master/AutomatiK%20files/assets/ak_logo.png"
+        self.AVATAR_URL = "https://avatars3.githubusercontent.com/u/55812692"
+        self.remove_command("help")
+        self.init_commands()
 
-def generate_message(title, link):
-    """Generates some messages the bot sends"""
-    # If third parameter True, then the message is for discord
-    # This lets the function knows where the message is going to be sent and adds the mention if required
+    async def on_ready(self):
 
-    global dataConfig
-    global langM
+        self.MODULES = Loader.load_modules()
+        self.load_config()
+        self.create_config_keys(self.MODULES)
+        self.check_config_changes()
 
-    draft = langM["procedural_message"].format(title, link)
+        self.load_lang(self.data_config["lang"])
 
-    if dataConfig["role_mention"]:  # If role_mention is True, then adds the role parameter from config
-        draft = dataConfig["role"] + " " + draft
+        updater = updates.Updates(local_version=self.VERSION, link="https://github.com/Axyss/AutomatiK/releases")
+        threading.Thread(target=updater.start_checking, daemon=True).start()  # Update checker
+        threading.Thread(target=self.cli, daemon=True).start()
 
-    return draft
+        await self.change_presence(status=discord.Status.online,  # Changes status to "online"
+                                   activity=discord.Game("!mk help")  # Changes activity (playing)
+                                   )
+        logger.info(f"AutomatiK bot {self.VERSION} now online")
 
+    def cli(self):
 
-def check_config_changes():
-    """Checks the version of the config and updates It if necessary"""
+        while True:
+            cli_command = input(">")
 
-    global dataConfig
-    global dataTemplate
+            if cli_command == "shutdown":
+                self.main_loop = False
+                logger.info("Stopping...")
+                time.sleep(1)
+                os._exit(1)
+            else:
+                logger.error("Unknown terminal command. Use 'shutdown' to stop the bot.")
 
-    templateKeys = list(dataTemplate.keys())
-    currentKeys = list(dataConfig.keys())
+    def get_status(self, service):
+        """Translates boolean values to the strings showed in !mk status"""
 
-    for i in templateKeys:  # Checks the differences between configs
+        return self.lang["status_active"] if self.data_config[service] else self.lang["status_inactive"]
 
-        if i in currentKeys:
-            continue
+    def generate_message(self, title, link):
+        """Generates some messages the bot sends"""
+
+        draft = random.choice(self.lang["generic_messages"]).format(title, link)
+        if self.data_config["mention_status"]:  # Adds the mention_status value from config
+            draft = self.data_config["mentioned_role"] + " " + draft
+
+        return draft
+
+    async def on_command_error(self, ctx, error):  # The second parameter is the error's information
+        """Function used for error handling"""
+
+        if isinstance(error, discord.ext.commands.MissingPermissions):
+            await ctx.channel.send(self.lang["missing_permissions"])
+
+        elif isinstance(error, discord.ext.commands.errors.CommandNotFound):
+            await ctx.channel.send(self.lang["invalid_command"])
+
+        elif isinstance(error, discord.ext.commands.errors.CommandOnCooldown):
+            await ctx.channel.send(self.lang["cooldown_error"].format(int(error.retry_after)))
 
         else:
-            edit_config(i, dataTemplate[i])  # Adds the element using the value from the template
+            try:
+                raise error
+            except:
+                logger.exception("Unexpected error")
 
+    def init_commands(self):
 
-def load_config():
-    """Loads the config from the file"""
+        @self.command()
+        @commands.cooldown(3, 10, commands.BucketType.user)
+        @commands.has_permissions(administrator=True)
+        async def notify(ctx, *args):
 
-    global dataConfig
-    global dataTemplate
+            args = list(args)
+            separator = " "  # String that will be inserted between elements of the list when using .join
 
-    # print(tuple(dataTemplate.keys())[2])
+            # Stores the link in another variable and removes It from args
+            link = args[-1]
+            args.pop()
 
-    if "config.json" in os.listdir("."):  # If config file already exists
+            game_name = separator.join(args)  # Converts list to string with spaces between elements
+            await ctx.channel.purge(limit=1)
 
-        with open("config.json", "r") as file:
-            dataConfig = json.load(file)  # Loads config
-            file.close()
+            await ctx.channel.send(self.generate_message(
+                game_name, link) + self.lang["notify_thanks"].format(ctx.author.id)  # Adds politeness
+            )
 
-    else:  # Creates the config file and writes the template into It
+        @self.command()
+        @commands.cooldown(2, 10, commands.BucketType.user)
+        @commands.has_permissions(administrator=True)
+        async def mention(ctx, role_id):
+            """Manages the mentions of the bot's messages"""
 
-        with open("config.json", "w") as file:
-            json.dump(dataTemplate, file)  # Injects the template
-            file.close()
-            dataConfig = dataTemplate  # Loads the template into the current config
+            if re.search("^<@&\w", role_id) and re.search(">$", role_id):
+                # If the string follows the std structure of a role <@&1234>
+                self.edit_config("mentioned_role", role_id)
+                await ctx.channel.send(self.lang["mention_established"])
+                logger.info(f"AutomatiK will now mention '{role_id}'")
+            else:
+                await ctx.channel.send(self.lang["mention_error"])
 
+        @self.command(aliases=["help"])
+        @commands.cooldown(1, 60, commands.BucketType.user)
+        async def helpme(ctx):
+            """Help command that uses embeds"""
 
-def edit_config(key, value):
-    """Only function which can alter both configs (permanent and loaded)"""
+            embed_help = discord.Embed(title="AutomatiK Help",
+                                       description=self.lang["embed_description"],
+                                       color=0x00BFFF
+                                       )
+            embed_help.set_footer(text=self.lang["embed_footer"],
+                                  icon_url=self.AVATAR_URL
+                                  )
+            embed_help.set_thumbnail(url=self.LOGO_URL)
 
-    global dataConfig
-
-    dataConfig[key] = value  # Alters loaded config
-    file = open("config.json", "w")
-
-    json.dump(dataConfig, file)  # Rewrites the persistent config
-    file.close()
-
-
-def load_lang():
-    """Loads the language file based on the 'lang' option from config.json"""
-
-    global dataConfig
-    global langM
-
-    file = open(f"lang/{dataConfig['lang']}.json", "r", encoding="utf-8")
-    langM = json.load(file)["messages"]
-    file.close()
-
-
-def get_available_languages():
-    """Obtains a list containing all the available languages for AutomatiK"""
-
-    language_list = os.listdir("lang/")  # Obtains the name of the files in lang to generate a list
-
-    parsed_language_list = []
-
-    for i in language_list:  # Adds to the new list the file names without their extensions
-        parsed_language_list.append(i[0:i.rindex(".")])
-
-    # Converts all the parsed list into a string with separators
-    parsed_language_list = "/".join(parsed_language_list)
-
-    return parsed_language_list
-
-# -----------------------EVENTS-----------------------
-
-
-@client.event
-async def on_ready():
-
-    print(get_time() + "[INFO]: AutomatiK bot now online")
-    client.remove_command("help")
-
-    load_config()
-    load_lang()
-
-    check_config_changes()
-
-    """Start of the version checker"""
-
-    obj = updates.Check_Updates(local_version="v1.1_11",
-                                link="https://github.com/Axyss/AutomatiK/releases")
-    threading.Thread(target=obj.start_checking).start()  # Starts thread that checks updates
-
-    """End of the version checker"""
-
-    await client.change_presence(status=discord.Status.online,  # Changes status to "online"
-                                 activity=discord.Game("!mk helpme")  # Changes activity (playing)
+            embed_help.add_field(name=self.lang["embed_field1_name"],
+                                 value="".join(self.lang["embed_field1_value"]), inline=False
                                  )
-
-
-@client.event
-async def on_command_error(ctx, error):  # The second parameter is the error's information
-    """Function used for error handling"""
-    global langM
-
-    if isinstance(error, discord.ext.commands.MissingPermissions):
-        """In case the user who tries to run the command does not have administrator perms, run this"""
-
-        await ctx.channel.send(langM["missing_permissions"])
-
-
-# -----------------------COMMANDS-----------------------
-
-@client.command()
-@commands.has_permissions(administrator=True)
-async def notify(ctx, *args):
-
-    global langM
-
-    if pm(ctx.channel):
-        return None
-
-    args = list(args)  # args' default type: tuple
-    separator = " "  # String that will be inserted between elements of the list when using .join
-
-    # Stores the link in another variable and removes It from args
-    link = args[-1]
-    args.pop()
-
-    gameName = separator.join(args)  # Converts list to string with spaces between elements
-
-    await ctx.channel.purge(limit=1)
-
-    await ctx.channel.send(generate_message(
-        gameName, link) + langM["notify_thanks"].format(ctx.author.id)  # Adds politeness
-    )
-
-
-@client.command()
-@commands.has_permissions(administrator=True)
-async def mention(ctx, roleid):
-    """Manages the mentions of the bot's messages"""
-
-    global langM
-
-    if pm(ctx.channel):
-        return None
-
-    if re.search("^<@&\w", roleid) and re.search(">$", roleid):
-        # If the string follows the std structure of a role <@&1234>, then...
-
-        edit_config("role", roleid)
-
-        print(get_time() + "[INFO]: AutomatiK will now mention:", roleid)
-        await ctx.channel.send(langM["mention_established"])
-
-
-@client.command()
-async def helpme(ctx):
-    """Help command that uses embeds"""
-    global langM
-
-    embed_help = discord.Embed(title="AutomatiK Help", color=0x00BFFF)
-
-    embed_help.set_footer(text=langM["embed_footer"],
-                          icon_url="https://avatars3.githubusercontent.com/u/55812692"
-                          )
-
-    embed_help.set_thumbnail(
-        url="http://www.axyss.ovh/automatik/ak_logo.png"
-    )
-
-    embed_help.add_field(name=langM["embed_field1_name"],
-                         value=langM["embed_field1_value"],
-                         inline=False)
-
-    embed_help.add_field(name=langM["embed_field2_name"],
-                         value=langM["embed_field2_value"].format(get_available_languages()),
-                         inline=False)
-
-    await ctx.channel.send(embed=embed_help)
-
-
-@client.command()
-@commands.has_permissions(administrator=True)
-async def start(ctx):
-    """Starts the AutomatiK service"""
-
-    global mainLoopStatus
-    global dataConfig  # Gets config values
-    global langM
-
-    if pm(ctx.channel):  # Checks if pm
-        return None
-
-    if mainLoopStatus:  # If service already started
-        await ctx.channel.send(langM["start_already"])
-        return None
-
-    print(get_time() +
-          "[INFO]: AutomatiK was started by",
-          str(ctx.author)
-          )
-
-    await ctx.channel.send(langM["start_success"])
-
-    # Here is where the real function starts
-
-    mainLoopStatus = True  # Changes It to True so the main loop can start
-
-    while mainLoopStatus:  # MAIN LOOP
-
-        # Epic Games methods
-        epic_mod.obj.make_request()
-        epic_mod.obj.process_request()
-
-        # Humble Bundle methods
-        humble_mod.obj.make_request()
-        humble_mod.obj.process_request()
-
-        # Epic Games caller
-        if epic_mod.obj.check_database() and dataConfig["epic_status"]:  # Checks If Epic module is enabled in config
-
-            evGD = tuple(epic_mod.obj.validGameData)
-
-            for i in evGD:
-
-                await ctx.channel.send(
-                    generate_message(i[0], i[1])
-                )
-
-        # Humble Bundle caller
-        if humble_mod.obj.check_database() and dataConfig["humble_status"]:  # If Humble module is enabled in config
-
-            # Message that will be sent to the guild.
-            hvGD = tuple(humble_mod.obj.validGameData)
-
-            for i in hvGD:
-
-                await ctx.channel.send(
-                    generate_message(i[0], i[1])
-                )
-
-        await asyncio.sleep(300)  # It will check free games every 5 minutes
-
-
-@client.command()
-@commands.has_permissions(administrator=True)
-async def stop(ctx):
-    """Stops the AutomatiK service"""
-
-    global mainLoopStatus
-    global langM
-
-    if pm(ctx.channel):
-        return None
-
-    if not mainLoopStatus:  # If service already stopped
-        await ctx.channel.send(langM["stop_already"])
-        return None
-
-    print(get_time() +
-          "[INFO]: AutomatiK was stopped by",
-          str(ctx.author)
-          )
-
-    await ctx.channel.send(langM["stop_success"])
-
-    mainLoopStatus = False  # Stops the loop by changing the boolean which maintains It active
-
-
-@client.command()
-async def status(ctx):
-    """Shows the status of the service"""
-
-    global dataConfig
-    global mainLoopStatus
-    global langM
-
-    if pm(ctx.channel):
-        return None
-
-    if mainLoopStatus:
-        mainService = langM["status_active"]
-    else:
-        mainService = langM["status_inactive"]
-
-    if dataConfig["epic_status"]:
-        epicModule = langM["status_active"]
-    else:
-        epicModule = langM["status_inactive"]
-
-    if dataConfig["humble_status"]:
-        humbleModule = langM["status_active"]
-    else:
-        humbleModule = langM["status_inactive"]
-
-    if dataConfig["role_mention"]:
-        roleMention = langM["status_active"]
-    else:
-        roleMention = langM["status_inactive"]
-
-    await ctx.channel.send(langM["status"].format(
-        mainService, epicModule, humbleModule, roleMention)
-    )
-
-
-@client.command()
-@commands.has_permissions(administrator=True)
-async def enable(ctx, service):
-    """Global manager to enable some AutomatiK services"""
-
-    global langM
-
-    if pm(ctx.channel):
-        return None
-
-    service = service.lower()  # Lowers the last argument
-
-    if service == "epic":
-        edit_config("epic_status", True)
-
-    elif service == "humble":
-        edit_config("humble_status", True)
-
-    elif service == "mention":
-
-        edit_config("role_mention", True)
-        print(get_time() + "[INFO]: AutomatiK mentions enabled")
-        await ctx.channel.send(langM["mention_enabled"])
-        return None
-
-    else:
-        await ctx.channel.send(langM["enable_unknown"])
-        return None
-
-    # This next lines will just be executed in case the command is correct
-
-    print(get_time() + f"[INFO]: {service.capitalize()} module enabled")
-    await ctx.channel.send(langM["module_enabled"].format(service.capitalize()))
-
-
-@client.command()
-@commands.has_permissions(administrator=True)
-async def disable(ctx, service):
-    """Global manager to disable some AutomatiK services"""
-
-    global langM
-
-    if pm(ctx.channel):
-        return None
-
-    service = service.lower()
-
-    if service == "epic":
-        edit_config("epic_status", False)
-
-    elif service == "humble":
-        edit_config("humble_status", False)
-
-    elif service == "mention":
-
-        edit_config("role_mention", False)
-        print(get_time() + "[INFO]: AutomatiK mentions disabled")
-        await ctx.channel.send(langM["mention_disabled"])
-        return None
-
-    else:
-        await ctx.channel.send(langM["disable_unknown"])
-        return None
-
-    # This next lines will just be executed in case the command is correct
-
-    print(get_time() + f"[INFO]: {service.capitalize()} module disabled")
-    await ctx.channel.send(langM["module_disabled"].format(service.capitalize()))
-
-
-@client.command()
-@commands.has_permissions(administrator=True)
-async def language(ctx, langcode):
-
-    global langM
-
-    if (langcode + ".json") not in os.listdir("lang"):  # If the language .json does not exist
-
-        await ctx.channel.send(langM["language_error"])
-
-    else:
-        edit_config("lang", langcode)  # Edits the config value which contains what lang is going to be loaded
-        load_lang()  # Reloads the language
-
-        print(get_time() + f"[INFO]: Language changed to {langcode}")
-        await ctx.channel.send(langM["language_changed"])
-
-
-# Creates the file where the secret token will be stored
-try:
-    open("SToken.txt", "x")
-
-except FileExistsError:
-    pass
-
-else:  # If there weren't any exceptions, the file will be written
-
-    STokenFile = open("SToken.txt", "w")
-    STokenFile.write("Introduce your bot's secret token in this line.")
-    STokenFile.close()
-
-
-with open("SToken.txt", "r") as f:  # Reads the secret token and starts the bot
-
+            embed_help.add_field(name=u"\U0001F6E0 " + self.lang["embed_field2_name"],
+                                 value="".join(self.lang["embed_field2_value"]),
+                                 inline=False)
+
+            await ctx.channel.send(embed=embed_help)
+            logger.debug(f"Command '{ctx.command}' invoked by {ctx.author}")
+
+        @self.command()
+        @commands.cooldown(2, 10, commands.BucketType.user)
+        @commands.has_permissions(administrator=True)
+        async def start(ctx):
+            """Starts the AutomatiK service"""
+
+            if self.main_loop:  # If service already started
+                await ctx.channel.send(self.lang["start_already"])
+                return None
+
+            self.main_loop = True  # Changes It to True so the main loop can start
+            await ctx.channel.send(self.lang["start_success"].format("<#" + str(ctx.channel.id) + ">"))
+            logger.info(f"Main service was started on #{ctx.channel} by {str(ctx.author)}")
+
+            while self.main_loop:  # MAIN LOOP
+
+                for i in self.MODULES:
+                    if not self.data_config[f"{i.MODULE_ID}_status"]:  # Prevents games from getting added to the db
+                        continue                                       # when a module isn't enabled
+                    free_games = i.get_free_games()
+                    if free_games:
+                        for j in free_games:
+                            await ctx.channel.send(self.generate_message(j[0], j[1]))
+
+                await asyncio.sleep(300)  # It will look for free games every 5 minutes
+
+        @self.command()
+        @commands.cooldown(2, 10, commands.BucketType.user)
+        @commands.has_permissions(administrator=True)
+        async def stop(ctx):
+            """Stops the AutomatiK service"""
+
+            if not self.main_loop:  # If service already stopped
+                await ctx.channel.send(self.lang["stop_already"])
+                return False
+
+            self.main_loop = False  # Stops the loop by changing the boolean which maintains It active
+            await ctx.channel.send(self.lang["stop_success"])
+            logger.info(f"Main service was stopped by {str(ctx.author)}")
+
+        @self.command()
+        @commands.cooldown(2, 10, commands.BucketType.user)
+        async def status(ctx):
+            """Shows the bot's status (New services must be added to the tuples)"""
+
+            embed_status = discord.Embed(title=self.lang["status"],
+                                         description=self.lang["status_description"],
+                                         color=0x00BFFF
+                                         )
+            embed_status.set_footer(text=self.lang["embed_footer"],
+                                    icon_url=self.AVATAR_URL
+                                    )
+            embed_status.set_thumbnail(url=self.LOGO_URL)
+            embed_status.add_field(name=self.lang["status_main"], value=self.lang["status_active"]
+                                   if self.main_loop else self.lang["status_inactive"]
+                                   )
+
+            for i in self.MODULES:
+                embed_status.add_field(name=i.SERVICE_NAME,
+                                       value=self.get_status(f"{i.MODULE_ID}_status")
+                                       )
+            await ctx.channel.send(embed=embed_status)
+            logger.debug(f"Command '{ctx.command}' invoked by {ctx.author}")
+
+        @self.command(aliases=["module"])
+        @commands.cooldown(2, 10, commands.BucketType.user)
+        @commands.has_permissions(administrator=True)
+        async def modules(ctx):
+            module_ids = [i.MODULE_ID.capitalize() for i in self.MODULES]
+            module_names = [i.SERVICE_NAME for i in self.MODULES]
+            module_authors = [i.AUTHOR for i in self.MODULES]
+
+            embed_module = discord.Embed(title=self.lang["modules"],
+                                         description=self.lang["modules_description"],
+                                         color=0x00BFFF
+                                         )
+            embed_module.set_footer(text=self.lang["embed_footer"],
+                                    icon_url=self.AVATAR_URL
+                                    )
+            embed_module.set_thumbnail(url=self.LOGO_URL)
+            embed_module.add_field(name="ModuleID", value="\n".join(module_ids))
+            embed_module.add_field(name=self.lang["modules_service"], value="\n".join(module_names))
+            embed_module.add_field(name=self.lang["modules_author"], value="\n".join(module_authors))
+
+            await ctx.channel.send(embed=embed_module)
+
+        @self.command(aliases=["disable"])
+        @commands.cooldown(2, 10, commands.BucketType.user)
+        @commands.has_permissions(administrator=True)
+        async def enable(ctx, service):
+            """Global manager to enable/disable some AutomatiK services"""
+
+            introduced_command = str(ctx.invoked_with)
+            user_decision = True if introduced_command == "enable" else False
+
+            for i in self.MODULES:
+                if service.lower() == i.MODULE_ID.lower():
+                    self.edit_config(f"{i.MODULE_ID}_status", user_decision)
+
+                    await ctx.channel.send(self.lang[f"module_{introduced_command}d"].format(service.capitalize()))
+                    logger.info(f"{service.capitalize()} module {introduced_command}d by {ctx.author}")
+                    return True
+
+            await ctx.channel.send(self.lang[f"{introduced_command}_unknown"])
+            return False
+
+            # This next lines will just be executed in case the command is correct
+
+        @self.command()
+        @commands.cooldown(2, 10, commands.BucketType.user)
+        @commands.has_permissions(administrator=True)
+        async def language(ctx, lang_code):
+
+            if (lang_code + ".json") not in os.listdir("lang"):  # If the language .json does not exist
+                await ctx.channel.send(self.lang["language_error"])
+
+            else:  # Edits the config value which contains what lang is going to be loaded
+                self.edit_config("lang", lang_code)
+                self.load_lang(self.data_config["lang"])  # Reloads the language
+                await ctx.channel.send(self.lang["language_changed"])
+                logger.info(f"Language changed to '{lang_code}' by {ctx.author}")
+
+        @self.command()
+        @commands.cooldown(2, 10, commands.BucketType.user)
+        @commands.has_permissions(administrator=True)
+        async def languages(ctx):
+            lang_name, lang_author = self.get_lang_metadata()
+            lang_ids = self.get_lang_ids()
+
+            embed_langs = discord.Embed(title=self.lang["languages"],
+                                        description=self.lang["languages_description"],
+                                        color=0x00BFFF
+                                        )
+            embed_langs.set_footer(text=self.lang["embed_footer"],
+                                   icon_url=self.AVATAR_URL
+                                   )
+            embed_langs.set_thumbnail(url=self.LOGO_URL)
+            embed_langs.add_field(name="LangID", value="\n".join(lang_ids))
+            embed_langs.add_field(name=self.lang["language"], value="\n".join(lang_name))
+            embed_langs.add_field(name=self.lang["modules_author"], value="\n".join(lang_author))
+
+            await ctx.channel.send(embed=embed_langs)
+
+
+if __name__ == "__main__":
+
+    automatik = Client(command_prefix="!mk ", self_bot=False)
     try:
-        client.run(str(f.readlines()[0]))  # Runs the bot using the token stored in the first line of SToken.txt
+        automatik.run(base64.b64decode(Loader.load_token().encode("utf-8")).decode("utf-8"))
 
-    except discord.errors.LoginFailure:  # Handles the error produced by an incorrect secret token
-        print(get_time() + "[ERROR]: Please, enter a valid secret token in SToken.txt")
-        input("Press enter to close...")  # Avoids the window from closing instantaneously
+    except discord.errors.LoginFailure:
+        logger.error("Invalid token, please make sure It's valid")
+        os.remove("Secret Token.json")
