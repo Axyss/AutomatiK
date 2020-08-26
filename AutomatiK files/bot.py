@@ -91,7 +91,7 @@ class Client(commands.Bot, LangManager, ConfigManager):
         logger.info(f"AutomatiK bot {self.VERSION} now online")
 
     def cli(self):
-
+        """Manages the console commands"""
         while True:
             cli_command = input("")
 
