@@ -1,40 +1,74 @@
 {
-    "language": "Español",
+    "language": "Español (España)",
     "author": "Axyss",
     "messages": {
 
       "missing_permissions": "\u274C No tienes suficientes permisos para ejecutar este comando.",
+      "invalid_command": "\u274C Comando desconocido. Usa **!mk help** para ver los comandos disponibles.",
+      "cooldown_error":  "\u274C Escribes demasiado rápido. Inténtalo de nuevo en **{}** segundos.",
+
       "notify_thanks": "\nGracias por avisar <@!{}>.",
 
-      "language_changed": "\u2705 Idioma cambiado a español.",
+      "language": "Idioma",
+      "languages": "Idiomas",
+      "languages_description": "La columna **LangID** contiene el nombre con el que cada paquete de idioma debe ser llamado en los comandos.",
+      "language_changed": "\u2705 Idioma cambiado a español (España).",
       "language_error": "\u274C Idioma no encontrado.",
 
-      "status": "> Servicio principal: {}\n\n>         Módulos:\n> Epic:             {}\n> Humble:      {}\n> Mentions:   {}",
+      "status": "Estado",
+      "status_main": "Servicio principal",
+      "status_description": "Comprueba el estado de varios servicios del bot.",
       "status_active": "ACTIVO \u2611",
       "status_inactive": "INACTIVO \u274C",
 
+      "mentions": "Menciones",
       "mention_established": "\u2705 Rol establecido con éxito.",
       "mention_enabled": "\u2705 Se ha activado el módulo Mention.",
       "mention_disabled": "\u2705 Se ha desactivado el módulo Mention.",
+      "mention_error": "\u274C El rol introducido no es válido.",
+
+      "modules": "Módulos",
+      "modules_description": "La columna **ModuleID** contiene el nombre con el que cada módulo debe ser llamado en los comandos.",
+      "modules_service": "Servicio",
+      "modules_author": "Autor",
 
       "module_enabled": "\u2705 Se ha activado el módulo {}.",
       "module_disabled": "\u274C Se ha desactivado el módulo {}.",
-      "enable_unknown": "\u274C Parámetro desconocido. Usa !mk enable (Epic/Humble/Mention)",
-      "disable_unknown": "\u274C Parámetro desconocido. Use !mk disable (Epic/Humble/Mention)",
+      "enable_unknown": "\u274C Parámetro desconocido. Usa **!mk enable (ModuleID)**",
+      "disable_unknown": "\u274C Parámetro desconocido. Usa **!mk disable (ModuleID)**",
 
       "start_already": "\u274C El servicio principal ya se encuentra iniciado.",
-      "start_success": "\u2705 Se ha iniciado el servicio principal.",
+      "start_success": "\u2705 Se ha iniciado el servicio principal en {}",
 
       "stop_already": "\u274C El servicio principal ya se encuentra parado.",
       "stop_success": "\u2705 Se ha parado el servicio principal.",
 
       "embed_footer": "Página del proyecto: github.com/Axyss/AutomatiK",
-      "embed_field1_name": "Comandos",
-      "embed_field1_value": "```!mk helpme - Muestra todos los comandos disponibles.\n!mk status - Muestra el estado del bot.```",
+      "embed_description": "Todos los comandos deben ir precedidos por el prefijo **!mk**. Ejemplo: **!mk start**",
+      "embed_field1_name": "\u2139 Comandos",
+      "embed_field1_value": ["⠀\n",
+                             "**help** - Muestra todos los comandos disponibles.\n",
+                             "**status** - Muestra el estado de los módulos cargados.\n⠀"],
 
       "embed_field2_name": "Comandos de administrador",
-      "embed_field2_value": "```\n!mk start - Inicia el proceso principal en el canal donde el comando sea ejecutado.\n!mk stop - Para el proceso principal.\n\n!mk enable (Epic/Humble/Mention) - Comando global para iniciar diversos servicios de AutomatiK.\n!mk disable (Epic/Humble/Mention) - Comando global para parar diversos servicios de AutomatiK.\n\n!mk mention (role) - Elige qué rol será mencionado en los mensajes de AutomatiK. Ejemplo: '!mk mention @MiRol'.\n!mk notify (name) (link) - Notifica juegos manualmente desde donde el bot no lo hace.\n\n!mk language ({}) - Cambia el idioma de los mensajes.```",
-      "procedural_message": "{} se encuentra gratis en {}."
+      "embed_field2_value": ["⠀\n",
+                             "**start** - Inicia el proceso principal en el canal donde el comando sea ejecutado..\n",
+                             "**stop** - Para el proceso principal.\n\n",
+
+                             "**enable (ModuleID)** - Comando para activar módulos.\n",
+                             "**disable (ModuleID)** - Comando para desactivar módulos.\n",
+                             "**modules** - Muestra información sobre los módulos cargados y sus **ModuleID**\n\n",
+
+                             "**mention (@MiRol)** - Elige qué rol será mencionado en los mensajes de AutomatiK\n",
+                             "**notify (name) (link)** - Notifica juegos de forma manual a través del bot.\n\n",
+
+                             "**language (LangID)** - Cambia el idioma de los mensajes.\n",
+                             "**languages** - Muestra información sobre los paquetes de idioma y sus **LangID**\n⠀"],
+
+      "generic_messages": ["{} se encuentra gratis en {}",
+                           "Date prisa, {} se encuentra gratis en {}",
+                           "{} puede ser encontrado gratis en {}",
+                           "{} se encuentra disponible de forma gratuita en {}"]
 
     }
 }
