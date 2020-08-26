@@ -20,6 +20,14 @@ from core.config_manager import ConfigManager
 
 class Loader:
 
+    ascii_art = r"""                _                        _   _ _  __
+     /\        | |                      | | (_) |/ /
+    /  \  _   _| |_ ___  _ __ ___   __ _| |_ _| ' / 
+   / /\ \| | | | __/ _ \| '_ ` _ \ / _` | __| |  <  
+  / ____ \ |_| | || (_) | | | | | | (_| | |_| | . \ 
+ /_/    \_\__,_|\__\___/|_| |_| |_|\__,_|\__|_|_|\_\  {}
+                                                    """
+
     @staticmethod
     def load_token():
         if "Secret Token.json" not in os.listdir("."):
@@ -30,7 +38,12 @@ class Loader:
                 Client.clear_console()
         else:
             with open("Secret Token.json") as token_file:
-                token = json.load(token_file)["secret_token"]
+                try:
+                    token = json.load(token_file)["secret_token"]
+                except json.decoder.JSONDecodeError:  # Avoids exception when closing without providing a valid token
+                    token_file.close()
+                    os.remove("Secret Token.json")
+                    token = Loader.load_token()
 
         return token
 
@@ -52,7 +65,7 @@ class Loader:
                 except AttributeError:
                     logger.exception(f"Module '{module_name}' couldn't be loaded")
                 except:
-                    logger.exception("Unexpected error")
+                    logger.exception(f"Unexpected error while loading module {module_name}")
 
         logger.info(f"{len(modules)} modules loaded")
         return modules
@@ -73,8 +86,11 @@ class Client(commands.Bot, LangManager, ConfigManager):
         self.remove_command("help")
         self.init_commands()
 
-    async def on_ready(self):
+        print(Loader.ascii_art.format(self.VERSION))
+        time.sleep(0.1)
+        logger.info("Loading...")
 
+    async def on_ready(self):
         self.MODULES = Loader.load_modules()
         self.load_config()
         self.create_config_keys(self.MODULES)
@@ -162,7 +178,7 @@ class Client(commands.Bot, LangManager, ConfigManager):
 
             await ctx.channel.send(self.generate_message(
                 game_name, link) + self.lang["notify_thanks"].format(ctx.author.id)  # Adds politeness
-            )
+                                   )
 
         @self.command()
         @commands.cooldown(2, 10, commands.BucketType.user)
@@ -220,7 +236,7 @@ class Client(commands.Bot, LangManager, ConfigManager):
 
                 for i in self.MODULES:
                     if not self.data_config[f"{i.MODULE_ID}_status"]:  # Prevents games from getting added to the db
-                        continue                                       # when a module isn't enabled
+                        continue  # when a module isn't enabled
                     free_games = i.get_free_games()
                     if free_games:
                         for j in free_games:
@@ -256,7 +272,7 @@ class Client(commands.Bot, LangManager, ConfigManager):
                                     )
             embed_status.set_thumbnail(url=self.LOGO_URL)
             embed_status.add_field(name=self.lang["status_main"], value=self.lang["status_active"]
-                                   if self.main_loop else self.lang["status_inactive"]
+            if self.main_loop else self.lang["status_inactive"]
                                    )
 
             for i in self.MODULES:
