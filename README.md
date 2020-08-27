@@ -45,7 +45,7 @@ Now let's execute the bot from the terminal/console.
 The last part consists on starting the principal process of the bot, use <b><i>!mk start</i></b> in the text channel where you want the notifications to show up, you will recieve a confirmation message... And that's It!
 </br>
 </br>
-<img src="http://www.axyss.ovh/automatik/command_success.png" align="bottom"></img>
+<img src="https://raw.githubusercontent.com/Axyss/AutomatiK/master/AutomatiK%20files/assets/command_success.png" align="bottom"></img>
 </br>
 <h2>Commands</h2>
 Automatik works with the prefix <b><i>!mk</i></b>. 
