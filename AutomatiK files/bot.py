@@ -350,8 +350,6 @@ class Client(commands.Bot, LangManager, ConfigManager):
             await ctx.channel.send(self.lang[f"{introduced_command}_unknown"])
             return False
 
-            # This next lines will just be executed in case the command is correct
-
         @self.command()
         @commands.guild_only()
         @commands.cooldown(2, 10, commands.BucketType.user)
