@@ -252,7 +252,7 @@ class Client(commands.Bot, LangManager, ConfigManager):
                 for i in self.MODULES:
                     if not self.data_config[f"{i.MODULE_ID}_status"]:  # Prevents games from getting added to the db
                         continue  # when a module isn't enabled
-                    free_games = i.get_free_games()
+                    free_games = i.call_module()
                     if free_games:
                         for j in free_games:
                             await ctx.channel.send(self.generate_message(j[0], j[1]))
