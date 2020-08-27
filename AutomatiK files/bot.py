@@ -220,7 +220,7 @@ class Client(commands.Bot, LangManager, ConfigManager):
         async def helpme(ctx):
             """Help command that uses embeds"""
 
-            embed_help = discord.Embed(title="AutomatiK Help",
+            embed_help = discord.Embed(title=f"AutomatiK {Client.VERSION} Help ",
                                        description=self.lang["embed_description"],
                                        color=0x00BFFF
                                        )
