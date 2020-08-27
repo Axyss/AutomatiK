@@ -39,7 +39,7 @@ Now let's execute the bot from the terminal/console.
 `python3 bot.py`
 </br>
 </br>
-<i>If we've done everything correctly we will see a message like this:</i> `[INFO]: AutomatiK bot now online on channel #channel`
+<i>If we've done everything correctly we will see a message like this:</i> `[INFO]: AutomatiK bot now online`
 </br>
 </br>
 The last part consists on starting the principal process of the bot, use <b><i>!mk start</i></b> in the text channel where you want the notifications to show up, you will recieve a confirmation message... And that's It!
