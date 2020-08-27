@@ -162,6 +162,9 @@ class Client(commands.Bot, LangManager, ConfigManager):
         if isinstance(error, discord.ext.commands.MissingPermissions):
             await ctx.channel.send(self.lang["missing_permissions"])
 
+        elif isinstance(error, discord.ext.commands.errors.NoPrivateMessage):
+            pass
+
         elif isinstance(error, discord.ext.commands.errors.CommandNotFound):
             await ctx.channel.send(self.lang["invalid_command"])
 
@@ -177,6 +180,7 @@ class Client(commands.Bot, LangManager, ConfigManager):
     def init_commands(self):
 
         @self.command()
+        @commands.guild_only()
         @commands.cooldown(3, 10, commands.BucketType.user)
         @commands.has_permissions(administrator=True)
         async def notify(ctx, *args):
@@ -196,6 +200,7 @@ class Client(commands.Bot, LangManager, ConfigManager):
                                    )
 
         @self.command()
+        @commands.guild_only()
         @commands.cooldown(2, 10, commands.BucketType.user)
         @commands.has_permissions(administrator=True)
         async def mention(ctx, role_id):
@@ -210,6 +215,7 @@ class Client(commands.Bot, LangManager, ConfigManager):
                 await ctx.channel.send(self.lang["mention_error"])
 
         @self.command(aliases=["help"])
+        @commands.guild_only()
         @commands.cooldown(1, 60, commands.BucketType.user)
         async def helpme(ctx):
             """Help command that uses embeds"""
@@ -234,6 +240,7 @@ class Client(commands.Bot, LangManager, ConfigManager):
             logger.debug(f"Command '{ctx.command}' invoked by {ctx.author}")
 
         @self.command()
+        @commands.guild_only()
         @commands.cooldown(2, 10, commands.BucketType.user)
         @commands.has_permissions(administrator=True)
         async def start(ctx):
@@ -260,6 +267,7 @@ class Client(commands.Bot, LangManager, ConfigManager):
                 await asyncio.sleep(300)  # It will look for free games every 5 minutes
 
         @self.command()
+        @commands.guild_only()
         @commands.cooldown(2, 10, commands.BucketType.user)
         @commands.has_permissions(administrator=True)
         async def stop(ctx):
@@ -274,6 +282,7 @@ class Client(commands.Bot, LangManager, ConfigManager):
             logger.info(f"Main service was stopped by {str(ctx.author)}")
 
         @self.command()
+        @commands.guild_only()
         @commands.cooldown(2, 10, commands.BucketType.user)
         async def status(ctx):
             """Shows the bot's status (New services must be added to the tuples)"""
@@ -298,6 +307,7 @@ class Client(commands.Bot, LangManager, ConfigManager):
             logger.debug(f"Command '{ctx.command}' invoked by {ctx.author}")
 
         @self.command(aliases=["module"])
+        @commands.guild_only()
         @commands.cooldown(2, 10, commands.BucketType.user)
         @commands.has_permissions(administrator=True)
         async def modules(ctx):
@@ -320,6 +330,7 @@ class Client(commands.Bot, LangManager, ConfigManager):
             await ctx.channel.send(embed=embed_module)
 
         @self.command(aliases=["disable"])
+        @commands.guild_only()
         @commands.cooldown(2, 10, commands.BucketType.user)
         @commands.has_permissions(administrator=True)
         async def enable(ctx, service):
@@ -342,6 +353,7 @@ class Client(commands.Bot, LangManager, ConfigManager):
             # This next lines will just be executed in case the command is correct
 
         @self.command()
+        @commands.guild_only()
         @commands.cooldown(2, 10, commands.BucketType.user)
         @commands.has_permissions(administrator=True)
         async def language(ctx, lang_code):
@@ -356,6 +368,7 @@ class Client(commands.Bot, LangManager, ConfigManager):
                 logger.info(f"Language changed to '{lang_code}' by {ctx.author}")
 
         @self.command()
+        @commands.guild_only()
         @commands.cooldown(2, 10, commands.BucketType.user)
         @commands.has_permissions(administrator=True)
         async def languages(ctx):
