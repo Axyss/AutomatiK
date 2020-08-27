@@ -6,15 +6,15 @@
 <b><a href="FUTURE.md">Next updates and the future of this project</a></b>
 </br>
 <h2>What is AutomatiK?</h2>
-AutomatiK is a <b>Discord bot</b> whose task is to notify users about free games from multiple platforms. It's completely automatic, has some <b>configuration options</b> and a built-in database where game data is stored.
+AutomatiK is a <b>Discord bot</b> whose task is to notify users about free games from multiple platforms. It's completely autonomous, has some <b>configuration options</b>, a built-in database where game data is stored and ,most importantly, it's <b>modularity</b> brings us the ability to <b>code our own modules very easily.</b>
 </br>
 </br>
-The currently supported platforms are:
+The default modules support the next services:
 
-- Epic Games
-- Humble Bundle
+- Epic Games (epic_mod.py)
+- Humble Bundle (humble_mod.py)
 </br>
-<b>Disclaimer:</b> AutomatiK was never meant to be a public bot, due to that, <b>It does not support more than one Discord server at a time</b>, so avoid inviting It to multiple servers.
+<b>Disclaimer:</b> AutomatiK was never meant to be a public bot, due to that, <b>It does not support more than one Discord server at a time</b>, so avoid inviting It to multiple servers. Nevertheless <b>If you just want to receive the free games</b> notifications without setting-up a whole bot, you can always follow <a href="https://twitter.com/AutomatiK_bot">AutomatiK's twitter account.</a>
 
 <h2>How can I use It?</h2>
 
@@ -39,7 +39,7 @@ Now let's execute the bot from the terminal/console.
 `python3 bot.py`
 </br>
 </br>
-<i>If we've done everything correctly we will see a message like this:</i> `[INFO]: AutomatiK bot now online`
+<i>If we've done everything correctly we will see a message like this:</i> `[INFO]: AutomatiK bot now online on channel #channel`
 </br>
 </br>
 The last part consists on starting the principal process of the bot, use <b><i>!mk start</i></b> in the text channel where you want the notifications to show up, you will recieve a confirmation message... And that's It!
