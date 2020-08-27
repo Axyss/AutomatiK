@@ -11,18 +11,20 @@ AutomatiK is a <b>Discord bot</b> whose task is to notify users about free games
 </br>
 The default modules support the next services:
 
-- Epic Games (epic_mod.py)
-- Humble Bundle (humble_mod.py)
+- Epic Games
+- Humble Bundle
 </br>
 <b>Disclaimer:</b> AutomatiK was never meant to be a public bot, due to that, <b>It does not support more than one Discord server at a time</b>, so avoid inviting It to multiple servers. Nevertheless <b>If you just want to receive the free games</b> notifications without setting-up a whole bot, you can always follow <a href="https://twitter.com/AutomatiK_bot">AutomatiK's twitter account</a> or join <a href="https://discord.gg/psDtnwX">this Discord server.</a>
 
 <h2>How can I use It?</h2>
 
-<b>Prerequisites:</b> 
+<b>Dependencies:</b> 
 - <a href="https://www.python.org/downloads/">Python 3.6 or higher</a>
 - <a href="https://pypi.org/project/discord.py/">discord.py</a>
 - <a href="https://pypi.org/project/beautifulsoup4/">BeautifulSoup4<a>
 - <a href="https://pypi.org/project/requests/">requests<a>
+</br>
+</br>Install Python and then use the command `pip3 install -r requirements.txt` to install all the previous dependencies.
   
 First of all we have to download the repository and extract It in a folder, then we will proceed to create a bot account, If you have never done It, then follow <a href="https://discordpy.readthedocs.io/en/latest/discord.html#creating-a-bot-account">this</a> tutorial. 
 
