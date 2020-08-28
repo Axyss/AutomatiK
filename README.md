@@ -43,7 +43,7 @@ This will cause a message like this one: `[INFO]: Please introduce your bot's se
 In the next place we will invite the bot to our server, follow <a href="https://discordpy.readthedocs.io/en/latest/discord.html#inviting-your-bot">this</a> guide to do so. <b>Make sure to give It administrator privileges.</b>
 </br>
 </br>
-The last part consists on starting the principal process of the bot, use <b><i>!mk start</i></b> in the text channel where you want the notifications to show up, you will recieve a confirmation message... And that's It, our bot should be fully working!. If we wanted to <b>stop the bot competely</b>, we need to use the command `shutdown` on
+The last part consists on starting the principal process of the bot, use <b><i>!mk start</i></b> in the text channel where you want the notifications to show up, you will recieve a confirmation message... And that's It, our bot should be fully working! If we wanted to <b>stop the bot competely</b>, we need to use the command `shutdown` on
 the terminal window where the bot is running.
 </br>
 </br>
