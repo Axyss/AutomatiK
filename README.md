@@ -24,9 +24,10 @@ The default modules support the next services:
 - <a href="https://pypi.org/project/beautifulsoup4/">BeautifulSoup4<a>
 - <a href="https://pypi.org/project/requests/">requests<a></br>
   
-Install Python and then use the command `pip3 install -r requirements.txt` to install all the previous dependencies.
+First we'll install Python and use the command `pip3 install -r requirements.txt` to install all the previous dependencies.
 </br>
-First of all we have to download the repository and extract It in a folder, then we will proceed to create a bot account, If you have never done It, then follow <a href="https://discordpy.readthedocs.io/en/latest/discord.html#creating-a-bot-account">this</a> tutorial. 
+</br>
+After that, we have to download the repository and extract It in a folder, then we will proceed to create a bot account, If you have never done It, then follow <a href="https://discordpy.readthedocs.io/en/latest/discord.html#creating-a-bot-account">this</a> tutorial. 
 
 Once we've done It we have to link our local copy of AutomatiK with our new bot, to do so we will copy our bot's secret token (be careful not to copy the application's token instead) and paste It in the first line of the file <i>SToken.txt</i> located in the directory where we extracted the program before.
 
