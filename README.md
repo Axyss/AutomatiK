@@ -18,12 +18,13 @@ The default modules support the next services:
 
 <h2>How can I use It?</h2>
 
-<b>Dependencies:</b> 
+<b>Prerequisites:</b> 
 - <a href="https://www.python.org/downloads/">Python 3.6 or higher</a>
 - <a href="https://pypi.org/project/discord.py/">discord.py</a>
 - <a href="https://pypi.org/project/beautifulsoup4/">BeautifulSoup4<a>
-- <a href="https://pypi.org/project/requests/">requests<a>
-</br>Install Python and then use the command `pip3 install -r requirements.txt` to install all the previous dependencies.
+- <a href="https://pypi.org/project/requests/">requests<a></br>
+  
+Install Python and then use the command `pip3 install -r requirements.txt` to install all the previous dependencies.
 </br>
 First of all we have to download the repository and extract It in a folder, then we will proceed to create a bot account, If you have never done It, then follow <a href="https://discordpy.readthedocs.io/en/latest/discord.html#creating-a-bot-account">this</a> tutorial. 
 
