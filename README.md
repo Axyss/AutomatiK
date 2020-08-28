@@ -52,6 +52,8 @@ The last part consists on starting the principal process of the bot, use <b><i>!
 Automatik works with the prefix <b><i>!mk</i></b>. 
 You can see all the available commands using <b><i>!mk help</i></b>
 <h3>Example:</h3> <img src="https://raw.githubusercontent.com/Axyss/AutomatiK/master/AutomatiK%20files/assets/help.png" alt="helpme_ss" align="center"></img>
+<h2>How can I code my own modules?</h2>
+Coming soon...
 <h2>License</h2>
 All the <b>software</b> of this repository is licensed under the MIT license, while <b>all the graphical content and logos</b> are licensed under Creative Commons Attribution-ShareAlike 4.0 International, click the logo down below to know more about the limitations of this license.
 </br>
