@@ -36,6 +36,7 @@ Once we've done It we have to link our local copy of AutomatiK with our new bot,
 <h4>Linux</h4>
 
 `python3 bot.py`</br>
+</br>
 This will cause a message like this one: `[INFO]: Please introduce your bot's secret token:` to show up on the terminal. We will just paste our token there and press enter.
 </br><i>If we've done everything correctly we will see a message like this:</i> `[INFO]: AutomatiK bot now online`
 
