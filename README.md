@@ -29,10 +29,7 @@ First we'll install Python and use the command `pip3 install -r requirements.txt
 </br>
 After that, we have to download the repository and extract It in a folder, then we will proceed to create a bot account, If you have never done It, then follow <a href="https://discordpy.readthedocs.io/en/latest/discord.html#creating-a-bot-account">this</a> tutorial. 
 
-Once we've done It we have to link our local copy of AutomatiK with our new bot, to do so we will copy our bot's secret token (be careful not to copy the application's token instead) and paste It in the first line of the file <i>SToken.txt</i> located in the directory where we extracted the program before.
-
-In the next place we will invite the bot to our server, follow <a href="https://discordpy.readthedocs.io/en/latest/discord.html#inviting-your-bot">this</a> guide to do so. <b>Make sure to give It administrator privileges.</b>
-
+Once we've done It we have to link our local copy of AutomatiK with our new bot, to do so we will execute the program using the next command in the terminal:
 Now let's execute the bot from the terminal/console.
 <h4>Windows</h4>
 
@@ -40,6 +37,11 @@ Now let's execute the bot from the terminal/console.
 <h4>Linux</h4>
 
 `python3 bot.py`
+copy our bot's secret token (be careful not to copy the application's token instead) and paste It in the first line of the file <i>SToken.txt</i> located in the directory where we extracted the program before.
+
+In the next place we will invite the bot to our server, follow <a href="https://discordpy.readthedocs.io/en/latest/discord.html#inviting-your-bot">this</a> guide to do so. <b>Make sure to give It administrator privileges.</b>
+
+
 </br>
 </br>
 <i>If we've done everything correctly we will see a message like this:</i> `[INFO]: AutomatiK bot now online`
@@ -52,7 +54,7 @@ The last part consists on starting the principal process of the bot, use <b><i>!
 </br>
 <h2>Commands</h2>
 Automatik works with the prefix <b><i>!mk</i></b>. 
-You can see all the available commands using <b><i>!mk helpme</i></b>
+You can see all the available commands using <b><i>!mk help</i></b>
 <h3>Example:</h3> <img src="https://raw.githubusercontent.com/Axyss/AutomatiK/master/AutomatiK%20files/assets/help.png" alt="helpme_ss" align="center"></img>
 <h2>License</h2>
 All the <b>software</b> of this repository is licensed under the MIT license, while <b>all the graphical content and logos</b> are licensed under Creative Commons Attribution-ShareAlike 4.0 International, click the logo down below to know more about the limitations of this license.
