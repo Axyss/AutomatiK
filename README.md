@@ -30,14 +30,14 @@ First we'll install Python and use the command `pip3 install -r requirements.txt
 After that, we have to download the repository and extract It in a folder, then we will proceed to create a bot account, If you have never done It, then follow <a href="https://discordpy.readthedocs.io/en/latest/discord.html#creating-a-bot-account">this</a> tutorial. 
 
 Once we've done It we have to link our local copy of AutomatiK with our new bot, to do so we will execute the program using the next command in the terminal:
-Now let's execute the bot from the terminal/console.
 <h4>Windows</h4>
 
 `python bot.py`
 <h4>Linux</h4>
 
 `python3 bot.py`
-copy our bot's secret token (be careful not to copy the application's token instead) and paste It in the first line of the file <i>SToken.txt</i> located in the directory where we extracted the program before.
+</b>
+This will cause a message like this one: `[INFO]: Please introduce your bot's secret token:` to show up on the terminal. We will just paste our token there and press enter.
 
 In the next place we will invite the bot to our server, follow <a href="https://discordpy.readthedocs.io/en/latest/discord.html#inviting-your-bot">this</a> guide to do so. <b>Make sure to give It administrator privileges.</b>
 
