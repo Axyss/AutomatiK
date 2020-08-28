@@ -37,6 +37,7 @@ Once we've done It we have to link our local copy of AutomatiK with our new bot,
 
 `python3 bot.py`
 </b>
+</b>
 This will cause a message like this one: `[INFO]: Please introduce your bot's secret token:` to show up on the terminal. We will just paste our token there and press enter.
 
 In the next place we will invite the bot to our server, follow <a href="https://discordpy.readthedocs.io/en/latest/discord.html#inviting-your-bot">this</a> guide to do so. <b>Make sure to give It administrator privileges.</b>
