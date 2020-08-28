@@ -55,3 +55,6 @@ class GenericModule:
         finally:
             conn.commit()  # Saves changes
             conn.close()
+
+    def get_free_games(self):
+        return None
