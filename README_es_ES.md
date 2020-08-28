@@ -1,8 +1,5 @@
 <img src="http://www.axyss.ovh/automatik/ak_logo.png" alt="automatik_logo" align="right" width="180" height="180"></img>
 <h1>AutomatiK</h1>
-<b>Language:</b> <a href="README.md#automatik">English</a>, <a href="README_es_ES.md#automatik">Español</a>
-<br>
-<br>
 <b><a href="FUTURE.md">Próximas actualizaciones y el futuro de este proyecto</a></b>
 </br>
 <h2>¿Qué es AutomatiK?</h2>
