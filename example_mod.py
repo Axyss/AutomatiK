@@ -48,4 +48,4 @@ class Example(GenericModule):
 		#  and pass It some parameters, in the table field we have to write (id)_TABLE , and in processed_data we'll put our formatted data.
 		free_games = self.check_database(table="EXAMPLE_TABLE", processed_data=possible_free_games)
 
-		return free_games  #  In the last place, we'll return what the self.check_database returned
+		return free_games  #  In last place, we'll return what the self.check_database returned
