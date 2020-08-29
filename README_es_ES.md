@@ -19,6 +19,8 @@ Las plataformas actualmemte soportadas son:
 - <a href="https://pypi.org/project/discord.py/">discord.py</a>
 - <a href="https://pypi.org/project/beautifulsoup4/">BeautifulSoup4<a>
 - <a href="https://pypi.org/project/requests/">requests<a>
+
+
 Primero instalaremos Python y usaremos el comando `pip3 install -r requirements.txt` para instalar las dependencias anteriores.<br>
 Tras ello, tendremos que descargar el repositorio y extraerlo en una carpeta, después procederemos a crear la cuenta que el bot usará, si nunca lo has hecho sigue <a href="https://discordpy.readthedocs.io/en/latest/discord.html#creating-a-bot-account">este</a> tutorial. 
 
