@@ -3,7 +3,7 @@
 <b>Language:</b> <a href="README.md#automatik">English</a>, <a href="README_es_ES.md#automatik">Español</a>
 </br>
 <h2>What is AutomatiK?</h2>
-AutomatiK is a <b>Discord bot</b> whose task is to notify users about free games from multiple platforms. It's completely autonomous, has some <b>configuration options</b>, a built-in database where game data is stored and, most importantly, it's <b>modularity</b> brings us the ability to <b>code our own modules very easily.</b>
+AutomatiK is a <b>Discord bot</b> whose task is to notify users about free games from multiple platforms. It's completely autonomous, has some <b>configuration options</b>, a built-in database where game data is stored and, most importantly, it's <b>modularity</b> brings us the ability to <b>code, add and remove modules very easily.</b>
 </br>
 </br>
 The default modules support the next services:
