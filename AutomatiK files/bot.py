@@ -103,24 +103,27 @@ class Client(commands.Bot, LangManager, ConfigManager):
         self.LOGO_URL = "https://raw.githubusercontent.com/Axyss/AutomatiK/master/AutomatiK%20files/assets/ak_logo.png"
         self.AVATAR_URL = "https://avatars3.githubusercontent.com/u/55812692"
         self.remove_command("help")
+        self.is_started = False
         self.init_commands()
 
     async def on_ready(self):
-        self.MODULES = Loader.load_modules()
-        self.load_config()
-        self.create_config_keys(self.MODULES)
-        self.check_config_changes()
+        if not self.is_started:  # Prevents the next lines from executing more than once when reconnecting
+            self.MODULES = Loader.load_modules()
+            self.load_config()
+            self.create_config_keys(self.MODULES)
+            self.check_config_changes()
 
-        self.load_lang(self.data_config["lang"])
+            self.load_lang(self.data_config["lang"])
 
-        updater = updates.Updates(local_version=Client.VERSION, link="https://github.com/Axyss/AutomatiK/releases")
-        threading.Thread(target=updater.start_checking, daemon=True).start()  # Update checker
-        threading.Thread(target=self.cli, daemon=True).start()
+            updater = updates.Updates(local_version=Client.VERSION, link="https://github.com/Axyss/AutomatiK/releases")
+            threading.Thread(target=updater.start_checking, daemon=True).start()  # Update checker
+            threading.Thread(target=self.cli, daemon=True).start()
 
-        await self.change_presence(status=discord.Status.online,  # Changes status to "online"
-                                   activity=discord.Game("!mk help")  # Changes activity (playing)
-                                   )
-        logger.info(f"AutomatiK bot {Client.VERSION} now online")
+            await self.change_presence(status=discord.Status.online,  # Changes status to "online"
+                                       activity=discord.Game("!mk help")  # Changes activity (playing)
+                                       )
+            logger.info(f"AutomatiK bot {Client.VERSION} now online")
+            self.is_started = True
 
     @staticmethod
     def clear_console():
