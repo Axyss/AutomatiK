@@ -24,23 +24,22 @@ Las plataformas actualmemte soportadas son:
 Primero instalaremos Python y usaremos el comando `pip3 install -r requirements.txt` para instalar las dependencias anteriores.<br>
 Tras ello, tendremos que descargar el repositorio y extraerlo en una carpeta, después procederemos a crear la cuenta que el bot usará, si nunca lo has hecho sigue <a href="https://discordpy.readthedocs.io/en/latest/discord.html#creating-a-bot-account">este</a> tutorial. 
 
-Una vez que lo hayamos hecho tendremos que vincular nuestra copia local de AutomatiK con la cuenta que hemos creado, para hacerlo copiaremos el secret token de nuestro bot (ten cuidado de no copiar el application's token por error) y lo pegaremos en la primera línea del archivo <i>SToken.txt</i> localizado en el directorio donde extrajimos anteriormente el repositorio.
-
-A continuación invitaremos al bot a nuestro servidor, sigue <a href="https://discordpy.readthedocs.io/en/latest/discord.html#inviting-your-bot">esta</a> guía para hacerlo. <b>Asegúrate de proporcionarle permisos de administrador.</b>
-
-Ahora ejecutaremos el bot desde el terminal/la consola.
+Una vez que lo hayamos hecho tendremos que vincular nuestra copia local de AutomatiK con la cuenta que hemos creado, para hacerlo ejecutaremos el programa introduciendo en siguiente comando en la terminal:
 <h4>Windows</h4>
 
 `python bot.py`
 <h4>Linux</h4>
 
-`python3 bot.py`
+`python3 bot.py`</br>
+</br>
+Esto hará que un mensaje como este: `[INFO]: Please introduce your bot's secret token:` aparezca en la terminal. Tras esto simplemente pegaremos nuestro token en ella y presionaremos enter.
+</br><i>Si hemos hecho todo correctamente veremos un mensaje como este:</i> `[INFO]: AutomatiK bot now online`
+
+A continuación invitaremos al bot a nuestro servidor, sigue <a href="https://discordpy.readthedocs.io/en/latest/discord.html#inviting-your-bot">esta</a> guía para hacerlo. <b>Asegúrate de proporcionarle permisos de administrador.</b>
 </br>
 </br>
-<i>Si lo hemos hecho todo correctamente veremos un mensaje como este:</i> `[INFO]: AutomatiK bot now online`
-</br>
-</br>
-La última parte consiste en iniciar el proceso principal del bot, usa <b><i>!mk start</i></b> en el canal de texto donde quieras que aparezcan las notificaciones, recibirás un mensaje de confirmación y eso es todo, AutomatiK ya se encontraría funcionando.
+La última parte consiste en iniciar el proceso principal del bot, usa <b><i>!mk start</i></b> en el canal de texto donde quieras que aparezcan las notificaciones, recibirás un mensaje de confirmación... y eso es todo, AutomatiK ya se encontraría funcionando. Nuestro bot ya se encontraría funcionando completamente. Si quisiésemos <b>parar el bot al completo</b>, necesitaríamos usar el comando `shutdown` en
+la terminal donde se encuentra el bot ejecuntándose.
 </br>
 </br>
 <img src="https://raw.githubusercontent.com/Axyss/AutomatiK/master/AutomatiK%20files/assets/command_success.png" align="bottom"></img>
@@ -53,7 +52,7 @@ Puedes ver todos los comandos disponibles usando <b><i>!mk helpme</i></b>
 Todo el <b>software</b> de este repositorio se encuentra licenciado bajo la licencia MIT, mientras que <b>todo el contenido gráfico y logos</b> se encuentran licenciados bajo Creative Commons Attribution-ShareAlike 4.0 International, haz click en el logo de debajo para conocer las limitaciones de esta licencia.
 </br>
 </br>
-<a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"><img alt="Licencia de Creative Commons" src="http://www.axyss.ovh/automatik/cc_license.png" width="120" height="40"></a>
+<a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"><img alt="Licencia de Creative Commons" src="https://raw.githubusercontent.com/Axyss/AutomatiK/master/AutomatiK%20files/assets/cc_by_sa.png" width="120" height="40"></a>
 <h2>Sugerencias</h2>
 <b>¿Tienes alguna sugerencia? ¿Crees que AutomatiK debería soportar una plataforma en particular?</b>
 </br>
