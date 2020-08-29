@@ -46,7 +46,7 @@ La última parte consiste en iniciar el proceso principal del bot, usa <b><i>!mk
 <h2>Comandos</h2>
 AutomatiK trabaja con el prefijo <b><i>!mk</i></b>. 
 Puedes ver todos los comandos disponibles usando <b><i>!mk helpme</i></b>
-<h3>Ejemplo:</h3> <img src="http://www.axyss.ovh/automatik/helpme_es_ES.png" alt="helpme"></img>
+<h3>Ejemplo:</h3> <img src="https://raw.githubusercontent.com/Axyss/AutomatiK/master/AutomatiK%20files/assets/help.png" alt="helpme"></img>
 <h2>Licencia</h2>
 Todo el <b>software</b> de este repositorio se encuentra licenciado bajo la licencia MIT, mientras que <b>todo el contenido gráfico y logos</b> se encuentran licenciados bajo Creative Commons Attribution-ShareAlike 4.0 International, haz click en el logo de debajo para conocer las limitaciones de esta licencia.
 </br>
