@@ -2,7 +2,7 @@
 <h1>AutomatiK</h1>
 <b>Language:</b> <a href="README.md#automatik">English</a>, <a href="README_es_ES.md#automatik">Español</a>
 <h2>¿Qué es AutomatiK?</h2>
-AutomatiK es un <b>bot de Discord</b> cuya tarea es notificar a los usuarios sobre los juegos gratis de múltiples plataformas. Es completamente autónomo, tiene algunas <b>opciones configurables</b> y una base de datos integrada donde se almacena la información de los juegos ,y lo más importante, su <b>modularidad</b> nos proporciona la posibilidad de <b>programar nuestros propios módulos de forma muy sencilla.</b>
+AutomatiK es un <b>bot de Discord</b> cuya tarea es notificar a los usuarios sobre los juegos gratis de múltiples plataformas. Es completamente autónomo, tiene algunas <b>opciones configurables</b> y una base de datos integrada donde se almacena la información de los juegos ,y lo más importante, su <b>modularidad</b> nos proporciona la posibilidad de <b>programar, añadir y eliminar módulos de forma muy sencilla.</b>
 </br>
 </br>
 Las plataformas actualmemte soportadas son:
