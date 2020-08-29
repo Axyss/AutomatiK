@@ -46,6 +46,10 @@ class Example(GenericModule):
 		#  Once we have our game data correctly formatted like the scheme above, we'll pass that to the database so we can know
 		#  which games of the ones detected have been already announced and which ones not. To do so we'll use the self.check_database method
 		#  and pass It some parameters, in the table field we have to write (id)_TABLE , and in processed_data we'll put our formatted data.
-		free_games = self.check_database(table="EXAMPLE_TABLE", processed_data=possible_free_games)
+
+		#  There is one more optional parameter that check_database can take, the "threshold". This threshold has a value of 10 by default,
+		#  what this means is that we are comparing the games with the last 10 added registries to a database's table, this threshold exists to
+		#  prevent some games from not being announced if they go free several times.
+		free_games = self.check_database(table="EXAMPLE_TABLE", processed_data=possible_free_games, threshold=8)
 
 		return free_games  #  In last place, we'll return what the self.check_database returned
