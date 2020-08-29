@@ -1,4 +1,4 @@
-<img src="http://www.axyss.ovh/automatik/ak_logo.png" alt="automatik_logo" align="right" width="180" height="180"></img>
+<img src="https://raw.githubusercontent.com/Axyss/AutomatiK/master/AutomatiK%20files/assets/ak_logo.png" alt="automatik_logo" align="right" width="180" height="180"></img>
 <h1>AutomatiK</h1>
 <b>Language:</b> <a href="README.md#automatik">English</a>, <a href="README_es_ES.md#automatik">Español</a>
 </br>
