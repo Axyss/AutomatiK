@@ -22,8 +22,6 @@ The default modules support the next services:
 - <a href="https://pypi.org/project/requests/">requests<a></br>
   
 First we'll install Python and use the command `pip3 install -r requirements.txt` to install all the previous dependencies.
-</br>
-</br>
 After that, we have to download the repository and extract It in a folder, then we will proceed to create a bot account, If you have never done It, then follow <a href="https://discordpy.readthedocs.io/en/latest/discord.html#creating-a-bot-account">this</a> tutorial. 
 
 Once we've done It we have to link our local copy of AutomatiK with our new bot, to do so we will execute the program using the next command in the terminal:
