@@ -11,7 +11,7 @@ The default modules support the next services:
 - Epic Games
 - Humble Bundle
 </br>
-<b>Disclaimer:</b> AutomatiK was never meant to be a public bot, due to that, <b>It does not support more than one Discord server at a time</b>, so avoid inviting It to multiple servers. Nevertheless <b>If you just want to receive the free games</b> notifications without setting-up a whole bot, you can always follow <a href="https://twitter.com/AutomatiK_bot">AutomatiK's Twitter account</a> or join <a href="https://discord.gg/psDtnwX">this Discord server.</a>
+<b>Disclaimer:</b> AutomatiK was never meant to be a public bot, due to that, <b>It does not support more than one Discord server at a time</b>, avoid inviting It to multiple servers. Nevertheless <b>If you just want to receive the free games</b> notifications without setting-up a whole bot, you can always follow <a href="https://twitter.com/AutomatiK_bot">AutomatiK's Twitter account</a> or join <a href="https://discord.gg/psDtnwX">this Discord server.</a>
 
 <h2>How can I use It?</h2>
 
