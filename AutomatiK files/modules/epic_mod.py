@@ -28,12 +28,15 @@ class Epic(GenericModule):
 
         except:
             logger.error(f"Request to {self.SERVICE_NAME} failed!")
+            return False
 
     def process_request(self, raw_data):  # Filters games that are free
         """Returns the useful information form the request"""
 
         processed_data = []
 
+        if not raw_data:
+            return False
         for i in raw_data:
             # i["promotions"]["upcomingPromotionalOffers"]
             try:
