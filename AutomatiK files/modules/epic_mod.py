@@ -53,5 +53,7 @@ class Epic(GenericModule):
     def get_free_games(self):
 
         processed_data = self.process_request(self.make_request())
+        if not processed_data:
+            return False
         free_games = self.check_database(table="EPIC_TABLE", processed_data=processed_data)
         return free_games
