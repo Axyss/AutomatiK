@@ -22,9 +22,9 @@ class Loader:
 
     ascii_art = r"""                _                        _   _ _  __
      /\        | |                      | | (_) |/ /
-    /  \  _   _| |_ ___  _ __ ___   __ _| |_ _| ' / 
-   / /\ \| | | | __/ _ \| '_ ` _ \ / _` | __| |  <  
-  / ____ \ |_| | || (_) | | | | | | (_| | |_| | . \ 
+    /  \  _   _| |_ ___  _ __ ___   __ _| |_ _| ' /
+   / /\ \| | | | __/ _ \| '_ ` _ \ / _` | __| |  <
+  / ____ \ |_| | || (_) | | | | | | (_| | |_| | . \
  /_/    \_\__,_|\__\___/|_| |_| |_|\__,_|\__|_|_|\_\  {}
                                                """
 
@@ -91,7 +91,7 @@ class Loader:
 
 class Client(commands.Bot, LangManager, ConfigManager):
 
-    VERSION = "v1.2"
+    VERSION = "v1.2.2b"
 
     def __init__(self, command_prefix, self_bot):
         commands.Bot.__init__(self, command_prefix=command_prefix, self_bot=self_bot)

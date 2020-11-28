@@ -23,13 +23,18 @@ class Humble(GenericModule):
             raw_data = requests.get(self.ENDPOINT).json()
             raw_data = raw_data["results"]
             return raw_data
+
         except:
             logger.error(f"Request to {self.SERVICE_NAME} failed!")
+            return False
 
     def process_request(self, raw_data):  # Filters games that are not free
         """Returns the useful information from the request in a tuple"""
 
         processed_data = []
+
+        if not raw_data:
+            return False
         for i in raw_data:
             if i["current_price"]["amount"] == 0:  # If game's price is 0
                 # Parses relevant data such as name and link and adds It to gameData

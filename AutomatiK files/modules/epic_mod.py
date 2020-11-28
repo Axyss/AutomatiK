@@ -28,12 +28,15 @@ class Epic(GenericModule):
 
         except:
             logger.error(f"Request to {self.SERVICE_NAME} failed!")
+            return False
 
     def process_request(self, raw_data):  # Filters games that are free
         """Returns the useful information form the request"""
 
         processed_data = []
 
+        if not raw_data:
+            return False
         for i in raw_data:
             # i["promotions"]["upcomingPromotionalOffers"]
             try:
@@ -50,5 +53,7 @@ class Epic(GenericModule):
     def get_free_games(self):
 
         processed_data = self.process_request(self.make_request())
+        if not processed_data:
+            return False
         free_games = self.check_database(table="EPIC_TABLE", processed_data=processed_data)
         return free_games
