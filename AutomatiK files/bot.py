@@ -16,6 +16,7 @@ from core import updates
 from core.log_manager import logger
 from core.lang_manager import LangManager
 from core.config_manager import ConfigManager
+from core.module_manager import db, Game
 
 
 class Loader:
@@ -91,7 +92,7 @@ class Loader:
 
 class Client(commands.Bot, LangManager, ConfigManager):
 
-    VERSION = "v1.2.3"
+    VERSION = "v1.3"
 
     def __init__(self, command_prefix, self_bot):
         commands.Bot.__init__(self, command_prefix=command_prefix, self_bot=self_bot)
@@ -115,7 +116,7 @@ class Client(commands.Bot, LangManager, ConfigManager):
 
             self.load_lang(self.data_config["lang"])
 
-            updater = updates.Updates(local_version=Client.VERSION, link="https://github.com/Axyss/AutomatiK/releases")
+            updater = updates.Updates(local_version=Client.VERSION, link="https://github.com/Axyss/AutomatiK/releases/")
             threading.Thread(target=updater.start_checking, daemon=True).start()  # Update checker
             threading.Thread(target=self.cli, daemon=True).start()
 
@@ -173,7 +174,6 @@ class Client(commands.Bot, LangManager, ConfigManager):
 
         elif isinstance(error, discord.ext.commands.errors.CommandOnCooldown):
             await ctx.channel.send(self.lang["cooldown_error"].format(int(error.retry_after)))
-
         else:
             try:
                 raise error
@@ -261,11 +261,14 @@ class Client(commands.Bot, LangManager, ConfigManager):
 
                 for i in self.MODULES:
                     if not self.data_config[f"{i.MODULE_ID}_status"]:  # Prevents games from getting added to the db
-                        continue  # when a module isn't enabled
+                        continue                                       # when a module isn't enabled
                     free_games = i.get_free_games()
+                    # If there is a single element this will put It in a list
+                    free_games = [free_games] if isinstance(free_games, Game) else free_games
                     if free_games:
+                        free_games = db.check_database(f"{i.MODULE_ID.upper()}_TABLE", free_games)
                         for j in free_games:
-                            await ctx.channel.send(self.generate_message(j[0], j[1]))
+                            await ctx.channel.send(self.generate_message(j.name, j.link))
 
                 await asyncio.sleep(300)  # It will look for free games every 5 minutes
 
@@ -299,7 +302,7 @@ class Client(commands.Bot, LangManager, ConfigManager):
                                     )
             embed_status.set_thumbnail(url=self.LOGO_URL)
             embed_status.add_field(name=self.lang["status_main"], value=self.lang["status_active"]
-            if self.main_loop else self.lang["status_inactive"]
+                                   if self.main_loop else self.lang["status_inactive"]
                                    )
 
             for i in self.MODULES:

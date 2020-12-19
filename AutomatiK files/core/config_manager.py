@@ -62,4 +62,4 @@ class ConfigManager:
         file = open(self.config_name, "w")
         json.dump(self.data_config, file, indent=2)  # Rewrites the persistent config
         file.close()
-        logger.debug(f"Configuration key {key} was successfully assigned the value {value}")
+        logger.debug(f"Configuration key '{key}' was successfully assigned the value '{value}'")

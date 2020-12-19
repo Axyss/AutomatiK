@@ -1,12 +1,10 @@
-import time
-
 import requests
 
+from core.module_manager import Game
 from core.log_manager import logger
-from core.generic_mod import GenericModule
 
 
-class Humble(GenericModule):
+class Humble:
 
     def __init__(self):
 
@@ -23,9 +21,8 @@ class Humble(GenericModule):
             raw_data = requests.get(self.ENDPOINT).json()
             raw_data = raw_data["results"]
             return raw_data
-
         except:
-            logger.error(f"Request to {self.SERVICE_NAME} failed!")
+            logger.error(f"Request to {self.SERVICE_NAME} by module \'{self.MODULE_ID}\' failed")
             return False
 
     def process_request(self, raw_data):  # Filters games that are not free
@@ -35,16 +32,18 @@ class Humble(GenericModule):
 
         if not raw_data:
             return False
-        for i in raw_data:
-            if i["current_price"]["amount"] == 0:  # If game's price is 0
-                # Parses relevant data such as name and link and adds It to gameData
-                game = (i["human_name"], str(self.URL + i["human_url"]))
-                processed_data.append(game)
+        try:
+            for i in raw_data:
+                if i["current_price"]["amount"] == 0:  # If game's price is 0
+                    # Parses relevant data such as name and link and adds It to gameData
+                    game = Game(i["human_name"], str(self.URL + i["human_url"]))
+                    processed_data.append(game)
+        except (TypeError, KeyError):
+            logger.debug(f"{self.SERVICE_NAME} by module \'{self.MODULE_ID}\' couldn't be processed")
 
         return processed_data
 
     def get_free_games(self):
 
-        processed_data = self.process_request(self.make_request())
-        free_games = self.check_database(table="HUMBLE_TABLE", processed_data=processed_data)
-        return free_games
+        free_games = self.process_request(self.make_request())
+        return free_games if free_games else False

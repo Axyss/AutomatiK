@@ -1,19 +1,18 @@
 import json
-
 import requests
 
-from core.generic_mod import GenericModule
+from core.module_manager import *
 from core.log_manager import logger
 
 
-class Epic(GenericModule):
+class Epic:
 
     def __init__(self):
 
         self.SERVICE_NAME = "Epic Games"
         self.MODULE_ID = "epic"
         self.AUTHOR = "Default"
-        self.URL = "https://www.epicgames.com/store/es-ES/product/"
+        self.URL = "https://www.epicgames.com/store/us-US/product/"
         self.ENDPOINT = "https://store-site-backend-static.ak.epicgames.com/freeGamesPromotions?locale=es-ES&country" \
                         "=ES&allowCountries=ES"
 
@@ -25,35 +24,30 @@ class Epic(GenericModule):
             raw_data = json.loads(raw_data.content)  # Bytes to json object
             raw_data = raw_data["data"]["Catalog"]["searchStore"]["elements"]  # Cleans the data
             return raw_data
-
         except:
-            logger.error(f"Request to {self.SERVICE_NAME} failed!")
+            logger.error(f"Request to {self.SERVICE_NAME} by module \'{self.MODULE_ID}\' failed")
             return False
 
     def process_request(self, raw_data):  # Filters games that are free
-        """Returns the useful information form the request"""
+        """Returns the useful information from the request"""
 
         processed_data = []
 
         if not raw_data:
             return False
-        for i in raw_data:
-            # i["promotions"]["upcomingPromotionalOffers"]
-            try:
-                if (i["price"]["totalPrice"]["discountPrice"] == i["price"]["totalPrice"]["originalPrice"]) != 0:
-                    continue
-            except TypeError:
-                continue
+        try:
+            for i in raw_data:
+                # (i["price"]["totalPrice"]["discountPrice"] == i["price"]["totalPrice"]["originalPrice"]) != 0
+                if i["promotions"]["promotionalOffers"]:
+                    game = Game(i["title"], str(self.URL + i["productSlug"]))
+                    processed_data.append(game)
+        except (TypeError, KeyError):
+            logger.debug(f"{self.SERVICE_NAME} by module \'{self.MODULE_ID}\' couldn't be processed")
+            return False
 
-            # Parses relevant data such as name and link and adds It to parsed_data
-            game = (i["title"], str(self.URL + i["productSlug"]))
-            processed_data.append(game)
         return processed_data
 
     def get_free_games(self):
 
-        processed_data = self.process_request(self.make_request())
-        if not processed_data:
-            return False
-        free_games = self.check_database(table="EPIC_TABLE", processed_data=processed_data)
-        return free_games
+        free_games = self.process_request(self.make_request())
+        return free_games if free_games else False

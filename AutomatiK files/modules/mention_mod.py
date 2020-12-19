@@ -1,7 +1,6 @@
-from core.generic_mod import GenericModule
+# This is not a removable module. If you wish to disable It use the '!mk disable' command
 
-
-class Mention(GenericModule):
+class Mention:
 
     def __init__(self):
 
@@ -10,5 +9,4 @@ class Mention(GenericModule):
         self.AUTHOR = "Default"
 
     def get_free_games(self):
-
         return False
