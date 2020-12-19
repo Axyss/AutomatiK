@@ -53,4 +53,4 @@ class Updates:
             remote_version = self.get_remote_version()
             if remote_version:
                 self.convert(remote_version)
-            time.sleep(Updates.TIME_INTERVAL * 360)
+            time.sleep(Updates.TIME_INTERVAL * 3600)
