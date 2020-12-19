@@ -35,6 +35,9 @@ class Updates:
     def convert(self, raw_remote_version):
         """Converts the complex syntax of a version to an integer"""
 
+        if not raw_remote_version:
+            return False
+
         local_version = "".join([x for x in self.raw_local_version if x.isdigit()])
         local_version += "0" * (Updates.MAX_LENGTH - len(local_version))
 
@@ -50,7 +53,5 @@ class Updates:
         """Use this method inside a thread"""
 
         while True:
-            remote_version = self.get_remote_version()
-            if remote_version:
-                self.convert(remote_version)
+            self.convert(self.get_remote_version())
             time.sleep(Updates.TIME_INTERVAL * 3600)
