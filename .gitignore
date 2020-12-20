@@ -1,2 +1,4 @@
-*/logs
-*/__pycache__/
+logs
+__pycache__
+AutomatiK files/*.json
+*.db
