@@ -46,4 +46,4 @@ class Humble:
     def get_free_games(self):
 
         free_games = self.process_request(self.make_request())
-        return free_games if free_games else False
+        return free_games
