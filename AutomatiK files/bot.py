@@ -92,7 +92,7 @@ class Loader:
 
 class Client(commands.Bot, LangManager, ConfigManager):
 
-    VERSION = "v1.3"
+    VERSION = "v1.2.4"
 
     def __init__(self, command_prefix, self_bot):
         commands.Bot.__init__(self, command_prefix=command_prefix, self_bot=self_bot)
@@ -317,7 +317,7 @@ class Client(commands.Bot, LangManager, ConfigManager):
         @commands.cooldown(2, 10, commands.BucketType.user)
         @commands.has_permissions(administrator=True)
         async def modules(ctx):
-            module_ids = [i.MODULE_ID.capitalize() for i in self.MODULES]
+            module_ids = [i.MODULE_ID for i in self.MODULES]
             module_names = [i.SERVICE_NAME for i in self.MODULES]
             module_authors = [i.AUTHOR for i in self.MODULES]
 
