@@ -43,7 +43,7 @@ class DBManager:
         logger.debug(f"Table '{table}' has been added to the database")
         return True
 
-    def check_database(self, table, input_data, threshold=6):
+    def check_database(self, table, input_data, threshold):
         free_games, last_reg = [], []
         self.create_table(table)
         self.connect_to_db()

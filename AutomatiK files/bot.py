@@ -190,17 +190,15 @@ class Client(commands.Bot, LangManager, ConfigManager):
         async def notify(ctx, *args):
 
             args = list(args)
-            separator = " "  # String that will be inserted between elements of the list when using .join
 
             # Stores the link in another variable and removes It from args
             link = args[-1]
             args.pop()
 
-            game_name = separator.join(args)  # Converts list to string with spaces between elements
+            game_name = " ".join(args)  # Converts list to string with spaces between elements
             await ctx.channel.purge(limit=1)
-
-            await ctx.channel.send(self.generate_message(
-                game_name, link) + self.lang["notify_thanks"].format(ctx.author.id)  # Adds politeness
+            await ctx.channel.send(self.generate_message(game_name, link)
+                                   + self.lang["notify_thanks"].format(ctx.author.id)  # Adds politeness
                                    )
 
         @self.command()
@@ -259,15 +257,18 @@ class Client(commands.Bot, LangManager, ConfigManager):
             logger.info(f"Main service was started on #{ctx.channel} by {str(ctx.author)}")
 
             while self.main_loop:  # MAIN LOOP
-
                 for i in self.MODULES:
                     if not self.data_config[f"{i.MODULE_ID}_status"]:  # Prevents games from getting added to the db
                         continue                                       # when a module isn't enabled
                     free_games = i.get_free_games()
-                    # If there is a single element this will put It in a list
+                    # If there is at least one element this will put It in a list
                     free_games = [free_games] if isinstance(free_games, Game) else free_games
                     if free_games:
-                        free_games = db.check_database(f"{i.MODULE_ID.upper()}_TABLE", free_games)
+                        try:  # Checks if module author specified a threshold
+                            i.THRESHOLD
+                        except AttributeError:
+                            i.THRESHOLD = 6
+                        free_games = db.check_database(f"{i.MODULE_ID.upper()}_TABLE", free_games, i.THRESHOLD)
                         for j in free_games:
                             await ctx.channel.send(self.generate_message(j.name, j.link))
 
@@ -402,10 +403,10 @@ class Client(commands.Bot, LangManager, ConfigManager):
             """Reloads configuration, modules and language packages"""
 
             logger.info("Reloading...")
-            was_started = bool(self.is_started)
-            self.is_started = False
+            was_started = bool(self.main_loop)
+            self.main_loop = False
             self.load_resources()
-            self.is_started = was_started
+            self.main_loop = was_started
 
             await ctx.channel.send(self.lang["reload_completed"])
             logger.info("Reload completed")
