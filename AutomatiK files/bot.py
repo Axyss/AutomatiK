@@ -109,12 +109,7 @@ class Client(commands.Bot, LangManager, ConfigManager):
 
     async def on_ready(self):
         if not self.is_started:  # Prevents the next lines from executing more than once when reconnecting
-            self.MODULES = Loader.load_modules()
-            self.load_config()
-            self.create_config_keys(self.MODULES)
-            self.check_config_changes()
-
-            self.load_lang(self.data_config["lang"])
+            self.load_resources()
 
             updater = updates.Updates(local_version=Client.VERSION, link="https://github.com/Axyss/AutomatiK/releases/")
             threading.Thread(target=updater.start_checking, daemon=True).start()  # Update checker
@@ -128,10 +123,7 @@ class Client(commands.Bot, LangManager, ConfigManager):
 
     @staticmethod
     def clear_console():
-        if os.name == "nt":  # Windows
-            os.system("cls")
-        else:  # Linux/OS X
-            os.system("clear")
+        os.system("cls") if os.name == "nt" else os.system("clear")
 
     def cli(self):
         """Manages the console commands"""
@@ -141,10 +133,19 @@ class Client(commands.Bot, LangManager, ConfigManager):
             if cli_command == "shutdown":
                 self.main_loop = False
                 logger.info("Stopping...")
-                time.sleep(1)
                 os._exit(1)
             else:
                 logger.error("Unknown terminal command. Use 'shutdown' to stop the bot.")
+
+    def load_resources(self):
+        """Loads configuration, modules and language packages"""
+
+        self.MODULES = Loader.load_modules()
+        self.load_config()
+        self.create_config_keys(self.MODULES)
+        self.check_config_changes()
+        self.load_lang(self.data_config["lang"])
+        return True
 
     def get_status(self, service):
         """Translates boolean values to the strings showed in !mk status"""
@@ -392,6 +393,22 @@ class Client(commands.Bot, LangManager, ConfigManager):
             embed_langs.add_field(name=self.lang["modules_author"], value="\n".join(lang_author))
 
             await ctx.channel.send(embed=embed_langs)
+
+        @self.command()
+        @commands.guild_only()
+        @commands.cooldown(2, 10, commands.BucketType.user)
+        @commands.has_permissions(administrator=True)
+        async def reload(ctx):
+            """Reloads configuration, modules and language packages"""
+
+            logger.info("Reloading...")
+            was_started = bool(self.is_started)
+            self.is_started = False
+            self.load_resources()
+            self.is_started = was_started
+
+            await ctx.channel.send(self.lang["reload_completed"])
+            logger.info("Reload completed")
 
 
 if __name__ == "__main__":

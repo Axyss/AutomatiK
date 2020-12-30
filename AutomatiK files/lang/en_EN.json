@@ -43,6 +43,8 @@
       "stop_already": "\u274C Main service is already stopped.",
       "stop_success": "\u2705 Main service stopped.",
 
+      "reload_completed": "\u2705 **Reload** completed.",
+
       "embed_footer": "Project page: github.com/Axyss/AutomatiK",
       "embed_description": "All commands must be preceded by the prefix **!mk**. Example: **!mk start**",
       "embed_field1_name": "\u2139 Commands",
@@ -53,7 +55,8 @@
       "embed_field2_name": "Administrator commands",
       "embed_field2_value": ["⠀\n",
                              "**start** - Starts the main process in the channel where the command is executed.\n",
-                             "**stop** - Stops the main process.\n\n",
+                             "**stop** - Stops the main process.\n",
+                             "**reload** - Reloads configuration, modules and language packages.\n\n",
 
                              "**enable (ModuleID)** - Command to enable AutomatiK modules.\n",
                              "**disable (ModuleID)** - Command to disable AutomatiK modules.\n",
