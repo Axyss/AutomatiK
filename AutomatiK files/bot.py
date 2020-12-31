@@ -268,7 +268,7 @@ class Client(commands.Bot, LangManager, ConfigManager):
                             i.THRESHOLD
                         except AttributeError:
                             i.THRESHOLD = 6
-                        free_games = db.check_database(f"{i.MODULE_ID.upper()}_TABLE", free_games, i.THRESHOLD)
+                        free_games = db.check_database(f"{i.MODULE_ID.upper()}_TABLE", free_games, int(i.THRESHOLD))
                         for j in free_games:
                             await ctx.channel.send(self.generate_message(j.name, j.link))
 
