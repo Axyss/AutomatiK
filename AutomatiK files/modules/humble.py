@@ -38,7 +38,7 @@ class Main:
                     game = Game(i["human_name"], str(self.URL + i["human_url"]))
                     processed_data.append(game)
         except (TypeError, KeyError):
-            logger.debug(f"{self.SERVICE_NAME} by module \'{self.MODULE_ID}\' couldn't be processed")
+            logger.exception(f"Data from module \'{self.MODULE_ID}\' couldn't be processed")
 
         return processed_data
 

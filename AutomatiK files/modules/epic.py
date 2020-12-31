@@ -40,9 +40,10 @@ class Main:
                 if i["promotions"]["promotionalOffers"]:
                     game = Game(i["title"], str(self.URL + i["productSlug"]))
                     processed_data.append(game)
-        except (TypeError, KeyError):
-            logger.debug(f"{self.SERVICE_NAME} by module \'{self.MODULE_ID}\' couldn't be processed")
-            return False
+        except KeyError:
+            logger.exception(f"Data from module \'{self.MODULE_ID}\' couldn't be processed")
+        except TypeError:  # This gets executed when ["promotionalOffers"] is empty or does not exist
+            pass
 
         return processed_data
 
