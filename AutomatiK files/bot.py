@@ -76,7 +76,6 @@ class Loader:
             module_extension = os.path.splitext(i)[1]
 
             if module_extension == ".py" and module_name != "__init__":
-                class_name = "".join([word.capitalize() for word in module_name.split("_")])  # Snake to upper camel
                 try:
                     # noinspection PyPep8Naming
                     Klass = getattr(importlib.import_module(f"modules.{module_name}"), "Main")
