@@ -79,7 +79,7 @@ class Loader:
                 class_name = "".join([word.capitalize() for word in module_name.split("_")])  # Snake to upper camel
                 try:
                     # noinspection PyPep8Naming
-                    Klass = getattr(importlib.import_module(f"modules.{module_name}"), str(class_name))
+                    Klass = getattr(importlib.import_module(f"modules.{module_name}"), "Main")
                     modules.append(Klass())
                 except AttributeError:
                     logger.exception(f"Module '{module_name}' couldn't be loaded")

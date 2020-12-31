@@ -5,7 +5,7 @@ from core.module_manager import Game
 from core.log_manager import logger
 
 
-class Epic:
+class Main:
 
     def __init__(self):
         self.SERVICE_NAME = "Epic Games"

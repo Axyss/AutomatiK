@@ -4,7 +4,7 @@ from core.module_manager import Game
 from core.log_manager import logger
 
 
-class Humble:
+class Main:
 
     def __init__(self):
         self.SERVICE_NAME = "Humble Bundle"
