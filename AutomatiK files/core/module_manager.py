@@ -8,6 +8,7 @@ class Game:
         self.link = link
 
     def __eq__(self, other):
+        """When comparing two Game objects only the name attribute will matter."""
         return True if self.name == other.name else False
 
 
@@ -20,16 +21,19 @@ class DBManager:
         self.pointer = None
 
     def connect_to_db(self):
+        """Starts a connection to the database."""
         self.conn = sqlite3.connect(DBManager.DB_NAME)
         self.pointer = self.conn.cursor()
         logger.debug("Connection established to the database")
 
     def disconnect_from_db(self):
+        """Closes the connection to the database."""
         self.conn.commit()
         self.conn.close()
         logger.debug("Connection to the database closed")
 
     def create_table(self, table):
+        """Creates a database table."""
         self.connect_to_db()
         try:
             self.pointer.execute(
@@ -44,6 +48,7 @@ class DBManager:
         return True
 
     def check_database(self, table, input_data, threshold):
+        """Checks if the passed games are already announced and ,therefore, in the database."""
         free_games, last_reg = [], []
         self.create_table(table)
         self.connect_to_db()

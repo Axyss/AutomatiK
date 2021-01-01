@@ -14,7 +14,7 @@ class Updates:
         self.url = link if link[-1] == "/" else link + "/"  # IMPORTANT: the url must contain a slash at the end
 
     def get_remote_version(self):
-
+        """Gets the last version of the remote AutomatiK repository."""
         try:
             req = requests.get(self.url)  # Gets the HTML code from the web page
         except:
@@ -33,8 +33,7 @@ class Updates:
         return remote_version
 
     def convert(self, raw_remote_version):
-        """Converts the complex syntax of a version to an integer"""
-
+        """Converts the complex syntax of a version to an integer."""
         if not raw_remote_version:
             return False
 
@@ -50,8 +49,7 @@ class Updates:
             return {"remote": int(remote_version), "local": int(local_version)}
 
     def start_checking(self):
-        """Use this method inside a thread"""
-
+        """Starts looking for new version every X hours."""
         while True:
             self.convert(self.get_remote_version())
             time.sleep(Updates.TIME_INTERVAL * 3600)

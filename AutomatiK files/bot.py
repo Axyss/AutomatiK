@@ -37,12 +37,10 @@ class Loader:
 
     @staticmethod
     def start():
-        """Adds the ascii art and requests the token at the start of the program"""
+        """Adds the ascii art and requests the token at the start of the program."""
         Client.clear_console()
         Loader.print_ascii_art()
-
         token = Loader.load_token()
-
         Client.clear_console()
         Loader.print_ascii_art()
         logger.info("Loading...")
@@ -50,13 +48,11 @@ class Loader:
 
     @staticmethod
     def load_token():
-
         if "Secret Token.json" not in os.listdir("."):  # Requests token and writes It in "Secret Token.json"
             with open("Secret Token.json", "w") as token_file:
                 logger.info("Please introduce your bot's secret token: ")
                 token = base64.b64encode(input().encode("utf-8")).decode("utf-8")  # Encodes token
                 json.dump({"secret_token": token}, token_file, indent=2)
-
         else:  # Loads token from file
             with open("Secret Token.json") as token_file:
                 try:
@@ -69,7 +65,7 @@ class Loader:
 
     @staticmethod
     def load_modules():
-        """Imports and instances all the modules automagically"""
+        """Imports and instances all the modules automagically."""
         modules = []
 
         for i in os.listdir("modules"):
@@ -93,8 +89,7 @@ class Loader:
 
     @staticmethod
     def reload_modules():
-        """Reimports and instances all the modules automagically"""
-
+        """Reimports and instances all the modules automagically."""
         Loader.imported_modules = [importlib.reload(i) for i in Loader.imported_modules]  # Reimports the modules
         importlib.invalidate_caches()
         logger.info(f"{len(Loader.imported_modules)} modules loaded")
@@ -137,7 +132,7 @@ class Client(commands.Bot, LangManager, ConfigManager):
         os.system("cls") if os.name == "nt" else os.system("clear")
 
     def cli(self):
-        """Manages the console commands"""
+        """Manages the console commands."""
         while True:
             cli_command = input("")
 
@@ -149,8 +144,7 @@ class Client(commands.Bot, LangManager, ConfigManager):
                 logger.error("Unknown terminal command. Use 'shutdown' to stop the bot.")
 
     def load_resources(self, reload=False):
-        """Loads configuration, modules and language packages"""
-
+        """Loads configuration, modules and language packages."""
         self.MODULES = Loader.reload_modules() if reload else Loader.load_modules()
         self.load_config()
         self.create_config_keys(self.MODULES)
@@ -159,13 +153,11 @@ class Client(commands.Bot, LangManager, ConfigManager):
         return True
 
     def get_status(self, service):
-        """Translates boolean values to the strings showed in !mk status"""
-
+        """Translates boolean values to the strings showed in '!mk status'."""
         return self.lang["status_active"] if self.data_config[service] else self.lang["status_inactive"]
 
     def generate_message(self, title, link):
-        """Generates some messages the bot sends"""
-
+        """Generates the messages for the free games."""
         draft = random.choice(self.lang["generic_messages"]).format(title, link)
         if self.data_config["mention_status"]:  # Adds the mention_status value from config
             draft = self.data_config["mentioned_role"] + " " + draft
@@ -173,8 +165,7 @@ class Client(commands.Bot, LangManager, ConfigManager):
         return draft
 
     async def on_command_error(self, ctx, error):  # The second parameter is the error's information
-        """Function used for error handling"""
-
+        """Method used for error handling regarding the discord.py library."""
         if isinstance(error, discord.ext.commands.MissingPermissions):
             await ctx.channel.send(self.lang["missing_permissions"])
 
@@ -199,7 +190,7 @@ class Client(commands.Bot, LangManager, ConfigManager):
         @commands.cooldown(3, 10, commands.BucketType.user)
         @commands.has_permissions(administrator=True)
         async def notify(ctx, *args):
-
+            """Command to notify free games from non-supported platforms."""
             args = list(args)
 
             # Stores the link in another variable and removes It from args
@@ -217,8 +208,7 @@ class Client(commands.Bot, LangManager, ConfigManager):
         @commands.cooldown(2, 10, commands.BucketType.user)
         @commands.has_permissions(administrator=True)
         async def mention(ctx, role_id):
-            """Manages the mentions of the bot's messages"""
-
+            """Manages the mentions of the bot's messages."""
             if re.search("^<@&\w", role_id) and re.search(">$", role_id):
                 # If the string follows the std structure of a role <@&1234>
                 self.edit_config("mentioned_role", role_id)
@@ -231,8 +221,7 @@ class Client(commands.Bot, LangManager, ConfigManager):
         @commands.guild_only()
         @commands.cooldown(1, 60, commands.BucketType.user)
         async def helpme(ctx):
-            """Help command that uses embeds"""
-
+            """Help command that uses embeds."""
             embed_help = discord.Embed(title=f"AutomatiK {Client.VERSION} Help ",
                                        description=self.lang["embed_description"],
                                        color=0x00BFFF
@@ -257,8 +246,7 @@ class Client(commands.Bot, LangManager, ConfigManager):
         @commands.cooldown(2, 10, commands.BucketType.user)
         @commands.has_permissions(administrator=True)
         async def start(ctx):
-            """Starts the AutomatiK service"""
-
+            """Starts the AutomatiK service."""
             if self.main_loop:  # If service already started
                 await ctx.channel.send(self.lang["start_already"])
                 return None
@@ -291,7 +279,6 @@ class Client(commands.Bot, LangManager, ConfigManager):
         @commands.has_permissions(administrator=True)
         async def stop(ctx):
             """Stops the AutomatiK service"""
-
             if not self.main_loop:  # If service already stopped
                 await ctx.channel.send(self.lang["stop_already"])
                 return False
@@ -304,8 +291,7 @@ class Client(commands.Bot, LangManager, ConfigManager):
         @commands.guild_only()
         @commands.cooldown(2, 10, commands.BucketType.user)
         async def status(ctx):
-            """Shows the bot's status (New services must be added to the tuples)"""
-
+            """Shows the bot's status."""
             embed_status = discord.Embed(title=self.lang["status"],
                                          description=self.lang["status_description"],
                                          color=0x00BFFF
@@ -330,6 +316,7 @@ class Client(commands.Bot, LangManager, ConfigManager):
         @commands.cooldown(2, 10, commands.BucketType.user)
         @commands.has_permissions(administrator=True)
         async def modules(ctx):
+            """Shows information about the loaded modules."""
             module_ids = [i.MODULE_ID for i in self.MODULES]
             module_names = [i.SERVICE_NAME for i in self.MODULES]
             module_authors = [i.AUTHOR for i in self.MODULES]
@@ -353,8 +340,7 @@ class Client(commands.Bot, LangManager, ConfigManager):
         @commands.cooldown(2, 10, commands.BucketType.user)
         @commands.has_permissions(administrator=True)
         async def enable(ctx, service):
-            """Global manager to enable/disable some AutomatiK services"""
-
+            """Global manager to enable/disable modules and some other services."""
             introduced_command = str(ctx.invoked_with)
             user_decision = True if introduced_command == "enable" else False
 
@@ -411,8 +397,7 @@ class Client(commands.Bot, LangManager, ConfigManager):
         @commands.cooldown(2, 10, commands.BucketType.user)
         @commands.has_permissions(administrator=True)
         async def reload(ctx):
-            """Reloads configuration, modules and language packages"""
-
+            """Reloads configuration, modules and language packages."""
             logger.info("Reloading...")
             was_started = bool(self.main_loop)
             self.main_loop = False

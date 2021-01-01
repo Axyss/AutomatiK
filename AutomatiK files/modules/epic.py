@@ -8,6 +8,7 @@ from core.log_manager import logger
 class Main:
 
     def __init__(self):
+        """Defines the module parameters."""
         self.SERVICE_NAME = "Epic Games"
         self.MODULE_ID = "epic"
         self.AUTHOR = "Default"
@@ -16,8 +17,7 @@ class Main:
                         "=ES&allowCountries=ES"
 
     def make_request(self):
-        """Makes the request and removes the unnecessary JSON data"""
-
+        """Makes the request and removes the unnecessary JSON data."""
         try:
             raw_data = requests.get(self.ENDPOINT)
             raw_data = json.loads(raw_data.content)  # Bytes to json object
@@ -27,9 +27,8 @@ class Main:
             logger.error(f"Request to {self.SERVICE_NAME} by module \'{self.MODULE_ID}\' failed")
             return False
 
-    def process_request(self, raw_data):  # Filters games that are free
-        """Returns the useful information from the request"""
-
+    def process_request(self, raw_data):
+        """Returns a list of free games from the raw data."""
         processed_data = []
 
         if not raw_data:
@@ -48,6 +47,5 @@ class Main:
         return processed_data
 
     def get_free_games(self):
-
         free_games = self.process_request(self.make_request())
         return free_games

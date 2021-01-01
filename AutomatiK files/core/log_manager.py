@@ -6,8 +6,6 @@ from logging.handlers import TimedRotatingFileHandler
 class LogManager(logging.Logger):
 
     def __init__(self, name, level=logging.NOTSET):
-
-        self.last_date = None
         try:
             os.mkdir("./logs")
         except FileExistsError:

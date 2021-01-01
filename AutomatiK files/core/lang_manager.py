@@ -13,16 +13,14 @@ class LangManager:
         self.lang_dir = lang_dir if lang_dir[-1] == "/" else lang_dir + "/"
 
     def load_lang(self, chosen_lang):
-        """Loads the language file based on the 'lang' option from config.json"""
-
+        """Loads the language file based on the 'lang' option from config.json ."""
         file = open(f"{self.lang_dir}{chosen_lang}.json", encoding="utf-8")
         self.lang = json.load(file)["messages"]
         file.close()
         logger.info(f"Language '{chosen_lang}' loaded")
 
     def get_lang_ids(self):
-        """Obtains a list containing all the available languages for AutomatiK"""
-
+        """Obtains a list containing all the available languages."""
         language_list = os.listdir(self.lang_dir)  # Obtains the name of the files in lang to generate a list
         parsed_language_list = []
 
@@ -32,8 +30,7 @@ class LangManager:
         return parsed_language_list
 
     def get_lang_metadata(self):
-        """Retrieves metadata from the language packages"""
-
+        """Retrieves metadata from the language packages."""
         lang_name = []
         lang_author = []
 
