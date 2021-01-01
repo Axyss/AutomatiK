@@ -36,8 +36,8 @@ class Loader:
         time.sleep(0.1)
 
     @staticmethod
-    def start_handler():
-        """Adds the ascii art and other things to the start of the program"""
+    def start():
+        """Adds the ascii art and requests the token at the start of the program"""
         Client.clear_console()
         Loader.print_ascii_art()
 
@@ -427,7 +427,7 @@ if __name__ == "__main__":
 
     automatik = Client(command_prefix="!mk ", self_bot=False)
     try:
-        automatik.run(base64.b64decode(Loader.start_handler().encode("utf-8")).decode("utf-8"))
+        automatik.run(base64.b64decode(Loader.start().encode("utf-8")).decode("utf-8"))
 
     except discord.errors.LoginFailure:
         logger.error("Invalid token, please make sure It's valid. Press enter to exit...")
