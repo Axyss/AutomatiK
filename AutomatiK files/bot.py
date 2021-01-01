@@ -21,6 +21,7 @@ from core.module_manager import db, Game
 
 class Loader:
 
+    imported_modules = []
     ascii_art = r"""                _                        _   _ _  __
      /\        | |                      | | (_) |/ /
     /  \  _   _| |_ ___  _ __ ___   __ _| |_ _| ' /
@@ -78,7 +79,9 @@ class Loader:
             if module_extension == ".py" and module_name != "__init__":
                 try:
                     # noinspection PyPep8Naming
-                    Klass = getattr(importlib.import_module(f"modules.{module_name}"), "Main")
+                    imported_module = importlib.import_module(f"modules.{module_name}")
+                    Klass = getattr(imported_module, "Main")
+                    Loader.imported_modules.append(imported_module)
                     modules.append(Klass())
                 except AttributeError:
                     logger.exception(f"Module '{module_name}' couldn't be loaded")
@@ -87,6 +90,15 @@ class Loader:
 
         logger.info(f"{len(modules)} modules loaded")
         return modules
+
+    @staticmethod
+    def reload_modules():
+        """Reimports and instances all the modules automagically"""
+
+        Loader.imported_modules = [importlib.reload(i) for i in Loader.imported_modules]  # Reimports the modules
+        importlib.invalidate_caches()
+        logger.info(f"{len(Loader.imported_modules)} modules loaded")
+        return [getattr(i, "Main")() for i in Loader.imported_modules]  # Instances from the modules
 
 
 class Client(commands.Bot, LangManager, ConfigManager):
@@ -136,10 +148,10 @@ class Client(commands.Bot, LangManager, ConfigManager):
             else:
                 logger.error("Unknown terminal command. Use 'shutdown' to stop the bot.")
 
-    def load_resources(self):
+    def load_resources(self, reload=False):
         """Loads configuration, modules and language packages"""
 
-        self.MODULES = Loader.load_modules()
+        self.MODULES = Loader.reload_modules() if reload else Loader.load_modules()
         self.load_config()
         self.create_config_keys(self.MODULES)
         self.check_config_changes()
@@ -404,7 +416,7 @@ class Client(commands.Bot, LangManager, ConfigManager):
             logger.info("Reloading...")
             was_started = bool(self.main_loop)
             self.main_loop = False
-            self.load_resources()
+            self.load_resources(reload=True)
             self.main_loop = was_started
 
             await ctx.channel.send(self.lang["reload_completed"])
