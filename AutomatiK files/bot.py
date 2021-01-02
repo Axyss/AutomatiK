@@ -129,7 +129,13 @@ class Client(commands.Bot, LangManager, ConfigManager):
 
     @staticmethod
     def clear_console():
-        os.system("cls") if os.name == "nt" else os.system("clear")
+        local_os = os.name
+        if local_os in ("nt", "dos"):
+            os.system("cls")
+        elif local_os in ("linux", "osx", "posix"):
+            os.system("clear")
+        else:
+            print("\n" * 120)
 
     def cli(self):
         """Manages the console commands."""
