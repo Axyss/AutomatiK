@@ -1,11 +1,13 @@
 <img src="https://raw.githubusercontent.com/Axyss/AutomatiK/master/AutomatiK%20files/assets/ak_logo.png" alt="automatik_logo" align="right" width="180" height="180"></img>
 <h1>AutomatiK</h1>
 <b>Language:</b> <a href="README.md#automatik">English</a>, <a href="README_es_ES.md#automatik">Español</a>
-</br>
+<br>
+<br>
+<a href="https://www.codefactor.io/repository/github/axyss/automatik"><img src="https://www.codefactor.io/repository/github/axyss/automatik/badge" alt="CodeFactor" /></a>
 <h2>What is AutomatiK?</h2>
 AutomatiK is a <b>Discord bot</b> whose task is to notify users about free games from multiple platforms. It's completely autonomous, has some <b>configuration options</b>, a built-in database where game data is stored and, most importantly, it's <b>modularity</b> brings us the ability to <b>code, add and remove modules very easily.</b>
-</br>
-</br>
+<br>
+<br>
 The default modules support the next services:
 
 - Epic Games
