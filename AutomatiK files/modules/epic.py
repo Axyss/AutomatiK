@@ -1,5 +1,6 @@
 import json
 import requests
+from requests.exceptions import HTTPError, Timeout
 
 from core.module_manager import Game
 from core.log_manager import logger
@@ -23,7 +24,7 @@ class Main:
             raw_data = json.loads(raw_data.content)  # Bytes to json object
             raw_data = raw_data["data"]["Catalog"]["searchStore"]["elements"]  # Cleans the data
             return raw_data
-        except:
+        except (HTTPError, Timeout, requests.exceptions.ConnectionError):
             logger.error(f"Request to {self.SERVICE_NAME} by module \'{self.MODULE_ID}\' failed")
             return False
 

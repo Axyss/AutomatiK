@@ -1,5 +1,6 @@
 import time
 import requests
+from requests.exceptions import HTTPError, Timeout
 from bs4 import BeautifulSoup
 
 from core.log_manager import logger
@@ -17,7 +18,7 @@ class Updates:
         """Gets the last version of the remote AutomatiK repository."""
         try:
             req = requests.get(self.url)  # Gets the HTML code from the web page
-        except:
+        except (HTTPError, Timeout, requests.exceptions.ConnectionError):
             logger.error("Version request to GitHub failed")
             return False
 

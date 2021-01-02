@@ -1,4 +1,5 @@
 import requests
+from requests.exceptions import HTTPError, Timeout
 
 from core.module_manager import Game
 from core.log_manager import logger
@@ -20,7 +21,7 @@ class Main:
             raw_data = requests.get(self.ENDPOINT).json()
             raw_data = raw_data["results"]
             return raw_data
-        except:
+        except (HTTPError, Timeout, requests.exceptions.ConnectionError):
             logger.error(f"Request to {self.SERVICE_NAME} by module \'{self.MODULE_ID}\' failed")
             return False
 
