@@ -18,7 +18,7 @@
       "status": "Status",
       "status_main": "Main service",
       "status_description": "Check the status of various services of the bot.",
-      "status_active": "ACTIVE \u2611",
+      "status_active": "ACTIVE \u2705",
       "status_inactive": "INACTIVE \u274C",
 
       "mentions": "Mentions",

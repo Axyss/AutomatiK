@@ -18,7 +18,7 @@
       "status": "Estado",
       "status_main": "Servicio principal",
       "status_description": "Comprueba el estado de varios servicios del bot.",
-      "status_active": "ACTIVO \u2611",
+      "status_active": "ACTIVO \u2705",
       "status_inactive": "INACTIVO \u274C",
 
       "mentions": "Menciones",
