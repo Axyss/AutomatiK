@@ -98,7 +98,7 @@ There are also **optional** elements that can be used if needed:
 ## Step 4: That's all!🎉
 
 If you have followed all the steps correctly, you should have a fully working module similar to the one at
-the beginning of this guide, the last step would be to create methods to scrape data from a web or an API and give the
+the beginning of this guide. The last step would be to create methods to scrape data from a web or an API and give the
 module a real purpose. 
 
 If you find any problems following this guide or with the bot itself, open a 
