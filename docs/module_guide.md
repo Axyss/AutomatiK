@@ -90,8 +90,7 @@ There are also **optional** elements that can be used if needed:
      <br>
  ⚠️**WARNING**: **THRESHOLD** values that are too low may cause an infinite loop of notifications, while 
  very high ones may result in some games not being notified.
-<br>
-<br>     
+    
 2. Methods inside the **Main** class:
    - Nothing yet. 🚧
     
