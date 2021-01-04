@@ -1,11 +1,14 @@
 <img src="https://raw.githubusercontent.com/Axyss/AutomatiK/master/AutomatiK%20files/assets/ak_logo.png" alt="automatik_logo" align="right" width="180" height="180"></img>
 <h1>AutomatiK</h1>
 <b>Language:</b> <a href="README.md#automatik">English</a>, <a href="README_es_ES.md#automatik">Español</a>
+<br>
+<br>
+<a href="https://www.codefactor.io/repository/github/axyss/automatik"><img src="https://www.codefactor.io/repository/github/axyss/automatik/badge" alt="CodeFactor" /></a>
 <h2>¿Qué es AutomatiK?</h2>
 AutomatiK es un <b>bot de Discord</b> cuya tarea es notificar a los usuarios sobre los juegos gratis de múltiples plataformas. Es completamente autónomo, tiene algunas <b>opciones configurables</b> y una base de datos integrada donde se almacena la información de los juegos ,y lo más importante, su <b>modularidad</b> nos proporciona la posibilidad de <b>programar, añadir y eliminar módulos de forma muy sencilla.</b>
-</br>
-</br>
-Las plataformas actualmemte soportadas son:
+<br>
+<br>
+Las plataformas actualmente soportadas son:
 
 - Epic Games
 - Humble Bundle
@@ -49,7 +52,7 @@ AutomatiK trabaja con el prefijo <b><i>!mk</i></b>.
 Puedes ver todos los comandos disponibles usando <b><i>!mk help</i></b>
 <h3>Ejemplo:</h3> <img src="https://raw.githubusercontent.com/Axyss/AutomatiK/master/AutomatiK%20files/assets/help.png" alt="helpme"></img>
 <h2>¿Cómo puedo programar mis propios módulos?</h2>
-Para aprender a crear módulos visita <a href="https://github.com/Axyss/AutomatiK/blob/master/example_mod.py">este módulo de ejemplo.</a>
+Para aprender a crear módulos visita <a href="https://github.com/Axyss/AutomatiK/blob/master/docs/module_guide.md">esta guía.</a>
 <h2>Licencia</h2>
 Todo el <b>software</b> de este repositorio se encuentra licenciado bajo la licencia MIT, mientras que <b>todo el contenido gráfico y logos</b> se encuentran licenciados bajo Creative Commons Attribution-ShareAlike 4.0 International, haz click en el logo de debajo para conocer las limitaciones de esta licencia.
 </br>

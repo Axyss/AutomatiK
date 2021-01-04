@@ -27,10 +27,10 @@
       "mention_disabled": "\u2705 Se ha desactivado el módulo Mention.",
       "mention_error": "\u274C El rol introducido no es válido.",
 
-      "modules": "Módulos",
+      "modules": "**Módulos**",
       "modules_description": "La columna **ModuleID** contiene el nombre con el que cada módulo debe ser llamado en los comandos.",
-      "modules_service": "Servicio",
-      "modules_author": "Autor",
+      "modules_service": "**Servicio**",
+      "modules_author": "**Autor**",
 
       "module_enabled": "\u2705 Se ha activado el módulo {}.",
       "module_disabled": "\u274C Se ha desactivado el módulo {}.",
@@ -43,6 +43,8 @@
       "stop_already": "\u274C El servicio principal ya se encuentra parado.",
       "stop_success": "\u2705 Se ha parado el servicio principal.",
 
+      "reload_completed": "\u2705 **Reload** completado.",
+
       "embed_footer": "Página del proyecto: github.com/Axyss/AutomatiK",
       "embed_description": "Todos los comandos deben ir precedidos por el prefijo **!mk**. Ejemplo: **!mk start**",
       "embed_field1_name": "\u2139 Comandos",
@@ -53,7 +55,8 @@
       "embed_field2_name": "Comandos de administrador",
       "embed_field2_value": ["⠀\n",
                              "**start** - Inicia el proceso principal en el canal donde el comando sea ejecutado..\n",
-                             "**stop** - Para el proceso principal.\n\n",
+                             "**stop** - Para el proceso principal.\n",
+                             "**reload** - Recarga la configuración, los módulos y los paquetes de idiomas.\n\n",
 
                              "**enable (ModuleID)** - Comando para activar módulos.\n",
                              "**disable (ModuleID)** - Comando para desactivar módulos.\n",

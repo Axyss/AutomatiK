@@ -1,82 +1,56 @@
 import time
-
 import requests
+from requests.exceptions import HTTPError, Timeout
 from bs4 import BeautifulSoup
 
 from core.log_manager import logger
 
 
 class Updates:
+    MAX_LENGTH = 25  # Maximum amount of numbers that a version can support
+    TIME_INTERVAL = 48  # In hours
 
     def __init__(self, link, local_version):
-
-        self.localVersion = str(local_version)
-        self.remoteVersion = ""
-        self.maxLength = 25  # Maximum amount of numbers that a version can support
-
-        # IMPORTANT: the url must contain a slash at the end
-        self.url = link
-
-        if self.url[-1] != "/":
-            self.url += "/"
-
-        self.numberList = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"]
+        self.raw_local_version = str(local_version)
+        self.url = link if link[-1] == "/" else link + "/"  # IMPORTANT: the url must contain a slash at the end
 
     def get_remote_version(self):
-        """Makes the get() request"""
-
+        """Gets the last version of the remote AutomatiK repository."""
         try:
             req = requests.get(self.url)  # Gets the HTML code from the web page
-        except:
+        except (HTTPError, Timeout, requests.exceptions.ConnectionError):
+            logger.error("Version request to GitHub failed")
             return False
 
-        soup = BeautifulSoup(req.content, 'html.parser')
-
+        soup = BeautifulSoup(req.content, "html.parser")
         try:
-            self.remoteVersion = soup.find("span",  # Type of container
-                                           {"class": "css-truncate-target"},  # Additional attrs
-                                           recursive=True).text  # Parameters of the search
+            remote_version = soup.find("span",  # Type of container
+                                       {"class": "css-truncate-target"},  # Additional attrs
+                                       recursive=True).text  # Parameters of the search
         except AttributeError:
+            logger.error("Version parsing from GitHub failed")
             return False
 
-    def convert(self):
-        """Converts the complex syntax of a version to an integer"""
-        localTemp = ""
-        remoteTemp = ""
+        return remote_version
 
-        for i in self.remoteVersion:
+    def convert(self, raw_remote_version):
+        """Converts the complex syntax of a version to an integer."""
+        if not raw_remote_version:
+            return False
 
-            if i in self.numberList:
-                remoteTemp += i
-            else:
-                continue
-        else:
+        local_version = "".join([x for x in self.raw_local_version if x.isdigit()])
+        local_version += "0" * (Updates.MAX_LENGTH - len(local_version))
 
-            # Adds "0" as many as needed to reach a length of 25 chars
-            remoteTemp += "0" * (self.maxLength - len(remoteTemp))
+        remote_version = "".join([x for x in raw_remote_version if x.isdigit()])
+        remote_version += "0" * (Updates.MAX_LENGTH - len(remote_version))
 
-        for i in self.localVersion:
-
-            if i in self.numberList:
-                localTemp += i
-            else:
-                continue
-        else:
-
-            # Adds "0" as many as needed to reach a length of 25 chars
-            localTemp += "0" * (self.maxLength - len(localTemp))
-
-        if int(remoteTemp) > int(localTemp):
-            # If the number of 25 digits of the remote version is higher, then It is a newer one
-
-            # Announce of a newer version
-            logger.info(f"New update ({self.remoteVersion}) available at {self.url + self.remoteVersion}")
-            return {"remote": int(remoteTemp), "local": int(localTemp)}
+        #  If the number of 25 digits of the remote version is higher, then It is a newer one
+        if int(remote_version) > int(local_version):
+            logger.info(f"New update ({raw_remote_version}) available at {self.url + raw_remote_version}")
+            return {"remote": int(remote_version), "local": int(local_version)}
 
     def start_checking(self):
-        """It will be necessary to use this method inside a thread"""
-
+        """Starts looking for new version every X hours."""
         while True:
-            self.get_remote_version()
-            self.convert()
-            time.sleep(172800)  # One check every 48 hours
+            self.convert(self.get_remote_version())
+            time.sleep(Updates.TIME_INTERVAL * 3600)

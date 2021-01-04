@@ -27,10 +27,10 @@
       "mention_disabled": "\u2705 Mention module disabled.",
       "mention_error": "\u274C The introduced role isn't valid.",
 
-      "modules": "Modules",
+      "modules": "**Modules**",
       "modules_description": "**ModuleID** column contains the way each module must be called by in commands.",
-      "modules_service": "Service",
-      "modules_author": "Author",
+      "modules_service": "**Service**",
+      "modules_author": "**Author**",
 
       "module_enabled": "\u2705 {} module enabled.",
       "module_disabled": "\u2705 {} module disabled.",
@@ -43,6 +43,8 @@
       "stop_already": "\u274C Main service is already stopped.",
       "stop_success": "\u2705 Main service stopped.",
 
+      "reload_completed": "\u2705 **Reload** completed.",
+
       "embed_footer": "Project page: github.com/Axyss/AutomatiK",
       "embed_description": "All commands must be preceded by the prefix **!mk**. Example: **!mk start**",
       "embed_field1_name": "\u2139 Commands",
@@ -53,7 +55,8 @@
       "embed_field2_name": "Administrator commands",
       "embed_field2_value": ["⠀\n",
                              "**start** - Starts the main process in the channel where the command is executed.\n",
-                             "**stop** - Stops the main process.\n\n",
+                             "**stop** - Stops the main process.\n",
+                             "**reload** - Reloads configuration, modules and language packages.\n\n",
 
                              "**enable (ModuleID)** - Command to enable AutomatiK modules.\n",
                              "**disable (ModuleID)** - Command to disable AutomatiK modules.\n",
