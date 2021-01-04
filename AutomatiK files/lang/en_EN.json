@@ -27,10 +27,10 @@
       "mention_disabled": "\u2705 Mention module disabled.",
       "mention_error": "\u274C The introduced role isn't valid.",
 
-      "modules": "Modules",
+      "modules": "**Modules**",
       "modules_description": "**ModuleID** column contains the way each module must be called by in commands.",
-      "modules_service": "Service",
-      "modules_author": "Author",
+      "modules_service": "**Service**",
+      "modules_author": "**Author**",
 
       "module_enabled": "\u2705 {} module enabled.",
       "module_disabled": "\u2705 {} module disabled.",

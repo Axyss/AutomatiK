@@ -98,7 +98,7 @@ class Loader:
 
 class Client(commands.Bot, LangManager, ConfigManager):
 
-    VERSION = "v1.2.4"
+    VERSION = "v1.3"
 
     def __init__(self, command_prefix, self_bot):
         commands.Bot.__init__(self, command_prefix=command_prefix, self_bot=self_bot)
@@ -335,7 +335,7 @@ class Client(commands.Bot, LangManager, ConfigManager):
                                     icon_url=self.AVATAR_URL
                                     )
             embed_module.set_thumbnail(url=self.LOGO_URL)
-            embed_module.add_field(name="ModuleID", value="\n".join(module_ids))
+            embed_module.add_field(name="**ModuleID**", value="\n".join(module_ids))
             embed_module.add_field(name=self.lang["modules_service"], value="\n".join(module_names))
             embed_module.add_field(name=self.lang["modules_author"], value="\n".join(module_authors))
 
