@@ -1,4 +1,4 @@
-<img src="https://raw.githubusercontent.com/Axyss/AutomatiK/master/AutomatiK%20files/assets/ak_logo.png" alt="automatik_logo" align="right" width="180" height="180"></img>
+<img src="https://raw.githubusercontent.com/Axyss/AutomatiK/master/docs/assets/ak_logo.png" alt="automatik_logo" align="right" width="180" height="180"></img>
 <h1>AutomatiK</h1>
 <b>Language:</b> <a href="README.md#automatik">English</a>, <a href="README_es_ES.md#automatik">Español</a>
 <br>
@@ -12,7 +12,7 @@ Las plataformas actualmente soportadas son:
 
 - Epic Games
 - Humble Bundle
-</br>
+<br>
 <b>Aviso:</b> AutomatiK no fue creado con la intención de ser un bot público, debido a ello, <b>no soporta más de un servidor de Discord a la vez</b>, evita invitarlo a múltiples servidores. No obstante, si lo único que quieres es recibir las notificaciones de los juegos gratis sin tener que configurar un bot, siempre puedes seguir la <a href="https://twitter.com/AutomatiK_bot">cuenta de Twitter de AutomatiK</a> o unirte a <a href="https://discord.gg/psDtnwX">este servidor de Discord.</a>
 
 <h2>¿Cómo puedo usarlo?</h2>
@@ -33,32 +33,32 @@ Una vez que lo hayamos hecho tendremos que vincular nuestra copia local de Autom
 `python bot.py`
 <h4>Linux</h4>
 
-`python3 bot.py`</br>
-</br>
+`python3 bot.py`<br>
+<br>
 Esto hará que un mensaje como este: `[INFO]: Please introduce your bot's secret token:` aparezca en la terminal. Tras esto simplemente pegaremos nuestro token en ella y presionaremos enter.
-</br><i>Si hemos hecho todo correctamente veremos un mensaje como este:</i> `[INFO]: AutomatiK bot now online`
+<br><i>Si hemos hecho todo correctamente veremos un mensaje como este:</i> `[INFO]: AutomatiK bot now online`
 
 A continuación invitaremos al bot a nuestro servidor, sigue <a href="https://discordpy.readthedocs.io/en/latest/discord.html#inviting-your-bot">esta</a> guía para hacerlo. <b>Asegúrate de proporcionarle permisos de administrador.</b>
-</br>
-</br>
+<br>
+<br>
 La última parte consiste en iniciar el proceso principal del bot, usa <b><i>!mk start</i></b> en el canal de texto donde quieras que aparezcan las notificaciones, recibirás un mensaje de confirmación... y eso es todo, AutomatiK ya se encontraría funcionando. Nuestro bot ya se encontraría funcionando completamente. Si quisiésemos <b>parar el bot al completo</b>, necesitaríamos usar el comando `shutdown` en
 la terminal donde se encuentra el bot ejecuntándose.
-</br>
-</br>
-<img src="https://raw.githubusercontent.com/Axyss/AutomatiK/master/AutomatiK%20files/assets/command_success.png" align="bottom"></img>
-</br>
+<br>
+<br>
+<img src="https://raw.githubusercontent.com/Axyss/AutomatiK/master/docs/assets/command_success.png" align="bottom"></img>
+<br>
 <h2>Comandos</h2>
 AutomatiK trabaja con el prefijo <b><i>!mk</i></b>. 
 Puedes ver todos los comandos disponibles usando <b><i>!mk help</i></b>
-<h3>Ejemplo:</h3> <img src="https://raw.githubusercontent.com/Axyss/AutomatiK/master/AutomatiK%20files/assets/help.png" alt="helpme"></img>
+<h3>Ejemplo:</h3> <img src="https://raw.githubusercontent.com/Axyss/AutomatiK/master/docs/assets/help.png" alt="helpme"></img>
 <h2>¿Cómo puedo programar mis propios módulos?</h2>
 Para aprender a crear módulos visita <a href="https://github.com/Axyss/AutomatiK/blob/master/docs/module_guide.md">esta guía.</a>
 <h2>Licencia</h2>
 Todo el <b>software</b> de este repositorio se encuentra licenciado bajo la licencia MIT, mientras que <b>todo el contenido gráfico y logos</b> se encuentran licenciados bajo Creative Commons Attribution-ShareAlike 4.0 International, haz click en el logo de debajo para conocer las limitaciones de esta licencia.
-</br>
-</br>
-<a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"><img alt="Licencia de Creative Commons" src="https://raw.githubusercontent.com/Axyss/AutomatiK/master/AutomatiK%20files/assets/cc_by_sa.png" width="120" height="40"></a>
+<br>
+<br>
+<a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"><img alt="Licencia de Creative Commons" src="https://raw.githubusercontent.com/Axyss/AutomatiK/master/docs/assets/cc_by_sa.png" width="120" height="40"></a>
 <h2>Sugerencias</h2>
 <b>¿Tienes alguna sugerencia? ¿Crees que AutomatiK debería soportar una plataforma en particular?</b>
-</br>
+<br>
 Abre un Issue, me encantaría escuchar vuestras ideas.
