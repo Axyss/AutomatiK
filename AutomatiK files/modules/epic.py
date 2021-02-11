@@ -37,13 +37,14 @@ class Main:
         try:
             for i in raw_data:
                 # (i["price"]["totalPrice"]["discountPrice"] == i["price"]["totalPrice"]["originalPrice"]) != 0
-                if i["promotions"]["promotionalOffers"]:
-                    game = Game(i["title"], str(self.URL + i["productSlug"]))
-                    processed_data.append(game)
+                try:
+                    if i["promotions"]["promotionalOffers"]:
+                        game = Game(i["title"], str(self.URL + i["productSlug"]))
+                        processed_data.append(game)
+                except TypeError:  # This gets executed when ["promotionalOffers"] is empty or does not exist
+                    pass
         except KeyError:
             logger.exception(f"Data from module \'{self.MODULE_ID}\' couldn't be processed")
-        except TypeError:  # This gets executed when ["promotionalOffers"] is empty or does not exist
-            pass
 
         return processed_data
 
