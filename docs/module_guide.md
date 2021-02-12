@@ -1,4 +1,4 @@
-# How to create AutomatiK modules (v1.3)
+# How to create AutomatiK modules (v1.3.X)
 
 ## Introduction
 Even though AutomatiK can run perfectly fine without them, they bring the most important part to it, 
