@@ -4,7 +4,7 @@ attrs==20.1.0
 beautifulsoup4==4.9.1
 certifi==2020.6.20
 chardet==3.0.4
-discord.py==1.4.1
+discord.py==1.6.0
 idna==2.10
 idna-ssl==1.1.0
 multidict==4.7.6

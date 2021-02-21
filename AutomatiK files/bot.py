@@ -100,14 +100,14 @@ class Client(commands.Bot, LangManager, ConfigManager):
 
     VERSION = "v1.3.1"
 
-    def __init__(self, command_prefix, self_bot):
-        commands.Bot.__init__(self, command_prefix=command_prefix, self_bot=self_bot)
+    def __init__(self, command_prefix, self_bot, intents):
+        commands.Bot.__init__(self, command_prefix=command_prefix, self_bot=self_bot, intents=intents)
         LangManager.__init__(self, lang_dir="lang/")
         ConfigManager.__init__(self, config_name="config.json")
 
         self.main_loop = False  # Variable which starts or stops the main loop
         self.MODULES = None
-        self.LOGO_URL = "https://raw.githubusercontent.com/Axyss/AutomatiK/master/AutomatiK%20files/assets/ak_logo.png"
+        self.LOGO_URL = "https://raw.githubusercontent.com/Axyss/AutomatiK/master/docs/assets/ak_logo.png"
         self.AVATAR_URL = "https://avatars3.githubusercontent.com/u/55812692"
         self.remove_command("help")
         self.is_started = False
@@ -416,7 +416,7 @@ class Client(commands.Bot, LangManager, ConfigManager):
 
 if __name__ == "__main__":
 
-    automatik = Client(command_prefix="!mk ", self_bot=False)
+    automatik = Client(command_prefix="!mk ", self_bot=False, intents=discord.Intents.default())
     try:
         automatik.run(base64.b64decode(Loader.start().encode("utf-8")).decode("utf-8"))
 
