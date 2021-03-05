@@ -2,7 +2,7 @@ import json
 import requests
 from requests.exceptions import HTTPError, Timeout
 
-from core.module_manager import Game
+from core.game import Game
 from core.log_manager import logger
 
 

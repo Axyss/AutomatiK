@@ -33,7 +33,7 @@
       "modules_author": "**Autor**",
 
       "module_enabled": "\u2705 Se ha activado el módulo {}.",
-      "module_disabled": "\u274C Se ha desactivado el módulo {}.",
+      "module_disabled": "\u2705 Se ha desactivado el módulo {}.",
       "enable_unknown": "\u274C Parámetro desconocido. Usa **!mk enable (ModuleID)**",
       "disable_unknown": "\u274C Parámetro desconocido. Usa **!mk disable (ModuleID)**",
 

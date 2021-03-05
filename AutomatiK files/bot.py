@@ -15,12 +15,12 @@ from discord.ext import commands
 from core import updates
 from core.log_manager import logger
 from core.lang_manager import LangManager
+from core.game import Game
 from core.config_manager import ConfigManager
-from core.module_manager import db, Game
+from core.db_manager import DatabaseManager
 
 
 class Loader:
-
     imported_modules = []
     ascii_art = r"""                _                        _   _ _  __
      /\        | |                      | | (_) |/ /
@@ -97,12 +97,12 @@ class Loader:
 
 
 class Client(commands.Bot, LangManager, ConfigManager):
-
-    VERSION = "v1.3.1"
+    VERSION = "v2.0"
 
     def __init__(self, command_prefix, self_bot, intents):
         commands.Bot.__init__(self, command_prefix=command_prefix, self_bot=self_bot, intents=intents)
-        LangManager.__init__(self, lang_dir="lang/")
+        self.lm = LangManager(lang_dir="lang/")
+        self.mongo = DatabaseManager()
         ConfigManager.__init__(self, config_name="config.json")
 
         self.main_loop = False  # Variable which starts or stops the main loop
@@ -155,16 +155,12 @@ class Client(commands.Bot, LangManager, ConfigManager):
         self.load_config()
         self.create_config_keys(self.MODULES)
         self.check_config_changes()
-        self.load_lang(self.data_config["lang"])
+        self.lm.load_lang_packages()
         return True
 
-    def get_status(self, service):
-        """Translates boolean values to the strings showed in '!mk status'."""
-        return self.lang["status_active"] if self.data_config[service] else self.lang["status_inactive"]
-
-    def generate_message(self, title, link):
+    def generate_message(self, ctx, title, link):
         """Generates the messages for the free games."""
-        draft = random.choice(self.lang["generic_messages"]).format(title, link)
+        draft = random.choice(self.lm.langs[self.mongo.get_lang(ctx.guild)]["generic_messages"]).format(title, link)
         if self.data_config["mention_status"]:  # Adds the mention_status value from config
             draft = self.data_config["mentioned_role"] + " " + draft
 
@@ -173,16 +169,16 @@ class Client(commands.Bot, LangManager, ConfigManager):
     async def on_command_error(self, ctx, error):  # The second parameter is the error's information
         """Method used for error handling regarding the discord.py library."""
         if isinstance(error, discord.ext.commands.MissingPermissions):
-            await ctx.channel.send(self.lang["missing_permissions"])
+            await ctx.channel.send(self.lm.langs[self.mongo.get_lang(ctx.guild)]["missing_permissions"])
 
         elif isinstance(error, discord.ext.commands.errors.NoPrivateMessage):
             pass
 
         elif isinstance(error, discord.ext.commands.errors.CommandNotFound):
-            await ctx.channel.send(self.lang["invalid_command"])
+            await ctx.channel.send(self.lm.langs[self.mongo.get_lang(ctx.guild)]["invalid_command"])
 
         elif isinstance(error, discord.ext.commands.errors.CommandOnCooldown):
-            await ctx.channel.send(self.lang["cooldown_error"].format(int(error.retry_after)))
+            await ctx.channel.send(self.lm.langs[self.mongo.get_lang(ctx.guild)]["cooldown_error"].format(int(error.retry_after)))
         else:
             try:
                 raise error
@@ -205,8 +201,8 @@ class Client(commands.Bot, LangManager, ConfigManager):
 
             game_name = " ".join(args)  # Converts list to string with spaces between elements
             await ctx.channel.purge(limit=1)
-            await ctx.channel.send(self.generate_message(game_name, link)
-                                   + self.lang["notify_thanks"].format(ctx.author.id)  # Adds politeness
+            await ctx.channel.send(self.generate_message(ctx, game_name, link)
+                                   + self.lm.langs[self.mongo.get_lang(ctx.guild)]["notify_thanks"].format(ctx.author.id)  # Adds politeness
                                    )
 
         @self.command()
@@ -218,10 +214,10 @@ class Client(commands.Bot, LangManager, ConfigManager):
             if re.search("^<@&\w", role_id) and re.search(">$", role_id):
                 # If the string follows the std structure of a role <@&1234>
                 self.edit_config("mentioned_role", role_id)
-                await ctx.channel.send(self.lang["mention_established"])
+                await ctx.channel.send(self.lm.langs[self.mongo.get_lang(ctx.guild)]["mention_established"])
                 logger.info(f"AutomatiK will now mention '{role_id}'")
             else:
-                await ctx.channel.send(self.lang["mention_error"])
+                await ctx.channel.send(self.lm.langs[self.mongo.get_lang(ctx.guild)]["mention_error"])
 
         @self.command(aliases=["help"])
         @commands.guild_only()
@@ -229,19 +225,19 @@ class Client(commands.Bot, LangManager, ConfigManager):
         async def helpme(ctx):
             """Help command that uses embeds."""
             embed_help = discord.Embed(title=f"AutomatiK {Client.VERSION} Help ",
-                                       description=self.lang["embed_description"],
+                                       description=self.lm.langs[self.mongo.get_lang(ctx.guild)]["embed_description"],
                                        color=0x00BFFF
                                        )
-            embed_help.set_footer(text=self.lang["embed_footer"],
+            embed_help.set_footer(text=self.lm.langs[self.mongo.get_lang(ctx.guild)]["embed_footer"],
                                   icon_url=self.AVATAR_URL
                                   )
             embed_help.set_thumbnail(url=self.LOGO_URL)
 
-            embed_help.add_field(name=self.lang["embed_field1_name"],
-                                 value="".join(self.lang["embed_field1_value"]), inline=False
+            embed_help.add_field(name=self.lm.langs[self.mongo.get_lang(ctx.guild)]["embed_field1_name"],
+                                 value="".join(self.lm.langs[self.mongo.get_lang(ctx.guild)]["embed_field1_value"]), inline=False
                                  )
-            embed_help.add_field(name=u"\U0001F6E0 " + self.lang["embed_field2_name"],
-                                 value="".join(self.lang["embed_field2_value"]),
+            embed_help.add_field(name=u"\U0001F6E0 " + self.lm.langs[self.mongo.get_lang(ctx.guild)]["embed_field2_name"],
+                                 value="".join(self.lm.langs[self.mongo.get_lang(ctx.guild)]["embed_field2_value"]),
                                  inline=False)
 
             await ctx.channel.send(embed=embed_help)
@@ -254,17 +250,17 @@ class Client(commands.Bot, LangManager, ConfigManager):
         async def start(ctx):
             """Starts the AutomatiK service."""
             if self.main_loop:  # If service already started
-                await ctx.channel.send(self.lang["start_already"])
+                await ctx.channel.send(self.lm.langs[self.mongo.get_lang(ctx.guild)]["start_already"])
                 return None
 
             self.main_loop = True  # Changes It to True so the main loop can start
-            await ctx.channel.send(self.lang["start_success"].format("<#" + str(ctx.channel.id) + ">"))
+            await ctx.channel.send(self.lm.langs[self.mongo.get_lang(ctx.guild)]["start_success"].format("<#" + str(ctx.channel.id) + ">"))
             logger.info(f"Main service was started on #{ctx.channel} by {str(ctx.author)}")
 
             while self.main_loop:  # MAIN LOOP
                 for i in self.MODULES:
                     if not self.data_config[f"{i.MODULE_ID}_status"]:  # Prevents games from getting added to the db
-                        continue                                       # when a module isn't enabled
+                        continue  # when a module isn't enabled
                     free_games = i.get_free_games()
                     # If there is at least one element this will put It in a list
                     free_games = [free_games] if isinstance(free_games, Game) else free_games
@@ -286,11 +282,11 @@ class Client(commands.Bot, LangManager, ConfigManager):
         async def stop(ctx):
             """Stops the AutomatiK service"""
             if not self.main_loop:  # If service already stopped
-                await ctx.channel.send(self.lang["stop_already"])
+                await ctx.channel.send(self.lm.langs[self.mongo.get_lang(ctx.guild)]["stop_already"])
                 return False
 
             self.main_loop = False  # Stops the loop by changing the boolean which maintains It active
-            await ctx.channel.send(self.lang["stop_success"])
+            await ctx.channel.send(self.lm.langs[self.mongo.get_lang(ctx.guild)]["stop_success"])
             logger.info(f"Main service was stopped by {str(ctx.author)}")
 
         @self.command()
@@ -298,21 +294,28 @@ class Client(commands.Bot, LangManager, ConfigManager):
         @commands.cooldown(2, 10, commands.BucketType.user)
         async def status(ctx):
             """Shows the bot's status."""
-            embed_status = discord.Embed(title=self.lang["status"],
-                                         description=self.lang["status_description"],
+            cfg = self.mongo.get_config(ctx.guild)
+            embed_status = discord.Embed(title=self.lm.get_message(cfg["lang"], "status"),
+                                         description=self.lm.langs[cfg["lang"]]["status_description"],
                                          color=0x00BFFF
                                          )
-            embed_status.set_footer(text=self.lang["embed_footer"],
+            embed_status.set_footer(text=self.lm.langs[cfg["lang"]]["embed_footer"],
                                     icon_url=self.AVATAR_URL
                                     )
             embed_status.set_thumbnail(url=self.LOGO_URL)
-            embed_status.add_field(name=self.lang["status_main"], value=self.lang["status_active"]
-                                   if self.main_loop else self.lang["status_inactive"]
+            embed_status.add_field(name=self.lm.langs[self.mongo.get_lang(ctx.guild)]["status_main"],
+                                   value=self.lm.langs[cfg["lang"]]["status_active"]
+                                   if cfg["services"]["main"]
+                                   else self.lm.langs[cfg["lang"]]["status_inactive"]
                                    )
 
             for i in self.MODULES:
+                value = self.lm.langs[cfg["lang"]]["status_active"] \
+                    if cfg["services"][i.MODULE_ID] \
+                    else self.lm.langs[cfg["lang"]]["status_inactive"]
+
                 embed_status.add_field(name=i.SERVICE_NAME,
-                                       value=self.get_status(f"{i.MODULE_ID}_status")
+                                       value=value,
                                        )
             await ctx.channel.send(embed=embed_status)
             logger.debug(f"Command '{ctx.command}' invoked by {ctx.author}")
@@ -327,17 +330,17 @@ class Client(commands.Bot, LangManager, ConfigManager):
             module_names = [i.SERVICE_NAME for i in self.MODULES]
             module_authors = [i.AUTHOR for i in self.MODULES]
 
-            embed_module = discord.Embed(title=self.lang["modules"],
-                                         description=self.lang["modules_description"],
+            embed_module = discord.Embed(title=self.lm.langs[self.mongo.get_lang(ctx.guild)]["modules"],
+                                         description=self.lm.langs[self.mongo.get_lang(ctx.guild)]["modules_description"],
                                          color=0x00BFFF
                                          )
-            embed_module.set_footer(text=self.lang["embed_footer"],
+            embed_module.set_footer(text=self.lm.langs[self.mongo.get_lang(ctx.guild)]["embed_footer"],
                                     icon_url=self.AVATAR_URL
                                     )
             embed_module.set_thumbnail(url=self.LOGO_URL)
             embed_module.add_field(name="**ModuleID**", value="\n".join(module_ids))
-            embed_module.add_field(name=self.lang["modules_service"], value="\n".join(module_names))
-            embed_module.add_field(name=self.lang["modules_author"], value="\n".join(module_authors))
+            embed_module.add_field(name=self.lm.langs[self.mongo.get_lang(ctx.guild)]["modules_service"], value="\n".join(module_names))
+            embed_module.add_field(name=self.lm.langs[self.mongo.get_lang(ctx.guild)]["modules_author"], value="\n".join(module_authors))
 
             await ctx.channel.send(embed=embed_module)
 
@@ -346,19 +349,19 @@ class Client(commands.Bot, LangManager, ConfigManager):
         @commands.cooldown(2, 10, commands.BucketType.user)
         @commands.has_permissions(administrator=True)
         async def enable(ctx, service):
-            """Global manager to enable/disable modules and some other services."""
+            """Global manager to enable/disable modules and other services."""
             introduced_command = str(ctx.invoked_with)
             user_decision = True if introduced_command == "enable" else False
 
             for i in self.MODULES:
                 if service.lower() == i.MODULE_ID.lower():
-                    self.edit_config(f"{i.MODULE_ID}_status", user_decision)
+                    self.mongo.update_config(ctx.guild, {"services." + service.lower(): user_decision})
 
-                    await ctx.channel.send(self.lang[f"module_{introduced_command}d"].format(service.capitalize()))
+                    await ctx.channel.send(self.lm.langs[self.mongo.get_lang(ctx.guild)][f"module_{introduced_command}d"].format(service.capitalize()))
                     logger.info(f"{service.capitalize()} module {introduced_command}d by {ctx.author}")
                     return True
 
-            await ctx.channel.send(self.lang[f"{introduced_command}_unknown"])
+            await ctx.channel.send(self.lm.langs[self.mongo.get_lang(ctx.guild)][f"{introduced_command}_unknown"])
             return False
 
         @self.command()
@@ -366,35 +369,35 @@ class Client(commands.Bot, LangManager, ConfigManager):
         @commands.cooldown(2, 10, commands.BucketType.user)
         @commands.has_permissions(administrator=True)
         async def language(ctx, lang_code):
+            guild_lang = self.mongo.get_config(ctx.guild)["lang"]
 
-            if (lang_code + ".json") not in os.listdir("lang"):  # If the language .json does not exist
-                await ctx.channel.send(self.lang["language_error"])
+            if lang_code not in self.lm.get_lang_packages_metadata()[0]:  # If the language .json does not exist
+                await ctx.channel.send(self.lm.get_message(guild_lang, "language_error"))
+                return None
 
-            else:  # Edits the config value which contains what lang is going to be loaded
-                self.edit_config("lang", lang_code)
-                self.load_lang(self.data_config["lang"])  # Reloads the language
-                await ctx.channel.send(self.lang["language_changed"])
-                logger.info(f"Language changed to '{lang_code}' by {ctx.author}")
+            self.mongo.update_config(ctx.guild, {"lang": lang_code})
+            await ctx.channel.send(self.lm.get_message(lang_code, "language_changed"))
+            logger.info(f"Language changed to '{lang_code}' by {ctx.author}")
 
         @self.command()
         @commands.guild_only()
         @commands.cooldown(2, 10, commands.BucketType.user)
         @commands.has_permissions(administrator=True)
         async def languages(ctx):
-            lang_name, lang_author = self.get_lang_metadata()
-            lang_ids = self.get_lang_ids()
+            lang_ids, lang_names, lang_authors = self.lm.get_lang_packages_metadata()
+            guild_lang = self.mongo.get_config(ctx.guild)["lang"]
 
-            embed_langs = discord.Embed(title=self.lang["languages"],
-                                        description=self.lang["languages_description"],
+            embed_langs = discord.Embed(title=self.lm.get_message(guild_lang, "languages"),
+                                        description=self.lm.get_message(guild_lang, "languages_description"),
                                         color=0x00BFFF
                                         )
-            embed_langs.set_footer(text=self.lang["embed_footer"],
+            embed_langs.set_footer(text=self.lm.get_message(guild_lang, "embed_footer"),
                                    icon_url=self.AVATAR_URL
                                    )
             embed_langs.set_thumbnail(url=self.LOGO_URL)
             embed_langs.add_field(name="LangID", value="\n".join(lang_ids))
-            embed_langs.add_field(name=self.lang["language"], value="\n".join(lang_name))
-            embed_langs.add_field(name=self.lang["modules_author"], value="\n".join(lang_author))
+            embed_langs.add_field(name=self.lm.get_message(guild_lang, "language"), value="\n".join(lang_names))
+            embed_langs.add_field(name=self.lm.get_message(guild_lang, "modules_author"), value="\n".join(lang_authors))
 
             await ctx.channel.send(embed=embed_langs)
 
@@ -410,7 +413,7 @@ class Client(commands.Bot, LangManager, ConfigManager):
             self.load_resources(reload=True)
             self.main_loop = was_started
 
-            await ctx.channel.send(self.lang["reload_completed"])
+            await ctx.channel.send(self.lm.langs[self.mongo.get_lang(ctx.guild)]["reload_completed"])
             logger.info("Reload completed")
 
 
