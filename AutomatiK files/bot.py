@@ -69,12 +69,10 @@ class Loader:
         modules = []
 
         for i in os.listdir("modules"):
-            module_name = os.path.splitext(i)[0]
-            module_extension = os.path.splitext(i)[1]
+            module_name, module_extension = os.path.splitext(i)
 
             if module_extension == ".py" and module_name != "__init__":
                 try:
-                    # noinspection PyPep8Naming
                     imported_module = importlib.import_module(f"modules.{module_name}")
                     Klass = getattr(imported_module, "Main")
                     Loader.imported_modules.append(imported_module)
@@ -90,7 +88,7 @@ class Loader:
     @staticmethod
     def reload_modules():
         """Reimports and instances all the modules automagically."""
-        Loader.imported_modules = [importlib.reload(i) for i in Loader.imported_modules]  # Reimports the modules
+        Loader.imported_modules = [importlib.reload(i) for i in Loader.imported_modules]  # Re-imports the modules
         importlib.invalidate_caches()
         logger.info(f"{len(Loader.imported_modules)} modules loaded")
         return [getattr(i, "Main")() for i in Loader.imported_modules]  # Instances from the modules
@@ -160,7 +158,9 @@ class Client(commands.Bot, LangManager, ConfigManager):
 
     def generate_message(self, ctx, title, link):
         """Generates the messages for the free games."""
-        draft = random.choice(self.lm.langs[self.mongo.get_lang(ctx.guild)]["generic_messages"]).format(title, link)
+        guild_lang = self.mongo.get_config(ctx.guild)["lang"]
+
+        draft = random.choice(self.lm.get_message(guild_lang, "generic_messages")).format(title, link)
         if self.data_config["mention_status"]:  # Adds the mention_status value from config
             draft = self.data_config["mentioned_role"] + " " + draft
 
@@ -168,17 +168,19 @@ class Client(commands.Bot, LangManager, ConfigManager):
 
     async def on_command_error(self, ctx, error):  # The second parameter is the error's information
         """Method used for error handling regarding the discord.py library."""
+        guild_lang = self.mongo.get_config(ctx.guild)["lang"]
+
         if isinstance(error, discord.ext.commands.MissingPermissions):
-            await ctx.channel.send(self.lm.langs[self.mongo.get_lang(ctx.guild)]["missing_permissions"])
+            await ctx.channel.send(self.lm.get_message(guild_lang, "missing_permissions"))
 
         elif isinstance(error, discord.ext.commands.errors.NoPrivateMessage):
             pass
 
         elif isinstance(error, discord.ext.commands.errors.CommandNotFound):
-            await ctx.channel.send(self.lm.langs[self.mongo.get_lang(ctx.guild)]["invalid_command"])
+            await ctx.channel.send(self.lm.get_message(guild_lang, "invalid_command"))
 
         elif isinstance(error, discord.ext.commands.errors.CommandOnCooldown):
-            await ctx.channel.send(self.lm.langs[self.mongo.get_lang(ctx.guild)]["cooldown_error"].format(int(error.retry_after)))
+            await ctx.channel.send(self.lm.get_message(guild_lang, "cooldown_error").format(int(error.retry_after)))
         else:
             try:
                 raise error
@@ -193,17 +195,17 @@ class Client(commands.Bot, LangManager, ConfigManager):
         @commands.has_permissions(administrator=True)
         async def notify(ctx, *args):
             """Command to notify free games from non-supported platforms."""
-            args = list(args)
+            guild_lang = self.mongo.get_config(ctx.guild)["lang"]
 
-            # Stores the link in another variable and removes It from args
+            args = list(args)
             link = args[-1]
             args.pop()
+            game_name = " ".join(args)  # Uses the args to generate the game name
 
-            game_name = " ".join(args)  # Converts list to string with spaces between elements
             await ctx.channel.purge(limit=1)
-            await ctx.channel.send(self.generate_message(ctx, game_name, link)
-                                   + self.lm.langs[self.mongo.get_lang(ctx.guild)]["notify_thanks"].format(ctx.author.id)  # Adds politeness
-                                   )
+            await ctx.channel.send(self.generate_message(ctx, game_name, link) +
+                                   self.lm.get_message(guild_lang, "notify_thanks").format(ctx.author.id)
+                                   )  # Adds politeness
 
         @self.command()
         @commands.guild_only()
@@ -211,33 +213,37 @@ class Client(commands.Bot, LangManager, ConfigManager):
         @commands.has_permissions(administrator=True)
         async def mention(ctx, role_id):
             """Manages the mentions of the bot's messages."""
+            guild_lang = self.mongo.get_config(ctx.guild)["lang"]
+
             if re.search("^<@&\w", role_id) and re.search(">$", role_id):
                 # If the string follows the std structure of a role <@&1234>
                 self.edit_config("mentioned_role", role_id)
-                await ctx.channel.send(self.lm.langs[self.mongo.get_lang(ctx.guild)]["mention_established"])
+                await ctx.channel.send(self.lm.get_message(guild_lang, "mention_established"))
                 logger.info(f"AutomatiK will now mention '{role_id}'")
             else:
-                await ctx.channel.send(self.lm.langs[self.mongo.get_lang(ctx.guild)]["mention_error"])
+                await ctx.channel.send(self.lm.get_message(guild_lang, "mention_error"))
 
         @self.command(aliases=["help"])
         @commands.guild_only()
         @commands.cooldown(1, 60, commands.BucketType.user)
         async def helpme(ctx):
             """Help command that uses embeds."""
+            guild_lang = self.mongo.get_config(ctx.guild)["lang"]
+
             embed_help = discord.Embed(title=f"AutomatiK {Client.VERSION} Help ",
-                                       description=self.lm.langs[self.mongo.get_lang(ctx.guild)]["embed_description"],
+                                       description=self.lm.get_message(guild_lang, "embed_description"),
                                        color=0x00BFFF
                                        )
-            embed_help.set_footer(text=self.lm.langs[self.mongo.get_lang(ctx.guild)]["embed_footer"],
+            embed_help.set_footer(text=self.lm.get_message(guild_lang, "embed_footer"),
                                   icon_url=self.AVATAR_URL
                                   )
             embed_help.set_thumbnail(url=self.LOGO_URL)
 
-            embed_help.add_field(name=self.lm.langs[self.mongo.get_lang(ctx.guild)]["embed_field1_name"],
-                                 value="".join(self.lm.langs[self.mongo.get_lang(ctx.guild)]["embed_field1_value"]), inline=False
+            embed_help.add_field(name=self.lm.get_message(guild_lang, "embed_field1_name"),
+                                 value="".join(self.lm.get_message(guild_lang, "embed_field1_value")), inline=False
                                  )
-            embed_help.add_field(name=u"\U0001F6E0 " + self.lm.langs[self.mongo.get_lang(ctx.guild)]["embed_field2_name"],
-                                 value="".join(self.lm.langs[self.mongo.get_lang(ctx.guild)]["embed_field2_value"]),
+            embed_help.add_field(name=u"\U0001F6E0 " + self.lm.get_message(guild_lang, "embed_field2_name"),
+                                 value="".join(self.lm.get_message(guild_lang, "embed_field2_value")),
                                  inline=False)
 
             await ctx.channel.send(embed=embed_help)
@@ -249,12 +255,16 @@ class Client(commands.Bot, LangManager, ConfigManager):
         @commands.has_permissions(administrator=True)
         async def start(ctx):
             """Starts the AutomatiK service."""
+            guild_lang = self.mongo.get_config(ctx.guild)["lang"]
+
             if self.main_loop:  # If service already started
-                await ctx.channel.send(self.lm.langs[self.mongo.get_lang(ctx.guild)]["start_already"])
-                return None
+                await ctx.channel.send(self.lm.get_message(guild_lang, "start_already"))
+                return
 
             self.main_loop = True  # Changes It to True so the main loop can start
-            await ctx.channel.send(self.lm.langs[self.mongo.get_lang(ctx.guild)]["start_success"].format("<#" + str(ctx.channel.id) + ">"))
+            await ctx.channel.send(
+                self.lm.get_message(guild_lang, "start_success").format("<#" + str(ctx.channel.id) + ">")
+            )
             logger.info(f"Main service was started on #{ctx.channel} by {str(ctx.author)}")
 
             while self.main_loop:  # MAIN LOOP
@@ -280,13 +290,15 @@ class Client(commands.Bot, LangManager, ConfigManager):
         @commands.cooldown(2, 10, commands.BucketType.user)
         @commands.has_permissions(administrator=True)
         async def stop(ctx):
-            """Stops the AutomatiK service"""
+            """Stops the main service on the guild where It is executed"""
+            guild_lang = self.mongo.get_config(ctx.guild)["lang"]
+
             if not self.main_loop:  # If service already stopped
-                await ctx.channel.send(self.lm.langs[self.mongo.get_lang(ctx.guild)]["stop_already"])
+                await ctx.channel.send(self.lm.get_message(guild_lang, "stop_already"))
                 return False
 
             self.main_loop = False  # Stops the loop by changing the boolean which maintains It active
-            await ctx.channel.send(self.lm.langs[self.mongo.get_lang(ctx.guild)]["stop_success"])
+            await ctx.channel.send(self.lm.get_message(guild_lang, "stop_success"))
             logger.info(f"Main service was stopped by {str(ctx.author)}")
 
         @self.command()
@@ -295,24 +307,24 @@ class Client(commands.Bot, LangManager, ConfigManager):
         async def status(ctx):
             """Shows the bot's status."""
             cfg = self.mongo.get_config(ctx.guild)
+
             embed_status = discord.Embed(title=self.lm.get_message(cfg["lang"], "status"),
-                                         description=self.lm.langs[cfg["lang"]]["status_description"],
+                                         description=self.lm.get_message(cfg["lang"], "status_description"),
                                          color=0x00BFFF
                                          )
-            embed_status.set_footer(text=self.lm.langs[cfg["lang"]]["embed_footer"],
+            embed_status.set_footer(text=self.lm.get_message(cfg["lang"], "embed_footer"),
                                     icon_url=self.AVATAR_URL
                                     )
             embed_status.set_thumbnail(url=self.LOGO_URL)
-            embed_status.add_field(name=self.lm.langs[self.mongo.get_lang(ctx.guild)]["status_main"],
-                                   value=self.lm.langs[cfg["lang"]]["status_active"]
+            embed_status.add_field(name=self.lm.get_message(cfg["lang"], "status_main"),
+                                   value=self.lm.get_message(cfg["lang"], "status_active")
                                    if cfg["services"]["main"]
-                                   else self.lm.langs[cfg["lang"]]["status_inactive"]
+                                   else self.lm.get_message(cfg["lang"], "status_inactive")
                                    )
 
             for i in self.MODULES:
-                value = self.lm.langs[cfg["lang"]]["status_active"] \
-                    if cfg["services"][i.MODULE_ID] \
-                    else self.lm.langs[cfg["lang"]]["status_inactive"]
+                value = self.lm.get_message(cfg["lang"], "status_active") \
+                    if cfg["services"][i.MODULE_ID] else self.lm.get_message(cfg["lang"], "status_inactive")
 
                 embed_status.add_field(name=i.SERVICE_NAME,
                                        value=value,
@@ -326,21 +338,27 @@ class Client(commands.Bot, LangManager, ConfigManager):
         @commands.has_permissions(administrator=True)
         async def modules(ctx):
             """Shows information about the loaded modules."""
+            guild_lang = self.mongo.get_config(ctx.guild)["lang"]
+
             module_ids = [i.MODULE_ID for i in self.MODULES]
             module_names = [i.SERVICE_NAME for i in self.MODULES]
             module_authors = [i.AUTHOR for i in self.MODULES]
 
-            embed_module = discord.Embed(title=self.lm.langs[self.mongo.get_lang(ctx.guild)]["modules"],
-                                         description=self.lm.langs[self.mongo.get_lang(ctx.guild)]["modules_description"],
+            embed_module = discord.Embed(title=self.lm.get_message(guild_lang, "modules"),
+                                         description=self.lm.get_message(guild_lang, "modules_description"),
                                          color=0x00BFFF
                                          )
-            embed_module.set_footer(text=self.lm.langs[self.mongo.get_lang(ctx.guild)]["embed_footer"],
+            embed_module.set_footer(text=self.lm.get_message(guild_lang, "embed_footer"),
                                     icon_url=self.AVATAR_URL
                                     )
             embed_module.set_thumbnail(url=self.LOGO_URL)
             embed_module.add_field(name="**ModuleID**", value="\n".join(module_ids))
-            embed_module.add_field(name=self.lm.langs[self.mongo.get_lang(ctx.guild)]["modules_service"], value="\n".join(module_names))
-            embed_module.add_field(name=self.lm.langs[self.mongo.get_lang(ctx.guild)]["modules_author"], value="\n".join(module_authors))
+            embed_module.add_field(name=self.lm.get_message(guild_lang, "modules_service"),
+                                   value="\n".join(module_names)
+                                   )
+            embed_module.add_field(name=self.lm.get_message(guild_lang, "modules_author"),
+                                   value="\n".join(module_authors)
+                                   )
 
             await ctx.channel.send(embed=embed_module)
 
@@ -350,6 +368,8 @@ class Client(commands.Bot, LangManager, ConfigManager):
         @commands.has_permissions(administrator=True)
         async def enable(ctx, service):
             """Global manager to enable/disable modules and other services."""
+            guild_lang = self.mongo.get_config(ctx.guild)["lang"]
+
             introduced_command = str(ctx.invoked_with)
             user_decision = True if introduced_command == "enable" else False
 
@@ -357,11 +377,13 @@ class Client(commands.Bot, LangManager, ConfigManager):
                 if service.lower() == i.MODULE_ID.lower():
                     self.mongo.update_config(ctx.guild, {"services." + service.lower(): user_decision})
 
-                    await ctx.channel.send(self.lm.langs[self.mongo.get_lang(ctx.guild)][f"module_{introduced_command}d"].format(service.capitalize()))
+                    await ctx.channel.send(
+                        self.lm.get_message(guild_lang, f"module_{introduced_command}d").format(f"**{service}**")
+                    )
                     logger.info(f"{service.capitalize()} module {introduced_command}d by {ctx.author}")
                     return True
 
-            await ctx.channel.send(self.lm.langs[self.mongo.get_lang(ctx.guild)][f"{introduced_command}_unknown"])
+            await ctx.channel.send(self.lm.get_message(guild_lang, f"{introduced_command}_unknown"))
             return False
 
         @self.command()
@@ -373,7 +395,7 @@ class Client(commands.Bot, LangManager, ConfigManager):
 
             if lang_code not in self.lm.get_lang_packages_metadata()[0]:  # If the language .json does not exist
                 await ctx.channel.send(self.lm.get_message(guild_lang, "language_error"))
-                return None
+                return
 
             self.mongo.update_config(ctx.guild, {"lang": lang_code})
             await ctx.channel.send(self.lm.get_message(lang_code, "language_changed"))
@@ -407,13 +429,15 @@ class Client(commands.Bot, LangManager, ConfigManager):
         @commands.has_permissions(administrator=True)
         async def reload(ctx):
             """Reloads configuration, modules and language packages."""
+            guild_lang = self.mongo.get_config(ctx.guild)["lang"]
+
             logger.info("Reloading...")
             was_started = bool(self.main_loop)
             self.main_loop = False
             self.load_resources(reload=True)
             self.main_loop = was_started
 
-            await ctx.channel.send(self.lm.langs[self.mongo.get_lang(ctx.guild)]["reload_completed"])
+            await ctx.channel.send(self.lm.get_message(guild_lang, "reload_completed"))
             logger.info("Reload completed")
 
 

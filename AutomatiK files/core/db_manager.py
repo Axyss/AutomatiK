@@ -1,6 +1,8 @@
 import pymongo
 import datetime
 
+from core.log_manager import logger
+
 
 class DatabaseManager:
     def __init__(self, host="127.0.0.1", port=27017):
@@ -31,7 +33,7 @@ class DatabaseManager:
     def create_config(self, guild):
         """Creates a new document in the 'configs' collection"""
         config = self.CONFIG_TEMPLATE
-        config["_id"] = guild.id
+        config["_id"] = str(guild.id)
         config["name"] = guild.name
         config["members"] = guild.member_count
         try:
@@ -43,12 +45,12 @@ class DatabaseManager:
     def get_config(self, guild):
         """Returns the configuration from a guild"""
         self.create_config(guild)
-        return self.db["configs"].find_one({"_id": guild.id})
+        return self.db["configs"].find_one({"_id": str(guild.id)})
 
     def update_config(self, guild, update):
         """Updates the value of a determined field"""
         self.create_config(guild)
-        self.db["configs"].update_one({"_id": guild.id}, {"$set": update})
+        self.db["configs"].update_one({"_id": str(guild.id)}, {"$set": update})
         return True
 
     def create_free_game(self, game_object):
