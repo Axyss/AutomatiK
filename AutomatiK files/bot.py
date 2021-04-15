@@ -98,7 +98,7 @@ class Loader:
 
 class Client(commands.Bot, LangManager, ConfigManager):
 
-    VERSION = "v1.3.1"
+    VERSION = "v1.3.2"
 
     def __init__(self, command_prefix, self_bot, intents):
         commands.Bot.__init__(self, command_prefix=command_prefix, self_bot=self_bot, intents=intents)

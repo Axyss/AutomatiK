@@ -24,7 +24,7 @@ class Main:
             raw_data = json.loads(raw_data.content)  # Bytes to json object
             raw_data = raw_data["data"]["Catalog"]["searchStore"]["elements"]  # Cleans the data
             return raw_data
-        except (HTTPError, Timeout, requests.exceptions.ConnectionError):
+        except (HTTPError, Timeout, requests.exceptions.ConnectionError, TypeError):
             logger.error(f"Request to {self.SERVICE_NAME} by module \'{self.MODULE_ID}\' failed")
             return False
 
