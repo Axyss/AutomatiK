@@ -77,7 +77,7 @@ There are some minimum elements a module needs to be loaded and integrated prope
    
 3. The next methods inside the **Main** class:
    - **get_free_games()** : Method that will be called by the AutomatiK core, it has to return a list of Game 
-     objects or False/[ ] if no free games were found by the module.
+     objects or **False** if no free games were found by the module.
     
 
 There are also **optional** elements that can be used if needed:

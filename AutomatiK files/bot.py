@@ -41,8 +41,10 @@ class Loader:
         Client.clear_console()
         Loader.print_ascii_art()
         token = Loader.load_token()
+
         Client.clear_console()
         Loader.print_ascii_art()
+
         logger.info("Loading...")
         return token
 
@@ -73,7 +75,8 @@ class Loader:
 
             if module_extension == ".py" and module_name != "__init__":
                 try:
-                    imported_module = importlib.import_module(f"modules.{module_name}")
+                    imported_module = importlib.import_module(f"modules.{module_name}")  # Imports module
+                    # Creates an instance of the Main class of the imported module
                     Klass = getattr(imported_module, "Main")
                     Loader.imported_modules.append(imported_module)
                     modules.append(Klass())
@@ -94,36 +97,41 @@ class Loader:
         return [getattr(i, "Main")() for i in Loader.imported_modules]  # Instances from the modules
 
 
-class Client(commands.Bot, LangManager, ConfigManager):
+class Client(commands.Bot):
     VERSION = "v2.0"
 
     def __init__(self, command_prefix, self_bot, intents):
         commands.Bot.__init__(self, command_prefix=command_prefix, self_bot=self_bot, intents=intents)
-        self.lm = LangManager(lang_dir="lang/")
-        self.mongo = DatabaseManager()
-        ConfigManager.__init__(self, config_name="config.json")
+        self.lm = LangManager(lang_dir="./lang/")
+        self.cfg = ConfigManager("config.json")
+        self.mongo = DatabaseManager(host=self.cfg.get_mongo_host(),
+                                     # int conversion in case 'port' comes from an env var
+                                     port=int(self.cfg.get_mongo_port()),
+                                     username=self.cfg.get_mongo_user(),
+                                     password=self.cfg.get_mongo_pwd(),
+                                     auth_source=self.cfg.get_mongo_auth_source(),
+                                     auth_mechanism=self.cfg.get_mongo_auth_mechanism())
 
-        self.main_loop = False  # Variable which starts or stops the main loop
-        self.MODULES = None
         self.LOGO_URL = "https://raw.githubusercontent.com/Axyss/AutomatiK/master/docs/assets/ak_logo.png"
         self.AVATAR_URL = "https://avatars3.githubusercontent.com/u/55812692"
+        self.MODULES = None  # Contains the instance of the Main class of every module
+        self.main_loop = False  # Variable used to start or stop the main loop
+
         self.remove_command("help")
-        self.is_started = False
         self.init_commands()
 
     async def on_ready(self):
-        if not self.is_started:  # Prevents the next lines from executing more than once when reconnecting
+        if self.MODULES is None:  # Prevents the next lines from executing more than once when reconnecting
             self.load_resources()
 
             updater = updates.Updates(local_version=Client.VERSION, link="https://github.com/Axyss/AutomatiK/releases/")
             threading.Thread(target=updater.start_checking, daemon=True).start()  # Update checker
             threading.Thread(target=self.cli, daemon=True).start()
 
-            await self.change_presence(status=discord.Status.online,  # Changes status to "online"
-                                       activity=discord.Game("!mk help")  # Changes activity (playing)
+            await self.change_presence(status=discord.Status.online,
+                                       activity=discord.Game("!mk help")
                                        )
             logger.info(f"AutomatiK bot {Client.VERSION} now online")
-            self.is_started = True
 
     @staticmethod
     def clear_console():
@@ -150,25 +158,24 @@ class Client(commands.Bot, LangManager, ConfigManager):
     def load_resources(self, reload=False):
         """Loads configuration, modules and language packages."""
         self.MODULES = Loader.reload_modules() if reload else Loader.load_modules()
-        self.load_config()
-        self.create_config_keys(self.MODULES)
-        self.check_config_changes()
+        self.cfg.load_config()
         self.lm.load_lang_packages()
         return True
 
     def generate_message(self, ctx, title, link):
         """Generates the messages for the free games."""
-        guild_lang = self.mongo.get_config(ctx.guild)["lang"]
+        guild_cfg = self.mongo.get_guild_config(ctx.guild)
+        guild_lang = guild_cfg["lang"]
 
         draft = random.choice(self.lm.get_message(guild_lang, "generic_messages")).format(title, link)
-        if self.data_config["mention_status"]:  # Adds the mention_status value from config
-            draft = self.data_config["mentioned_role"] + " " + draft
+        if guild_cfg["mention_status"]:  # Adds the mention_status value from config
+            draft = guild_cfg["mentioned_role"] + " " + draft
 
         return draft
 
     async def on_command_error(self, ctx, error):  # The second parameter is the error's information
         """Method used for error handling regarding the discord.py library."""
-        guild_lang = self.mongo.get_config(ctx.guild)["lang"]
+        guild_lang = self.mongo.get_guild_config(ctx.guild)["lang"]
 
         if isinstance(error, discord.ext.commands.MissingPermissions):
             await ctx.channel.send(self.lm.get_message(guild_lang, "missing_permissions"))
@@ -195,7 +202,7 @@ class Client(commands.Bot, LangManager, ConfigManager):
         @commands.has_permissions(administrator=True)
         async def notify(ctx, *args):
             """Command to notify free games from non-supported platforms."""
-            guild_lang = self.mongo.get_config(ctx.guild)["lang"]
+            guild_lang = self.mongo.get_guild_config(ctx.guild)["lang"]
 
             args = list(args)
             link = args[-1]
@@ -213,11 +220,11 @@ class Client(commands.Bot, LangManager, ConfigManager):
         @commands.has_permissions(administrator=True)
         async def mention(ctx, role_id):
             """Manages the mentions of the bot's messages."""
-            guild_lang = self.mongo.get_config(ctx.guild)["lang"]
+            guild_lang = self.mongo.get_guild_config(ctx.guild)["lang"]
 
             if re.search("^<@&\w", role_id) and re.search(">$", role_id):
                 # If the string follows the std structure of a role <@&1234>
-                self.edit_config("mentioned_role", role_id)
+                self.mongo.update_guild_config(ctx.guild, {"mention_role": role_id})
                 await ctx.channel.send(self.lm.get_message(guild_lang, "mention_established"))
                 logger.info(f"AutomatiK will now mention '{role_id}'")
             else:
@@ -228,7 +235,7 @@ class Client(commands.Bot, LangManager, ConfigManager):
         @commands.cooldown(1, 60, commands.BucketType.user)
         async def helpme(ctx):
             """Help command that uses embeds."""
-            guild_lang = self.mongo.get_config(ctx.guild)["lang"]
+            guild_lang = self.mongo.get_guild_config(ctx.guild)["lang"]
 
             embed_help = discord.Embed(title=f"AutomatiK {Client.VERSION} Help ",
                                        description=self.lm.get_message(guild_lang, "embed_description"),
@@ -255,11 +262,11 @@ class Client(commands.Bot, LangManager, ConfigManager):
         @commands.has_permissions(administrator=True)
         async def start(ctx):
             """Starts the AutomatiK service."""
-            guild_lang = self.mongo.get_config(ctx.guild)["lang"]
+            guild_lang = self.mongo.get_guild_config(ctx.guild)["lang"]
 
             if self.main_loop:  # If service already started
                 await ctx.channel.send(self.lm.get_message(guild_lang, "start_already"))
-                return
+                return None
 
             self.main_loop = True  # Changes It to True so the main loop can start
             await ctx.channel.send(
@@ -269,16 +276,8 @@ class Client(commands.Bot, LangManager, ConfigManager):
 
             while self.main_loop:  # MAIN LOOP
                 for i in self.MODULES:
-                    if not self.data_config[f"{i.MODULE_ID}_status"]:  # Prevents games from getting added to the db
-                        continue  # when a module isn't enabled
                     free_games = i.get_free_games()
-                    # If there is at least one element this will put It in a list
-                    free_games = [free_games] if isinstance(free_games, Game) else free_games
                     if free_games:
-                        try:  # Checks if module author specified a threshold
-                            i.THRESHOLD
-                        except AttributeError:
-                            i.THRESHOLD = 6
                         free_games = db.check_database(f"{i.MODULE_ID.upper()}_TABLE", free_games, int(i.THRESHOLD))
                         for j in free_games:
                             await ctx.channel.send(self.generate_message(j.name, j.link))
@@ -291,7 +290,7 @@ class Client(commands.Bot, LangManager, ConfigManager):
         @commands.has_permissions(administrator=True)
         async def stop(ctx):
             """Stops the main service on the guild where It is executed"""
-            guild_lang = self.mongo.get_config(ctx.guild)["lang"]
+            guild_lang = self.mongo.get_guild_config(ctx.guild)["lang"]
 
             if not self.main_loop:  # If service already stopped
                 await ctx.channel.send(self.lm.get_message(guild_lang, "stop_already"))
@@ -306,7 +305,7 @@ class Client(commands.Bot, LangManager, ConfigManager):
         @commands.cooldown(2, 10, commands.BucketType.user)
         async def status(ctx):
             """Shows the bot's status."""
-            cfg = self.mongo.get_config(ctx.guild)
+            cfg = self.mongo.get_guild_config(ctx.guild)
 
             embed_status = discord.Embed(title=self.lm.get_message(cfg["lang"], "status"),
                                          description=self.lm.get_message(cfg["lang"], "status_description"),
@@ -338,7 +337,7 @@ class Client(commands.Bot, LangManager, ConfigManager):
         @commands.has_permissions(administrator=True)
         async def modules(ctx):
             """Shows information about the loaded modules."""
-            guild_lang = self.mongo.get_config(ctx.guild)["lang"]
+            guild_lang = self.mongo.get_guild_config(ctx.guild)["lang"]
 
             module_ids = [i.MODULE_ID for i in self.MODULES]
             module_names = [i.SERVICE_NAME for i in self.MODULES]
@@ -368,14 +367,14 @@ class Client(commands.Bot, LangManager, ConfigManager):
         @commands.has_permissions(administrator=True)
         async def enable(ctx, service):
             """Global manager to enable/disable modules and other services."""
-            guild_lang = self.mongo.get_config(ctx.guild)["lang"]
+            guild_lang = self.mongo.get_guild_config(ctx.guild)["lang"]
 
             introduced_command = str(ctx.invoked_with)
             user_decision = True if introduced_command == "enable" else False
 
             for i in self.MODULES:
                 if service.lower() == i.MODULE_ID.lower():
-                    self.mongo.update_config(ctx.guild, {"services." + service.lower(): user_decision})
+                    self.mongo.update_guild_config(ctx.guild, {"services." + service.lower(): user_decision})
 
                     await ctx.channel.send(
                         self.lm.get_message(guild_lang, f"module_{introduced_command}d").format(f"**{service}**")
@@ -391,13 +390,13 @@ class Client(commands.Bot, LangManager, ConfigManager):
         @commands.cooldown(2, 10, commands.BucketType.user)
         @commands.has_permissions(administrator=True)
         async def language(ctx, lang_code):
-            guild_lang = self.mongo.get_config(ctx.guild)["lang"]
+            guild_lang = self.mongo.get_guild_config(ctx.guild)["lang"]
 
             if lang_code not in self.lm.get_lang_packages_metadata()[0]:  # If the language .json does not exist
                 await ctx.channel.send(self.lm.get_message(guild_lang, "language_error"))
                 return
 
-            self.mongo.update_config(ctx.guild, {"lang": lang_code})
+            self.mongo.update_guild_config(ctx.guild, {"lang": lang_code})
             await ctx.channel.send(self.lm.get_message(lang_code, "language_changed"))
             logger.info(f"Language changed to '{lang_code}' by {ctx.author}")
 
@@ -407,7 +406,7 @@ class Client(commands.Bot, LangManager, ConfigManager):
         @commands.has_permissions(administrator=True)
         async def languages(ctx):
             lang_ids, lang_names, lang_authors = self.lm.get_lang_packages_metadata()
-            guild_lang = self.mongo.get_config(ctx.guild)["lang"]
+            guild_lang = self.mongo.get_guild_config(ctx.guild)["lang"]
 
             embed_langs = discord.Embed(title=self.lm.get_message(guild_lang, "languages"),
                                         description=self.lm.get_message(guild_lang, "languages_description"),
@@ -429,7 +428,7 @@ class Client(commands.Bot, LangManager, ConfigManager):
         @commands.has_permissions(administrator=True)
         async def reload(ctx):
             """Reloads configuration, modules and language packages."""
-            guild_lang = self.mongo.get_config(ctx.guild)["lang"]
+            guild_lang = self.mongo.get_guild_config(ctx.guild)["lang"]
 
             logger.info("Reloading...")
             was_started = bool(self.main_loop)
