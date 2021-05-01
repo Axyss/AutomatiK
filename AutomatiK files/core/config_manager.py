@@ -22,14 +22,14 @@ class ConfigManager:
         try:
             open(self.FILENAME, "x").close()
             with open(self.FILENAME, "w") as f:
-                yaml.dump(yaml.load(self.CONFIG_TEMPLATE), f, sort_keys=False)
+                yaml.safe_dump(yaml.safe_load(self.CONFIG_TEMPLATE), f, sort_keys=False)
         except FileExistsError:
             logger.debug("Configuration file already exists, omitting...")
 
     def load_config(self):
         """Loads into memory the information of the configuration file."""
         with open(self.FILENAME, "r") as f:
-            config = yaml.load(f.read())
+            config = yaml.safe_load(f.read())
             self.config = config
 
     @staticmethod
@@ -41,8 +41,7 @@ class ConfigManager:
         if value.startswith("env('") and value.endswith("')"):
             env_var = value[value.find("'") + 1: value.rfind("'")]
             return os.getenv(env_var)
-        else:
-            return value
+        return value
 
     def get_mongo_host(self):
         return ConfigManager._parse_var(self.config["MONGODB"]["HOST"])
