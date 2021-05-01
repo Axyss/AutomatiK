@@ -7,7 +7,7 @@ class ConfigManager:
     def __init__(self, filename):
         self.CONFIG_TEMPLATE = """MONGODB:
                                     HOST: '127.0.0.1'
-                                    PORT: 27017
+                                    PORT: '27017'
                                     USER: ''
                                     PASSWORD: ''
                                     AUTH_SOURCE: ''
