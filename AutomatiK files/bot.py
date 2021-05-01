@@ -3,8 +3,6 @@ import os
 import re
 import threading
 import asyncio
-import base64
-import json
 import importlib
 import random
 import time
@@ -34,36 +32,6 @@ class Loader:
     def print_ascii_art():
         print(Loader.ascii_art.format(Client.VERSION))
         time.sleep(0.1)
-
-    @staticmethod
-    def start():
-        """Adds the ascii art and requests the token at the start of the program."""
-        Client.clear_console()
-        Loader.print_ascii_art()
-        token = Loader.load_token()
-
-        Client.clear_console()
-        Loader.print_ascii_art()
-
-        logger.info("Loading...")
-        return token
-
-    @staticmethod
-    def load_token():
-        if "Secret Token.json" not in os.listdir("."):  # Requests token and writes It in "Secret Token.json"
-            with open("Secret Token.json", "w") as token_file:
-                logger.info("Please introduce your bot's secret token: ")
-                token = base64.b64encode(input().encode("utf-8")).decode("utf-8")  # Encodes token
-                json.dump({"secret_token": token}, token_file, indent=2)
-        else:  # Loads token from file
-            with open("Secret Token.json") as token_file:
-                try:
-                    token = json.load(token_file)["secret_token"]
-                except json.decoder.JSONDecodeError:  # Avoids exception when closing without providing a valid token
-                    token_file.close()
-                    os.remove("Secret Token.json")
-                    token = Loader.load_token()
-        return token
 
     @staticmethod
     def load_modules():
@@ -103,14 +71,14 @@ class Client(commands.Bot):
     def __init__(self, command_prefix, self_bot, intents):
         commands.Bot.__init__(self, command_prefix=command_prefix, self_bot=self_bot, intents=intents)
         self.lm = LangManager(lang_dir="./lang/")
-        self.cfg = ConfigManager("./config.yml")
-        self.mongo = DatabaseManager(host=self.cfg.get_mongo_host(),
+        self.cfg = ConfigManager("config.yml")
+        self.mongo = DatabaseManager(host=self.cfg.get_mongo_value("host"),
                                      # int conversion in case 'port' comes from an env var
-                                     port=int(self.cfg.get_mongo_port()),
-                                     username=self.cfg.get_mongo_user(),
-                                     password=self.cfg.get_mongo_pwd(),
-                                     auth_source=self.cfg.get_mongo_auth_source(),
-                                     auth_mechanism=self.cfg.get_mongo_auth_mechanism())
+                                     port=int(self.cfg.get_mongo_value("port")),
+                                     username=self.cfg.get_mongo_value("user"),
+                                     password=self.cfg.get_mongo_value("password"),
+                                     auth_source=self.cfg.get_mongo_value("auth_source"),
+                                     auth_mechanism=self.cfg.get_mongo_value("auth_mechanism"))
 
         self.LOGO_URL = "https://raw.githubusercontent.com/Axyss/AutomatiK/master/docs/assets/ak_logo.png"
         self.AVATAR_URL = "https://avatars3.githubusercontent.com/u/55812692"
@@ -442,10 +410,12 @@ class Client(commands.Bot):
 if __name__ == "__main__":
 
     automatik = Client(command_prefix="!mk ", self_bot=False, intents=discord.Intents.default())
+    Client.clear_console()
+    Loader.print_ascii_art()
+    logger.info("Loading...")
     try:
-        automatik.run(base64.b64decode(Loader.start().encode("utf-8")).decode("utf-8"))
+        automatik.run(automatik.cfg.get_secret_value("discord_bot_token"))
 
     except discord.errors.LoginFailure:
         logger.error("Invalid token, please make sure It's valid. Press enter to exit...")
-        os.remove("Secret Token.json")
         input()
