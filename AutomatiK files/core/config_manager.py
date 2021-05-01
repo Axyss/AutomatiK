@@ -6,12 +6,12 @@ from core.log_manager import logger
 class ConfigManager:
     def __init__(self, filename):
         self.CONFIG_TEMPLATE = """MONGODB:
-                                    HOST: 127.0.0.1
+                                    HOST: '127.0.0.1'
                                     PORT: 27017
-                                    USER: null
-                                    PASSWORD: null
-                                    AUTH_SOURCE: null
-                                    AUTH_MECHANISM: DEFAULT"""
+                                    USER: ''
+                                    PASSWORD: ''
+                                    AUTH_SOURCE: ''
+                                    AUTH_MECHANISM: 'DEFAULT'"""
         self.FILENAME = filename
         self.config = None
         self._create_config()
@@ -22,7 +22,7 @@ class ConfigManager:
         try:
             open(self.FILENAME, "x").close()
             with open(self.FILENAME, "w") as f:
-                yaml.dump(yaml.load(self.CONFIG_TEMPLATE), f)
+                yaml.dump(yaml.load(self.CONFIG_TEMPLATE), f, sort_keys=False)
         except FileExistsError:
             logger.debug("Configuration file already exists, omitting...")
 
