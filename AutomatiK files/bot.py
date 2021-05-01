@@ -103,7 +103,7 @@ class Client(commands.Bot):
     def __init__(self, command_prefix, self_bot, intents):
         commands.Bot.__init__(self, command_prefix=command_prefix, self_bot=self_bot, intents=intents)
         self.lm = LangManager(lang_dir="./lang/")
-        self.cfg = ConfigManager("config.json")
+        self.cfg = ConfigManager("./config.yml")
         self.mongo = DatabaseManager(host=self.cfg.get_mongo_host(),
                                      # int conversion in case 'port' comes from an env var
                                      port=int(self.cfg.get_mongo_port()),
@@ -170,7 +170,6 @@ class Client(commands.Bot):
         draft = random.choice(self.lm.get_message(guild_lang, "generic_messages")).format(title, link)
         if guild_cfg["mention_status"]:  # Adds the mention_status value from config
             draft = guild_cfg["mentioned_role"] + " " + draft
-
         return draft
 
     async def on_command_error(self, ctx, error):  # The second parameter is the error's information
@@ -222,8 +221,8 @@ class Client(commands.Bot):
             """Manages the mentions of the bot's messages."""
             guild_lang = self.mongo.get_guild_config(ctx.guild)["lang"]
 
+            # If the string follows the std structure of a role <@&1234>
             if re.search("^<@&\w", role_id) and re.search(">$", role_id):
-                # If the string follows the std structure of a role <@&1234>
                 self.mongo.update_guild_config(ctx.guild, {"mention_role": role_id})
                 await ctx.channel.send(self.lm.get_message(guild_lang, "mention_established"))
                 logger.info(f"AutomatiK will now mention '{role_id}'")

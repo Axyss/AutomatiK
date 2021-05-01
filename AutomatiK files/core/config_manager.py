@@ -1,19 +1,17 @@
-import json
 import os
+import yaml
 from core.log_manager import logger
 
 
 class ConfigManager:
     def __init__(self, filename):
-        self.CONFIG_TEMPLATE = {"MONGODB": {
-                                    "HOST": "127.0.0.1",
-                                    "PORT": "27017",
-                                    "USER": "",
-                                    "PASSWORD": "",
-                                    "AUTH_SOURCE": "",
-                                    "AUTH_MECHANISM": "DEFAULT"
-                                    }
-                                }
+        self.CONFIG_TEMPLATE = """MONGODB:
+                                    HOST: 127.0.0.1
+                                    PORT: 27017
+                                    USER: null
+                                    PASSWORD: null
+                                    AUTH_SOURCE: null
+                                    AUTH_MECHANISM: DEFAULT"""
         self.FILENAME = filename
         self.config = None
         self._create_config()
@@ -24,14 +22,14 @@ class ConfigManager:
         try:
             open(self.FILENAME, "x").close()
             with open(self.FILENAME, "w") as f:
-                json.dump(self.CONFIG_TEMPLATE, f, indent=2)
+                yaml.dump(yaml.load(self.CONFIG_TEMPLATE), f)
         except FileExistsError:
             logger.debug("Configuration file already exists, omitting...")
 
     def load_config(self):
         """Loads into memory the information of the configuration file."""
         with open(self.FILENAME, "r") as f:
-            config = json.load(f)
+            config = yaml.load(f.read())
             self.config = config
 
     @staticmethod

@@ -1,5 +1,7 @@
-.idea
-logs
-__pycache__
+.idea/
+venv/
+logs/
+__pycache__/
 AutomatiK files/*.json
-*.db
+AutomatiK files/*.yml
+AutomatiK files/*.db
