@@ -38,7 +38,7 @@ class ConfigManager:
             self.config = config
 
     @staticmethod
-    def _parse_var(value):
+    def _get_env_var(value):
         """
            Obtains the value from the YAML configuration file, directly, or from an environment variable if
            the syntax is: env(my_env_var).
@@ -51,8 +51,8 @@ class ConfigManager:
 
     def get_mongo_value(self, field):
         """Returns the value of a given key from the MONGODB field."""
-        return ConfigManager._parse_var(self.config["MONGODB"][field])
+        return ConfigManager._get_env_var(self.config["MONGODB"][field])
 
     def get_secret_value(self, field):
         """Returns the value of a given key from the SECRET field."""
-        return ConfigManager._parse_var(self.config["SECRET"][field])
+        return ConfigManager._get_env_var(self.config["SECRET"][field])

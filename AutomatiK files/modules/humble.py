@@ -6,7 +6,6 @@ from core.log_manager import logger
 
 
 class Main:
-
     def __init__(self):
         """Defines the module parameters."""
         self.SERVICE_NAME = "Humble Bundle"
@@ -35,7 +34,7 @@ class Main:
             for i in raw_data:
                 if i["current_price"]["amount"] == 0:  # If game's price is 0
                     # Parses relevant data such as name and link and adds It to gameData
-                    game = Game(i["human_name"], str(self.URL + i["human_url"]))
+                    game = Game(i["human_name"], self.URL + i["human_url"], self.MODULE_ID)
                     processed_data.append(game)
         except (TypeError, KeyError):
             logger.exception(f"Data from module \'{self.MODULE_ID}\' couldn't be processed")

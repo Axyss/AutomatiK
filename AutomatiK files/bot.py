@@ -228,35 +228,48 @@ class Client(commands.Bot):
         @commands.cooldown(2, 10, commands.BucketType.user)
         @commands.has_permissions(administrator=True)
         async def start(ctx):
-            """Starts the AutomatiK service."""
+            """Starts the main service on the guild where it is executed."""
             guild_lang = self.mongo.get_guild_config(ctx.guild)["lang"]
 
             if self.main_loop:  # If service already started
                 await ctx.channel.send(self.lm.get_message(guild_lang, "start_already"))
                 return None
 
-            self.main_loop = True  # Changes It to True so the main loop can start
+            self.main_loop = True  # Changes it to True so the main loop can start
             await ctx.channel.send(
                 self.lm.get_message(guild_lang, "start_success").format("<#" + str(ctx.channel.id) + ">")
             )
             logger.info(f"Main service was started on #{ctx.channel} by {str(ctx.author)}")
 
             while self.main_loop:  # MAIN LOOP
-                for i in self.MODULES:
-                    free_games = i.get_free_games()
-                    if free_games:
-                        free_games = db.check_database(f"{i.MODULE_ID.upper()}_TABLE", free_games, int(i.THRESHOLD))
-                        for j in free_games:
-                            await ctx.channel.send(self.generate_message(j.name, j.link))
+                for module in self.MODULES:
+                    retrieved_free_games = module.get_free_games()
+                    stored_free_games = self.mongo.get_free_games_by_module_id(module.MODULE_ID)
+                    if retrieved_free_games:
+                        for game in retrieved_free_games:
+                            if game not in stored_free_games:
+                                self.mongo.create_free_game(game)
+                                logger.info(f"New game '{game.NAME}' ({game.MODULE_ID}) added to the database")
 
-                await asyncio.sleep(300)  # It will look for free games every 5 minutes
+                        for game in stored_free_games:
+                            if game not in retrieved_free_games:
+                                self.mongo.move_to_past_free_games(game)
+                                logger.info(f"'{game.NAME}' ({game.MODULE_ID}) moved to 'past_free_games' database")
+
+                        """free_games = db.check_database(f"{module.MODULE_ID.upper()}_TABLE",
+                                                       free_games,
+                                                       int(module.THRESHOLD))
+                        for j in free_games:
+                            await ctx.channel.send(self.generate_message(j.name, j.link))"""
+
+                await asyncio.sleep(300)  # 5 minutes until the next cycle
 
         @self.command()
         @commands.guild_only()
         @commands.cooldown(2, 10, commands.BucketType.user)
         @commands.has_permissions(administrator=True)
         async def stop(ctx):
-            """Stops the main service on the guild where It is executed"""
+            """Stops the main service on the guild where it is executed."""
             guild_lang = self.mongo.get_guild_config(ctx.guild)["lang"]
 
             if not self.main_loop:  # If service already stopped
@@ -417,5 +430,5 @@ if __name__ == "__main__":
         automatik.run(automatik.cfg.get_secret_value("discord_bot_token"))
 
     except discord.errors.LoginFailure:
-        logger.error("Invalid token, please make sure It's valid. Press enter to exit...")
+        logger.error("Invalid token, please make sure it's valid. Press enter to exit...")
         input()
