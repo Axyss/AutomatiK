@@ -34,7 +34,7 @@ logging.setLoggerClass(LogManager)
 # Creation of the custom logger
 logger = logging.getLogger("regular_logger")
 logger.setLevel(logging.INFO)
-formatter = logging.Formatter("%(asctime)s[%(levelname)s]: %(message)s", "[%H:%M]")
+formatter = logging.Formatter("%(asctime)s[%(levelname)s]: %(message)s.", "[%H:%M]")
 
 stream_h = logging.StreamHandler()
 file_h = TimedRotatingFileHandler("./logs/latest.log", when="midnight", backupCount=365)

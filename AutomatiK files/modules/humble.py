@@ -33,7 +33,6 @@ class Main:
         try:
             for i in raw_data:
                 if i["current_price"]["amount"] == 0:  # If game's price is 0
-                    # Parses relevant data such as name and link and adds It to gameData
                     game = Game(i["human_name"], self.URL + i["human_url"], self.MODULE_ID)
                     processed_data.append(game)
         except (TypeError, KeyError):

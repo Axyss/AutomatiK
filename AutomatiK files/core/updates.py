@@ -34,7 +34,7 @@ class Updates:
         return remote_version
 
     def convert(self, raw_remote_version):
-        """Converts the complex syntax of a version to an integer."""
+        """Converts the syntax of a version string into an integer."""
         if not raw_remote_version:
             return False
 

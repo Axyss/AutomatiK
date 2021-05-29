@@ -5,9 +5,12 @@ from core.log_manager import logger
 
 class ConfigManager:
     def __init__(self, filename):
-        self.CONFIG_TEMPLATE = ("# We know that putting important credentials inside a plain text file\n"
+        self.CONFIG_TEMPLATE = ("# We know writing important credentials inside a plain text file\n"
                                 "# might feel a bit scary. That's why now you can use environment variables!\n"
                                 "# To use them, follow the next syntax: env(my_new_env_variable).\n"
+                                "GENERAL:\n"
+                                "  bot_owners: []\n"
+                                "  debug: false"
                                 "MONGODB:\n"
                                 "  host: '127.0.0.1'\n"
                                 "  port: 27017\n"
@@ -48,6 +51,10 @@ class ConfigManager:
             env_var = value[value.find("(") + 1: value.rfind(")")]
             return os.getenv(env_var)
         return value
+
+    def get_general_value(self, field):
+        """Returns the value of a given key from the GENERAL field."""
+        return ConfigManager._get_env_var(self.config["GENERAL"][field])
 
     def get_mongo_value(self, field):
         """Returns the value of a given key from the MONGODB field."""

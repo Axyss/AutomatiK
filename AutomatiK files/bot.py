@@ -1,6 +1,5 @@
 # coding=utf-8
 import os
-import re
 import threading
 import asyncio
 import importlib
@@ -13,7 +12,6 @@ from discord.ext import commands
 from core import updates
 from core.log_manager import logger
 from core.lang_manager import LangManager
-from core.game import Game
 from core.config_manager import ConfigManager
 from core.db_manager import DatabaseManager
 
@@ -70,7 +68,7 @@ class Client(commands.Bot):
 
     def __init__(self, command_prefix, self_bot, intents):
         commands.Bot.__init__(self, command_prefix=command_prefix, self_bot=self_bot, intents=intents)
-        self.lm = LangManager(lang_dir="./lang/")
+        self.lm = LangManager("./lang")
         self.cfg = ConfigManager("config.yml")
         self.mongo = DatabaseManager(host=self.cfg.get_mongo_value("host"),
                                      # int conversion in case 'port' comes from an env var
@@ -95,14 +93,15 @@ class Client(commands.Bot):
             updater = updates.Updates(local_version=Client.VERSION, link="https://github.com/Axyss/AutomatiK/releases/")
             threading.Thread(target=updater.start_checking, daemon=True).start()  # Update checker
             threading.Thread(target=self.cli, daemon=True).start()
+            logger.info(f"AutomatiK bot {Client.VERSION} online")
 
-            await self.change_presence(status=discord.Status.online,
-                                       activity=discord.Game("!mk help")
-                                       )
-            logger.info(f"AutomatiK bot {Client.VERSION} now online")
+        # Outside the if block so it does execute more than once to prevent the presence message from
+        # disappearing forever.
+        await self.change_presence(status=discord.Status.online, activity=discord.Game("!mk help"))
 
     @staticmethod
     def clear_console():
+        """Clears the console in a different way depending on the OS."""
         local_os = os.name
         if local_os in ("nt", "dos"):
             os.system("cls")
@@ -130,15 +129,29 @@ class Client(commands.Bot):
         self.lm.load_lang_packages()
         return True
 
-    def generate_message(self, ctx, title, link):
-        """Generates the messages for the free games."""
-        guild_cfg = self.mongo.get_guild_config(ctx.guild)
-        guild_lang = guild_cfg["lang"]
+    def generate_message(self, guild_cfg, game):
+        """Generates a 'X free on Y' type message."""
 
-        draft = random.choice(self.lm.get_message(guild_lang, "generic_messages")).format(title, link)
-        if guild_cfg["mention_status"]:  # Adds the mention_status value from config
-            draft = guild_cfg["mentioned_role"] + " " + draft
-        return draft
+        message = random.choice(self.lm.get_message(guild_cfg["lang"], "generic_messages"))\
+                        .format(game.NAME, game.LINK)
+        if guild_cfg["services"]["mention"]:
+            message = guild_cfg["mention_role"] + " " + message
+        return message
+
+    async def broadcast_message(self, game):
+        """Sends a message to the selected channel of every guild."""
+        for guild in self.guilds:
+            guild_cfg = self.mongo.get_guild_config(guild)
+            if guild_cfg["services"]["main"] and guild_cfg["services"][game.MODULE_ID]:
+                selected_channel = guild_cfg["selected_channel"]
+                # Transforms "<#1234>" into 1234
+                selected_channel = int(selected_channel[selected_channel.find("#") + 1: selected_channel.rfind(">")])
+                message = self.generate_message(guild_cfg, game)
+                try:
+                    await guild.get_channel(selected_channel).send(message)
+                except AttributeError:  # If the channel ID is not valid
+                    # todo Handle this error properly
+                    pass
 
     async def on_command_error(self, ctx, error):  # The second parameter is the error's information
         """Method used for error handling regarding the discord.py library."""
@@ -155,7 +168,7 @@ class Client(commands.Bot):
 
         elif isinstance(error, discord.ext.commands.errors.CommandOnCooldown):
             await ctx.channel.send(self.lm.get_message(guild_lang, "cooldown_error").format(int(error.retry_after)))
-        else:
+        else:  # Without this, unexpected errors wouldn't show up
             try:
                 raise error
             except:
@@ -165,35 +178,17 @@ class Client(commands.Bot):
 
         @self.command()
         @commands.guild_only()
-        @commands.cooldown(3, 10, commands.BucketType.user)
-        @commands.has_permissions(administrator=True)
-        async def notify(ctx, *args):
-            """Command to notify free games from non-supported platforms."""
-            guild_lang = self.mongo.get_guild_config(ctx.guild)["lang"]
-
-            args = list(args)
-            link = args[-1]
-            args.pop()
-            game_name = " ".join(args)  # Uses the args to generate the game name
-
-            await ctx.channel.purge(limit=1)
-            await ctx.channel.send(self.generate_message(ctx, game_name, link) +
-                                   self.lm.get_message(guild_lang, "notify_thanks").format(ctx.author.id)
-                                   )  # Adds politeness
-
-        @self.command()
-        @commands.guild_only()
         @commands.cooldown(2, 10, commands.BucketType.user)
         @commands.has_permissions(administrator=True)
-        async def mention(ctx, role_id):
+        async def mention(ctx, mention_role):
             """Manages the mentions of the bot's messages."""
             guild_lang = self.mongo.get_guild_config(ctx.guild)["lang"]
 
             # If the string follows the std structure of a role <@&1234>
-            if re.search("^<@&\w", role_id) and re.search(">$", role_id):
-                self.mongo.update_guild_config(ctx.guild, {"mention_role": role_id})
+            if mention_role.startswith("<@&") and mention_role.endswith(">"):
+                self.mongo.update_guild_config(ctx.guild, {"mention_role": mention_role})
                 await ctx.channel.send(self.lm.get_message(guild_lang, "mention_established"))
-                logger.info(f"AutomatiK will now mention '{role_id}'")
+                logger.info(f"AutomatiK will now mention '{mention_role}'")
             else:
                 await ctx.channel.send(self.lm.get_message(guild_lang, "mention_error"))
 
@@ -214,7 +209,8 @@ class Client(commands.Bot):
             embed_help.set_thumbnail(url=self.LOGO_URL)
 
             embed_help.add_field(name=self.lm.get_message(guild_lang, "embed_field1_name"),
-                                 value="".join(self.lm.get_message(guild_lang, "embed_field1_value")), inline=False
+                                 value="".join(self.lm.get_message(guild_lang, "embed_field1_value")),
+                                 inline=False
                                  )
             embed_help.add_field(name=u"\U0001F6E0 " + self.lm.get_message(guild_lang, "embed_field2_name"),
                                  value="".join(self.lm.get_message(guild_lang, "embed_field2_value")),
@@ -227,9 +223,48 @@ class Client(commands.Bot):
         @commands.guild_only()
         @commands.cooldown(2, 10, commands.BucketType.user)
         @commands.has_permissions(administrator=True)
-        async def start(ctx):
-            """Starts the main service on the guild where it is executed."""
+        async def start(ctx, channel=None):
+            """Starts announcing free games in the guild where it is executed."""
+            guild_cfg = self.mongo.get_guild_config(ctx.guild)
+            guild_lang = guild_cfg["lang"]
+            selected_channel = ctx.channel.mention if channel is None else channel
+            # todo Check if 'channel' is a valid text channel
+
+            if guild_cfg["services"]["main"]:  # If service already started
+                await ctx.channel.send(self.lm.get_message(guild_lang, "start_already"))
+                return None
+
+            self.mongo.update_guild_config(ctx.guild, {"selected_channel": selected_channel})
+            self.mongo.update_guild_config(ctx.guild, {"services.main": True})
+
+            await ctx.channel.send(
+                self.lm.get_message(guild_lang, "start_success").format(selected_channel)
+            )
+
+        @self.command()
+        @commands.guild_only()
+        @commands.cooldown(2, 10, commands.BucketType.user)
+        @commands.has_permissions(administrator=True)
+        async def stop(ctx):
+            """Stops announcing free games in the guild where it is executed."""
+            guild_cfg = self.mongo.get_guild_config(ctx.guild)
+            guild_lang = guild_cfg["lang"]
+
+            if not guild_cfg["services"]["main"]:  # If service already stopped
+                await ctx.channel.send(self.lm.get_message(guild_lang, "stop_already"))
+                return None
+            self.mongo.update_guild_config(ctx.guild, {"services.main": False})
+            await ctx.channel.send(self.lm.get_message(guild_lang, "stop_success"))
+
+        @self.command()
+        @commands.guild_only()
+        @commands.cooldown(2, 10, commands.BucketType.user)
+        async def global_start(ctx):
+            """Starts the GLOBAL main loop that will look for free games every 5 minutes."""
             guild_lang = self.mongo.get_guild_config(ctx.guild)["lang"]
+
+            if str(ctx.author) not in self.cfg.get_general_value("bot_owners"):  # If command author not a bot owner
+                return None
 
             if self.main_loop:  # If service already started
                 await ctx.channel.send(self.lm.get_message(guild_lang, "start_already"))
@@ -239,46 +274,42 @@ class Client(commands.Bot):
             await ctx.channel.send(
                 self.lm.get_message(guild_lang, "start_success").format("<#" + str(ctx.channel.id) + ">")
             )
-            logger.info(f"Main service was started on #{ctx.channel} by {str(ctx.author)}")
+            logger.info(f"Main service was started globally by {str(ctx.author)}")
 
             while self.main_loop:  # MAIN LOOP
                 for module in self.MODULES:
                     retrieved_free_games = module.get_free_games()
                     stored_free_games = self.mongo.get_free_games_by_module_id(module.MODULE_ID)
                     if retrieved_free_games:
-                        for game in retrieved_free_games:
+                        for game in retrieved_free_games:  # Looks for free games
                             if game not in stored_free_games:
                                 self.mongo.create_free_game(game)
                                 logger.info(f"New game '{game.NAME}' ({game.MODULE_ID}) added to the database")
+                                await self.broadcast_message(game)
 
-                        for game in stored_free_games:
+                        for game in stored_free_games:  # Looks for games that are no longer free
                             if game not in retrieved_free_games:
                                 self.mongo.move_to_past_free_games(game)
-                                logger.info(f"'{game.NAME}' ({game.MODULE_ID}) moved to 'past_free_games' database")
-
-                        """free_games = db.check_database(f"{module.MODULE_ID.upper()}_TABLE",
-                                                       free_games,
-                                                       int(module.THRESHOLD))
-                        for j in free_games:
-                            await ctx.channel.send(self.generate_message(j.name, j.link))"""
-
-                await asyncio.sleep(300)  # 5 minutes until the next cycle
+                                logger.info(f"'{game.NAME}' ({game.MODULE_ID}) moved to the 'past_free_games' database")
+                await asyncio.sleep(300)  # 5 minutes until the next iteration
 
         @self.command()
         @commands.guild_only()
         @commands.cooldown(2, 10, commands.BucketType.user)
-        @commands.has_permissions(administrator=True)
-        async def stop(ctx):
-            """Stops the main service on the guild where it is executed."""
+        async def global_stop(ctx):
+            """Stops the loop that looks for free games GLOBALLY."""
             guild_lang = self.mongo.get_guild_config(ctx.guild)["lang"]
+
+            if str(ctx.author) not in self.cfg.get_general_value("bot_owners"):  # If command author not a bot owner
+                return None
 
             if not self.main_loop:  # If service already stopped
                 await ctx.channel.send(self.lm.get_message(guild_lang, "stop_already"))
-                return False
+                return None
 
-            self.main_loop = False  # Stops the loop by changing the boolean which maintains It active
+            self.main_loop = False
             await ctx.channel.send(self.lm.get_message(guild_lang, "stop_success"))
-            logger.info(f"Main service was stopped by {str(ctx.author)}")
+            logger.info(f"Main service was stopped globally by {str(ctx.author)}")
 
         @self.command()
         @commands.guild_only()
@@ -352,8 +383,8 @@ class Client(commands.Bot):
             introduced_command = str(ctx.invoked_with)
             user_decision = True if introduced_command == "enable" else False
 
-            for i in self.MODULES:
-                if service.lower() == i.MODULE_ID.lower():
+            for module in self.MODULES:
+                if service.lower() == module.MODULE_ID.lower():
                     self.mongo.update_guild_config(ctx.guild, {"services." + service.lower(): user_decision})
 
                     await ctx.channel.send(
@@ -372,7 +403,7 @@ class Client(commands.Bot):
         async def language(ctx, lang_code):
             guild_lang = self.mongo.get_guild_config(ctx.guild)["lang"]
 
-            if lang_code not in self.lm.get_lang_packages_metadata()[0]:  # If the language .json does not exist
+            if lang_code not in self.lm.get_lang_packages_metadata()[0]:  # If the language package does not exist
                 await ctx.channel.send(self.lm.get_message(guild_lang, "language_error"))
                 return
 
@@ -410,7 +441,7 @@ class Client(commands.Bot):
             """Reloads configuration, modules and language packages."""
             guild_lang = self.mongo.get_guild_config(ctx.guild)["lang"]
 
-            logger.info("Reloading...")
+            logger.info("Reloading..")
             was_started = bool(self.main_loop)
             self.main_loop = False
             self.load_resources(reload=True)
@@ -421,14 +452,13 @@ class Client(commands.Bot):
 
 
 if __name__ == "__main__":
-
     automatik = Client(command_prefix="!mk ", self_bot=False, intents=discord.Intents.default())
     Client.clear_console()
     Loader.print_ascii_art()
-    logger.info("Loading...")
+    logger.info("Loading..")
+
     try:
         automatik.run(automatik.cfg.get_secret_value("discord_bot_token"))
-
     except discord.errors.LoginFailure:
-        logger.error("Invalid token, please make sure it's valid. Press enter to exit...")
+        logger.error("Invalid 'discord_bot_token'. Press enter to exit...")
         input()
