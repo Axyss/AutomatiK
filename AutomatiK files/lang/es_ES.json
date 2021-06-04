@@ -37,8 +37,14 @@
       "enable_unknown": "\u274C Parámetro desconocido. Usa **!mk enable (ModuleID)**",
       "disable_unknown": "\u274C Parámetro desconocido. Usa **!mk disable (ModuleID)**",
 
+      "select_invalid_channel": "\u274C Canal de texto no válido. Usa **!mk select [#mi-canal]**",
+      "select_success": "\u2705 Canal de texto {} seleccionado.",
+
+      "unselect_already": "\u274C No hay ningún canal de texto seleccionado.",
+      "unselect_success": "\u2705 Canal de texto {} deseleccionado.",
+
       "start_already": "\u274C El servicio principal ya se encuentra iniciado.",
-      "start_success": "\u2705 Se ha iniciado el servicio principal en {}",
+      "start_success": "\u2705 Se ha iniciado el servicio principal.",
 
       "stop_already": "\u274C El servicio principal ya se encuentra parado.",
       "stop_success": "\u2705 Se ha parado el servicio principal.",

@@ -17,11 +17,10 @@ class DatabaseManager:
                 "_id": None,
                 "name": None,
                 "members": None,
-                "mention_role": None,  # Structure: <@&1234>
                 "selected_channel": None,  # Structure: <#1234>
+                "mention_role": None,  # Structure: <@&1234>
                 "lang": "en_EN",
                 "services": {
-                    "main": False,
                     "mention": True,
                     "epic": True,
                     "humble": True,

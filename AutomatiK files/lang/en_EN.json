@@ -25,7 +25,7 @@
       "mention_established": "\u2705 Role successfully established.",
       "mention_enabled": "\u2705 Mention module enabled.",
       "mention_disabled": "\u2705 Mention module disabled.",
-      "mention_error": "\u274C The introduced role isn't valid.",
+      "mention_error": "\u274C The introduced role is not valid.",
 
       "modules": "**Modules**",
       "modules_description": "**ModuleID** column contains the way each module must be called by in commands.",
@@ -37,8 +37,14 @@
       "enable_unknown": "\u274C Unknown parameter. Use **!mk enable (ModuleID)**",
       "disable_unknown": "\u274C Unknown parameter. Use **!mk disable (ModuleID)**",
 
+      "select_invalid_channel": "\u274C Invalid text channel. Use **!mk select [#my-channel]**",
+      "select_success": "\u2705 Text channel {} selected.",
+
+      "unselect_already": "\u274C There is not a selected channel yet.",
+      "unselect_success": "\u2705 Text channel {} unselected.",
+
       "start_already": "\u274C Main service is already started.",
-      "start_success": "\u2705 Main service started on {}",
+      "start_success": "\u2705 Main service started.",
 
       "stop_already": "\u274C Main service is already stopped.",
       "stop_success": "\u2705 Main service stopped.",

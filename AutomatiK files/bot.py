@@ -142,7 +142,7 @@ class Client(commands.Bot):
         """Sends a message to the selected channel of every guild."""
         for guild in self.guilds:
             guild_cfg = self.mongo.get_guild_config(guild)
-            if guild_cfg["services"]["main"] and guild_cfg["services"][game.MODULE_ID]:
+            if guild_cfg["selected_channel"] and guild_cfg["services"][game.MODULE_ID]:
                 selected_channel = guild_cfg["selected_channel"]
                 # Transforms "<#1234>" into 1234
                 selected_channel = int(selected_channel[selected_channel.find("#") + 1: selected_channel.rfind(">")])
@@ -223,43 +223,41 @@ class Client(commands.Bot):
         @commands.guild_only()
         @commands.cooldown(2, 10, commands.BucketType.user)
         @commands.has_permissions(administrator=True)
-        async def start(ctx, channel=None):
-            """Starts announcing free games in the guild where it is executed."""
+        async def select(ctx, channel=None):
+            """Starts announcing free games in the guild where it is executed or in the specified channel."""
             guild_cfg = self.mongo.get_guild_config(ctx.guild)
             guild_lang = guild_cfg["lang"]
             selected_channel = ctx.channel.mention if channel is None else channel
-            # todo Check if 'channel' is a valid text channel
 
-            if guild_cfg["services"]["main"]:  # If service already started
-                await ctx.channel.send(self.lm.get_message(guild_lang, "start_already"))
+            if channel is not None and not(channel.startswith("<#") and channel.endswith(">")):
+                await ctx.channel.send(self.lm.get_message(guild_lang, "select_invalid_channel"))
                 return None
 
             self.mongo.update_guild_config(ctx.guild, {"selected_channel": selected_channel})
-            self.mongo.update_guild_config(ctx.guild, {"services.main": True})
-
-            await ctx.channel.send(
-                self.lm.get_message(guild_lang, "start_success").format(selected_channel)
-            )
+            await ctx.channel.send(self.lm.get_message(guild_lang, "select_success").format(selected_channel))
 
         @self.command()
         @commands.guild_only()
         @commands.cooldown(2, 10, commands.BucketType.user)
         @commands.has_permissions(administrator=True)
-        async def stop(ctx):
+        async def unselect(ctx):
             """Stops announcing free games in the guild where it is executed."""
             guild_cfg = self.mongo.get_guild_config(ctx.guild)
             guild_lang = guild_cfg["lang"]
+            guild_selected_channel = guild_cfg["selected_channel"]
 
-            if not guild_cfg["services"]["main"]:  # If service already stopped
-                await ctx.channel.send(self.lm.get_message(guild_lang, "stop_already"))
+            if guild_selected_channel is None:
+                await ctx.channel.send(self.lm.get_message(guild_lang, "unselect_already")
+                                       .format(guild_selected_channel))
                 return None
-            self.mongo.update_guild_config(ctx.guild, {"services.main": False})
-            await ctx.channel.send(self.lm.get_message(guild_lang, "stop_success"))
+
+            self.mongo.update_guild_config(ctx.guild, {"selected_channel": None})
+            await ctx.channel.send(self.lm.get_message(guild_lang, "unselect_success").format(guild_selected_channel))
 
         @self.command()
         @commands.guild_only()
         @commands.cooldown(2, 10, commands.BucketType.user)
-        async def global_start(ctx):
+        async def start(ctx):
             """Starts the GLOBAL main loop that will look for free games every 5 minutes."""
             guild_lang = self.mongo.get_guild_config(ctx.guild)["lang"]
 
@@ -271,9 +269,7 @@ class Client(commands.Bot):
                 return None
 
             self.main_loop = True  # Changes it to True so the main loop can start
-            await ctx.channel.send(
-                self.lm.get_message(guild_lang, "start_success").format("<#" + str(ctx.channel.id) + ">")
-            )
+            await ctx.channel.send(self.lm.get_message(guild_lang, "start_success"))
             logger.info(f"Main service was started globally by {str(ctx.author)}")
 
             while self.main_loop:  # MAIN LOOP
@@ -296,7 +292,7 @@ class Client(commands.Bot):
         @self.command()
         @commands.guild_only()
         @commands.cooldown(2, 10, commands.BucketType.user)
-        async def global_stop(ctx):
+        async def stop(ctx):
             """Stops the loop that looks for free games GLOBALLY."""
             guild_lang = self.mongo.get_guild_config(ctx.guild)["lang"]
 
