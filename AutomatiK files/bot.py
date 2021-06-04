@@ -9,27 +9,14 @@ import time
 import discord
 from discord.ext import commands
 
-from core import update
+from core.update import Update
 from core.log_manager import logger
 from core.lang_manager import LangManager
 from core.config_manager import ConfigManager
 from core.db_manager import DatabaseManager
 
 
-class Loader:
-    imported_modules = []
-    ascii_art = r"""                _                        _   _ _  __
-     /\        | |                      | | (_) |/ /
-    /  \  _   _| |_ ___  _ __ ___   __ _| |_ _| ' /
-   / /\ \| | | | __/ _ \| '_ ` _ \ / _` | __| |  <
-  / ____ \ |_| | || (_) | | | | | | (_| | |_| | . \
- /_/    \_\__,_|\__\___/|_| |_| |_|\__,_|\__|_|_|\_\  {}
-                                               """
-
-    @staticmethod
-    def print_ascii_art():
-        print(Loader.ascii_art.format(Client.VERSION))
-        time.sleep(0.1)
+class ModuleLoader:
 
     @staticmethod
     def load_modules():
@@ -44,7 +31,6 @@ class Loader:
                     imported_module = importlib.import_module(f"modules.{module_name}")  # Imports module
                     # Creates an instance of the Main class of the imported module
                     Klass = getattr(imported_module, "Main")
-                    Loader.imported_modules.append(imported_module)
                     modules.append(Klass())
                 except AttributeError:
                     logger.exception(f"Module '{module_name}' couldn't be loaded")
@@ -54,17 +40,16 @@ class Loader:
         logger.info(f"{len(modules)} modules loaded")
         return modules
 
-    @staticmethod
-    def reload_modules():
-        """Reimports and instances all the modules automagically."""
-        Loader.imported_modules = [importlib.reload(i) for i in Loader.imported_modules]  # Re-imports the modules
-        importlib.invalidate_caches()
-        logger.info(f"{len(Loader.imported_modules)} modules loaded")
-        return [getattr(i, "Main")() for i in Loader.imported_modules]  # Instances from the modules
-
 
 class Client(commands.Bot):
     VERSION = "v1.4"
+    ascii_art = r"""                  _                        _   _ _  __
+        /\        | |                      | | (_) |/ /
+       /  \  _   _| |_ ___  _ __ ___   __ _| |_ _| ' /
+      / /\ \| | | | __/ _ \| '_ ` _ \ / _` | __| |  <
+     / ____ \ |_| | || (_) | | | | | | (_| | |_| | . \
+    /_/    \_\__,_|\__\___/|_| |_| |_|\__,_|\__|_|_|\_\  {}
+                                                  """
 
     def __init__(self, command_prefix, self_bot, intents):
         commands.Bot.__init__(self, command_prefix=command_prefix, self_bot=self_bot, intents=intents)
@@ -80,19 +65,18 @@ class Client(commands.Bot):
 
         self.LOGO_URL = "https://raw.githubusercontent.com/Axyss/AutomatiK/master/docs/assets/ak_logo.png"
         self.AVATAR_URL = "https://avatars3.githubusercontent.com/u/55812692"
-        self.MODULES = None  # Contains the instance of the Main class of every module
+        self.modules = None  # Contains the instance of the Main class of every module
         self.main_loop = False  # Variable used to start or stop the main loop
 
         self.remove_command("help")
         self.init_commands()
 
     async def on_ready(self):
-        if self.MODULES is None:  # Prevents the next lines from executing more than once when reconnecting
+        if self.modules is None:  # Prevents the next lines from executing more than once when reconnecting
             self.load_resources()
 
-            updater = update.Update(local_version=Client.VERSION, link="https://github.com/Axyss/AutomatiK/releases/")
-            threading.Thread(target=updater.check_every_x_days, args=[7],  daemon=True).start()
-            threading.Thread(target=self.cli, daemon=True).start()
+            updater = Update(local_version=Client.VERSION, link="https://github.com/Axyss/AutomatiK/releases/")
+            threading.Thread(target=updater.check_every_x_days, args=[7], daemon=True).start()
             logger.info(f"AutomatiK bot {Client.VERSION} online")
 
         # Outside the if block so it does execute more than once to prevent the presence message from
@@ -110,30 +94,21 @@ class Client(commands.Bot):
         else:
             print("\n" * 120)
 
-    def cli(self):
-        """Manages the console commands."""
-        while True:
-            cli_command = input("")
+    @staticmethod
+    def print_ascii_art():
+        print(Client.ascii_art.format(Client.VERSION))
+        time.sleep(0.1)
 
-            if cli_command == "shutdown":
-                self.main_loop = False
-                logger.info("Stopping...")
-                os._exit(1)
-            else:
-                logger.error("Unknown terminal command. Use 'shutdown' to stop the bot.")
-
-    def load_resources(self, reload=False):
+    def load_resources(self):
         """Loads configuration, modules and language packages."""
-        self.MODULES = Loader.reload_modules() if reload else Loader.load_modules()
+        self.modules = ModuleLoader.load_modules()
         self.cfg.load_config()
         self.lm.load_lang_packages()
         return True
 
     def generate_message(self, guild_cfg, game):
         """Generates a 'X free on Y' type message."""
-
-        message = random.choice(self.lm.get_message(guild_cfg["lang"], "generic_messages"))\
-                        .format(game.NAME, game.LINK)
+        message = random.choice(self.lm.get_message(guild_cfg["lang"], "generic_messages")).format(game.NAME, game.LINK)
         if guild_cfg["services"]["mention"]:
             message = guild_cfg["mention_role"] + " " + message
         return message
@@ -241,7 +216,7 @@ class Client(commands.Bot):
         @commands.cooldown(2, 10, commands.BucketType.user)
         @commands.has_permissions(administrator=True)
         async def unselect(ctx):
-            """Stops announcing free games in the guild where it is executed."""
+            """Stops announcing free games in the guild."""
             guild_cfg = self.mongo.get_guild_config(ctx.guild)
             guild_lang = guild_cfg["lang"]
             guild_selected_channel = guild_cfg["selected_channel"]
@@ -273,7 +248,7 @@ class Client(commands.Bot):
             logger.info(f"Main service was started globally by {str(ctx.author)}")
 
             while self.main_loop:  # MAIN LOOP
-                for module in self.MODULES:
+                for module in self.modules:
                     retrieved_free_games = module.get_free_games()
                     stored_free_games = self.mongo.get_free_games_by_module_id(module.MODULE_ID)
                     if retrieved_free_games:
@@ -311,26 +286,32 @@ class Client(commands.Bot):
         @commands.guild_only()
         @commands.cooldown(2, 10, commands.BucketType.user)
         async def status(ctx):
-            """Shows the bot's status."""
-            cfg = self.mongo.get_guild_config(ctx.guild)
+            """Shows information about the bot based on the guild (modules, selected channel...)."""
+            guild_cfg = self.mongo.get_guild_config(ctx.guild)
+            guild_lang = guild_cfg["lang"]
+            temp_value = None
 
-            embed_status = discord.Embed(title=self.lm.get_message(cfg["lang"], "status"),
-                                         description=self.lm.get_message(cfg["lang"], "status_description"),
+            embed_status = discord.Embed(title=self.lm.get_message(guild_lang, "status"),
+                                         description=self.lm.get_message(guild_lang, "status_description"),
                                          color=0x00BFFF
                                          )
-            embed_status.set_footer(text=self.lm.get_message(cfg["lang"], "embed_footer"),
+            embed_status.set_footer(text=self.lm.get_message(guild_lang, "embed_footer"),
                                     icon_url=self.AVATAR_URL
                                     )
             embed_status.set_thumbnail(url=self.LOGO_URL)
-            embed_status.add_field(name=self.lm.get_message(cfg["lang"], "status_main"),
-                                   value=self.lm.get_message(cfg["lang"], "status_active")
-                                   if cfg["services"]["main"]
-                                   else self.lm.get_message(cfg["lang"], "status_inactive")
-                                   )
 
-            for i in self.MODULES:
-                value = self.lm.get_message(cfg["lang"], "status_active") \
-                    if cfg["services"][i.MODULE_ID] else self.lm.get_message(cfg["lang"], "status_inactive")
+            if guild_cfg["selected_channel"]:
+                temp_value = self.lm.get_message(guild_lang, "status_active") + "\n" + guild_cfg["selected_channel"]
+            else:
+                temp_value = self.lm.get_message(guild_lang, "status_inactive")
+
+            embed_status.add_field(name=self.lm.get_message(guild_lang, "status_main"), value=temp_value)
+
+            for i in self.modules:
+                if guild_cfg["services"][i.MODULE_ID]:
+                    value = self.lm.get_message(guild_lang, "status_active")
+                else:
+                    value = self.lm.get_message(guild_lang, "status_inactive")
 
                 embed_status.add_field(name=i.SERVICE_NAME,
                                        value=value,
@@ -346,9 +327,9 @@ class Client(commands.Bot):
             """Shows information about the loaded modules."""
             guild_lang = self.mongo.get_guild_config(ctx.guild)["lang"]
 
-            module_ids = [i.MODULE_ID for i in self.MODULES]
-            module_names = [i.SERVICE_NAME for i in self.MODULES]
-            module_authors = [i.AUTHOR for i in self.MODULES]
+            module_ids = [i.MODULE_ID for i in self.modules]
+            module_names = [i.SERVICE_NAME for i in self.modules]
+            module_authors = [i.AUTHOR for i in self.modules]
 
             embed_module = discord.Embed(title=self.lm.get_message(guild_lang, "modules"),
                                          description=self.lm.get_message(guild_lang, "modules_description"),
@@ -379,7 +360,7 @@ class Client(commands.Bot):
             introduced_command = str(ctx.invoked_with)
             user_decision = True if introduced_command == "enable" else False
 
-            for module in self.MODULES:
+            for module in self.modules:
                 if service.lower() == module.MODULE_ID.lower():
                     self.mongo.update_guild_config(ctx.guild, {"services." + service.lower(): user_decision})
 
@@ -437,24 +418,29 @@ class Client(commands.Bot):
             """Reloads configuration, modules and language packages."""
             guild_lang = self.mongo.get_guild_config(ctx.guild)["lang"]
 
+            if str(ctx.author) not in self.cfg.get_general_value("bot_owners"):  # If command author not a bot owner
+                return None
+
             logger.info("Reloading..")
             was_started = bool(self.main_loop)
             self.main_loop = False
-            self.load_resources(reload=True)
+            if self.load_resources():
+                await ctx.channel.send(self.lm.get_message(guild_lang, "reload_completed"))
+                logger.info("Reload completed")
+            else:
+                logger.error("An error ocurred while reloading")
+                # todo finish
             self.main_loop = was_started
-
-            await ctx.channel.send(self.lm.get_message(guild_lang, "reload_completed"))
-            logger.info("Reload completed")
 
 
 if __name__ == "__main__":
     automatik = Client(command_prefix="!mk ", self_bot=False, intents=discord.Intents.default())
     Client.clear_console()
-    Loader.print_ascii_art()
+    Client.print_ascii_art()
     logger.info("Loading..")
 
     try:
         automatik.run(automatik.cfg.get_secret_value("discord_bot_token"))
     except discord.errors.LoginFailure:
-        logger.error("Invalid 'discord_bot_token'. Press enter to exit...")
+        logger.error("Invalid 'discord_bot_token'. Press enter to exit..")
         input()

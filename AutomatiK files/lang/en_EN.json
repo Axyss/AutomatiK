@@ -6,6 +6,7 @@
       "missing_permissions": "\u274C You don't have enough permissions to execute this command.",
       "invalid_command": "\u274C Unknown command. Use **!mk help** to see the available commands.",
       "cooldown_error":  "\u274C You type very fast. Please retry in **{}** seconds.",
+      "unexpected_error": "\u274C Unexpected error.",
 
       "notify_thanks": "\nThanks for notifying <@!{}>.",
 

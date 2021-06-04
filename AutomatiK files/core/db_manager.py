@@ -22,9 +22,6 @@ class DatabaseManager:
                 "lang": "en_EN",
                 "services": {
                     "mention": True,
-                    "epic": True,
-                    "humble": True,
-                    "steam": True
                 },
                 "join_date": str(datetime.datetime.now())
             }
@@ -70,5 +67,8 @@ class DatabaseManager:
                                                                           "module_id": game_obj.MODULE_ID})
         self._db["past_free_games"].insert_one(past_free_game_dict)
         return True
+
+    def add_new_service_field(self, module_id):
+        pass
 
 
