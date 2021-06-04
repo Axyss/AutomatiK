@@ -9,7 +9,7 @@ import time
 import discord
 from discord.ext import commands
 
-from core import updates
+from core import update
 from core.log_manager import logger
 from core.lang_manager import LangManager
 from core.config_manager import ConfigManager
@@ -64,7 +64,7 @@ class Loader:
 
 
 class Client(commands.Bot):
-    VERSION = "v2.0"
+    VERSION = "v1.4"
 
     def __init__(self, command_prefix, self_bot, intents):
         commands.Bot.__init__(self, command_prefix=command_prefix, self_bot=self_bot, intents=intents)
@@ -90,8 +90,8 @@ class Client(commands.Bot):
         if self.MODULES is None:  # Prevents the next lines from executing more than once when reconnecting
             self.load_resources()
 
-            updater = updates.Updates(local_version=Client.VERSION, link="https://github.com/Axyss/AutomatiK/releases/")
-            threading.Thread(target=updater.start_checking, daemon=True).start()  # Update checker
+            updater = update.Update(local_version=Client.VERSION, link="https://github.com/Axyss/AutomatiK/releases/")
+            threading.Thread(target=updater.check_every_x_days, args=[7],  daemon=True).start()
             threading.Thread(target=self.cli, daemon=True).start()
             logger.info(f"AutomatiK bot {Client.VERSION} online")
 

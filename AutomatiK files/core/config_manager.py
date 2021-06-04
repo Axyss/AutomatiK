@@ -10,7 +10,7 @@ class ConfigManager:
                                 "# To use them, follow the next syntax: env(my_new_env_variable).\n"
                                 "GENERAL:\n"
                                 "  bot_owners: []\n"
-                                "  debug: false"
+                                "  debug: false\n"
                                 "MONGODB:\n"
                                 "  host: '127.0.0.1'\n"
                                 "  port: 27017\n"
