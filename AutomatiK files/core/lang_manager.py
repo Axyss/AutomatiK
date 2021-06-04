@@ -25,4 +25,9 @@ class LangManager:
         return lang_codes, lang_names, lang_authors
 
     def get_message(self, lang_code, message_id):
-        return self.lang_data[lang_code]["messages"][message_id]
+        try:
+            return self.lang_data[lang_code]["messages"][message_id]
+        except KeyError:
+            logger.debug(f"Message '{message_id}' could not be found on '{lang_code}.json'. " +
+                         "Falling back to 'en_EN'..")
+            return self.lang_data["en_EN"]["messages"][message_id]
