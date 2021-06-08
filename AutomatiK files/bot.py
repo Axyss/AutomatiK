@@ -7,6 +7,7 @@ import random
 import time
 
 import discord
+import psutil
 from discord.ext import commands
 
 from core.update import Update
@@ -97,7 +98,7 @@ class Client(commands.Bot):
     @staticmethod
     def print_ascii_art():
         print(Client.ascii_art.format(Client.VERSION))
-        time.sleep(0.1)
+        time.sleep(0.05)
 
     def load_resources(self):
         """Loads configuration, modules and language packages."""
@@ -432,6 +433,33 @@ class Client(commands.Bot):
                 # todo finish
             self.main_loop = was_started
 
+        @self.command(aliases=["statistics"])
+        @commands.guild_only()
+        @commands.cooldown(2, 10, commands.BucketType.user)
+        async def stats(ctx):
+            """Starts the GLOBAL main loop that will look for free games every 5 minutes."""
+            guild_lang = self.mongo.get_guild_config(ctx.guild)["lang"]
+
+            if str(ctx.author) not in self.cfg.get_general_value("bot_owners"):  # If command author not a bot owner
+                return None
+            
+            embed_stats = discord.Embed(title="\U0001f4c8 Statistics",
+                                        description="Shows additional information and stats about this bot's instance.",
+                                        color=0x00BFFF
+                                        )
+            embed_stats.set_footer(text=self.lm.get_message(guild_lang, "embed_footer"),
+                                   icon_url=self.AVATAR_URL
+                                   )
+            embed_stats.set_thumbnail(url=self.LOGO_URL)
+            embed_stats.add_field(name="Guilds", value=str(len(self.guilds)))
+            embed_stats.add_field(name="Owners", value="\n".join(self.cfg.get_general_value("bot_owners")))
+            embed_stats.add_field(name="Server load",
+                                  value="CPU: **{}%** \nRAM: **{}%**".format(
+                                         psutil.cpu_percent(), psutil.virtual_memory().percent))
+
+            await ctx.channel.send(embed=embed_stats)
+            logger.debug(f"Command '{ctx.command}' invoked by {ctx.author}")
+            
 
 if __name__ == "__main__":
     automatik = Client(command_prefix="!mk ", self_bot=False, intents=discord.Intents.default())

@@ -8,8 +8,6 @@
       "cooldown_error":  "\u274C Escribes demasiado rápido. Inténtalo de nuevo en **{}** segundos.",
       "unexpected_error": "\u274C Error inesperado.",
 
-      "notify_thanks": "\nGracias por avisar <@!{}>.",
-
       "language": "Idioma",
       "languages": "Idiomas",
       "languages_description": "La columna **LangID** contiene el nombre con el que cada paquete de idioma debe ser llamado en los comandos.",

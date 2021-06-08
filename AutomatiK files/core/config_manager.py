@@ -5,6 +5,7 @@ from core.log_manager import logger
 
 class ConfigManager:
     def __init__(self, filename):
+        # todo Explain how to introduce data on the configuration file properly
         self.CONFIG_TEMPLATE = ("# We know writing important credentials inside a plain text file\n"
                                 "# might feel a bit scary. That's why now you can use environment variables!\n"
                                 "# To use them, follow the next syntax: env(my_new_env_variable).\n"
@@ -46,6 +47,9 @@ class ConfigManager:
            Obtains the value from the YAML configuration file, directly, or from an environment variable if
            the syntax is: env(my_env_var).
         """
+        if isinstance(value, list):
+            return value
+
         value = str(value)  # Necessary to try to parse numeric values without crashing
         if value.startswith("env(") and value.endswith(")"):
             env_var = value[value.find("(") + 1: value.rfind(")")]

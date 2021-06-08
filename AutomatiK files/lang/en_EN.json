@@ -8,8 +8,6 @@
       "cooldown_error":  "\u274C You type very fast. Please retry in **{}** seconds.",
       "unexpected_error": "\u274C Unexpected error.",
 
-      "notify_thanks": "\nThanks for notifying <@!{}>.",
-
       "language": "Language",
       "languages": "Languages",
       "languages_description": "**LangID** column contains the way each language package must be called by in commands.",
