@@ -75,6 +75,7 @@ class Client(commands.Bot):
     async def on_ready(self):
         if self.modules is None:  # Prevents the next lines from executing more than once when reconnecting
             self.load_resources()
+            self.loop.create_task(self.init_main_loop())
             updater = Update(local_version=Client.VERSION, link="https://github.com/Axyss/AutomatiK/releases/")
             threading.Thread(target=updater.check_every_x_days, args=[7], daemon=True).start()
             logger.info(f"AutomatiK bot {Client.VERSION} online")
@@ -104,7 +105,6 @@ class Client(commands.Bot):
         self.modules = ModuleLoader.load_modules()
         self.cfg.load_config()
         self.lm.load_lang_packages()
-        return True
 
     def generate_message(self, guild_cfg, game):
         """Generates a 'X free on Y' type message."""
@@ -149,6 +149,33 @@ class Client(commands.Bot):
             except:
                 logger.exception("Unexpected error")
 
+    async def init_main_loop(self):
+        while True:
+            while self.main_loop:  # MAIN LOOP
+                for module in self.modules:
+                    try:
+                        retrieved_free_games = module.get_free_games()
+                        stored_free_games = self.mongo.get_free_games_by_module_id(module.MODULE_ID)
+                    except:  # If this wasn't here, any unhandled exception would crash the method
+                        logger.exception("Unexpected error while retrieving game data")
+                        continue
+                    if retrieved_free_games is not False:
+                        for game in retrieved_free_games:  # Looks for free games
+                            if game not in stored_free_games:
+                                self.mongo.create_free_game(game)
+                                logger.info(f"New game '{game.NAME}' ({game.MODULE_ID}) added to the database")
+                                await self.broadcast_message(game)
+
+                        for game in stored_free_games:  # Looks for games that are no longer free
+                            if game not in retrieved_free_games:
+                                self.mongo.move_to_past_free_games(game)
+                                logger.info(f"'{game.NAME}' ({game.MODULE_ID}) moved to the 'past_free_games' database")
+                    else:
+                        # todo module error message
+                        pass
+                await asyncio.sleep(300)  # 5 minutes until the next iteration
+            await asyncio.sleep(10)
+
     def init_commands(self):
 
         @self.command()
@@ -187,14 +214,16 @@ class Client(commands.Bot):
                                  value="".join(self.lm.get_message(guild_lang, "embed_field1_value")),
                                  inline=False
                                  )
-            embed_help.add_field(name=u"\U0001F6E0 " + self.lm.get_message(guild_lang, "embed_field2_name"),
-                                 value="".join(self.lm.get_message(guild_lang, "embed_field2_value")),
-                                 inline=False)
-
-            embed_help.add_field(name=u"\U0001F451 " + self.lm.get_message(guild_lang, "embed_field3_name"),
-                                 value="".join(self.lm.get_message(guild_lang, "embed_field3_value")),
-                                 inline=False)
-
+            if ctx.author.guild_permissions.administrator:
+                embed_help.add_field(name=u"\U0001F6E0 " + self.lm.get_message(guild_lang, "embed_field2_name"),
+                                     value="".join(self.lm.get_message(guild_lang, "embed_field2_value")),
+                                     inline=False
+                                     )
+            if str(ctx.author) in self.cfg.get_general_value("bot_owners"):  # If command author a bot owner
+                embed_help.add_field(name=u"\U0001F451 " + self.lm.get_message(guild_lang, "embed_field3_name"),
+                                     value="".join(self.lm.get_message(guild_lang, "embed_field3_value")),
+                                     inline=False
+                                     )
             await ctx.channel.send(embed=embed_help)
             logger.debug(f"Command '{ctx.command}' invoked by {ctx.author}")
 
@@ -233,65 +262,33 @@ class Client(commands.Bot):
             self.mongo.update_guild_config(ctx.guild, {"selected_channel": None})
             await ctx.channel.send(self.lm.get_message(guild_lang, "unselect_success").format(guild_selected_channel))
 
-        @self.command()
+        @self.command(aliases=["stop"])
         @commands.guild_only()
         @commands.cooldown(2, 10, commands.BucketType.user)
         async def start(ctx):
-            """Starts the GLOBAL main loop that will look for free games every 5 minutes."""
+            """Starts/stops the main loop that will look for free games every 5 minutes."""
             guild_lang = self.mongo.get_guild_config(ctx.guild)["lang"]
+            introduced_command = str(ctx.invoked_with)
 
             if str(ctx.author) not in self.cfg.get_general_value("bot_owners"):  # If command author not a bot owner
                 return None
 
-            if self.main_loop:  # If service already started
+            # If the main loop is already started/stopped
+            if introduced_command == "start" and self.main_loop:
                 await ctx.channel.send(self.lm.get_message(guild_lang, "start_already"))
                 return None
-
-            self.main_loop = True  # Changes it to True so the main loop can continue
-            await ctx.channel.send(self.lm.get_message(guild_lang, "start_success"))
-            logger.info(f"Main service was started globally by {str(ctx.author)}")
-
-            while self.main_loop:  # MAIN LOOP
-                for module in self.modules:
-                    try:
-                        retrieved_free_games = module.get_free_games()
-                        stored_free_games = self.mongo.get_free_games_by_module_id(module.MODULE_ID)
-                    except:  # If this wasn't here, any unhandled exception would crash the function
-                        logger.exception("Unexpected error while retrieving game data")
-                        continue
-                    if retrieved_free_games is not False:
-                        for game in retrieved_free_games:  # Looks for free games
-                            if game not in stored_free_games:
-                                self.mongo.create_free_game(game)
-                                logger.info(f"New game '{game.NAME}' ({game.MODULE_ID}) added to the database")
-                                await self.broadcast_message(game)
-
-                        for game in stored_free_games:  # Looks for games that are no longer free
-                            if game not in retrieved_free_games:
-                                self.mongo.move_to_past_free_games(game)
-                                logger.info(f"'{game.NAME}' ({game.MODULE_ID}) moved to the 'past_free_games' database")
-                    else:
-                        # todo module error message
-                        pass
-                await asyncio.sleep(300)  # 5 minutes until the next iteration
-
-        @self.command()
-        @commands.guild_only()
-        @commands.cooldown(2, 10, commands.BucketType.user)
-        async def stop(ctx):
-            """Stops the loop that looks for free games GLOBALLY."""
-            guild_lang = self.mongo.get_guild_config(ctx.guild)["lang"]
-
-            if str(ctx.author) not in self.cfg.get_general_value("bot_owners"):  # If command author not a bot owner
-                return None
-
-            if not self.main_loop:  # If service already stopped
+            elif introduced_command == "stop" and not self.main_loop:
                 await ctx.channel.send(self.lm.get_message(guild_lang, "stop_already"))
                 return None
 
-            self.main_loop = False
-            await ctx.channel.send(self.lm.get_message(guild_lang, "stop_success"))
-            logger.info(f"Main service was stopped globally by {str(ctx.author)}")
+            if introduced_command == "start":
+                self.main_loop = True
+                await ctx.channel.send(self.lm.get_message(guild_lang, "start_success"))
+                logger.info(f"Main service was started globally by {str(ctx.author)}")
+            elif introduced_command == "stop":
+                self.main_loop = False
+                await ctx.channel.send(self.lm.get_message(guild_lang, "stop_success"))
+                logger.info(f"Main service was stopped globally by {str(ctx.author)}")
 
         @self.command()
         @commands.guild_only()
@@ -404,8 +401,8 @@ class Client(commands.Bot):
         @commands.cooldown(2, 10, commands.BucketType.user)
         @commands.has_permissions(administrator=True)
         async def languages(ctx):
-            lang_ids, lang_names, lang_authors = self.lm.get_lang_packages_metadata()
             guild_lang = self.mongo.get_guild_config(ctx.guild)["lang"]
+            lang_ids, lang_names, lang_authors = self.lm.get_lang_packages_metadata()
 
             embed_langs = discord.Embed(title=self.lm.get_message(guild_lang, "languages"),
                                         description=self.lm.get_message(guild_lang, "languages_description"),
@@ -435,13 +432,15 @@ class Client(commands.Bot):
             logger.info("Reloading..")
             was_started = bool(self.main_loop)
             self.main_loop = False
-            if self.load_resources():
+            try:
+                self.load_resources()
                 await ctx.channel.send(self.lm.get_message(guild_lang, "reload_completed"))
                 logger.info("Reload completed")
-            else:
+            except:
+                await ctx.channel.send(self.lm.get_message(guild_lang, "unexpected_error"))
                 logger.error("An error ocurred while reloading")
-                # todo finish
-            self.main_loop = was_started
+            finally:
+                self.main_loop = was_started
 
         @self.command(aliases=["statistics"])
         @commands.guild_only()

@@ -5,12 +5,15 @@ from core.log_manager import logger
 
 class ConfigManager:
     def __init__(self, filename):
-        # todo Explain how to introduce data on the configuration file properly
         self.CONFIG_TEMPLATE = ("# We know writing important credentials inside a plain text file\n"
                                 "# might feel a bit scary. That's why now you can use environment variables!\n"
-                                "# To use them, follow the next syntax: env(my_new_env_variable).\n"
+                                "# To use them, follow the next syntax: env(my_new_env_variable).\n\n"
                                 "GENERAL:\n"
-                                "  bot_owners: []\n"
+                                "# Bot owners have access to exclusive commands to help them manage the bot. "
+                                "Introduce as many as you want.\n"
+                                "# Try replicating the syntax down below with your own Discord tag.\n"
+                                "  bot_owners:\n"
+                                "#    - 'Axyss#5593'\n"
                                 "  debug: false\n"
                                 "MONGODB:\n"
                                 "  host: '127.0.0.1'\n"
