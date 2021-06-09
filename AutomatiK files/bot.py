@@ -75,7 +75,6 @@ class Client(commands.Bot):
     async def on_ready(self):
         if self.modules is None:  # Prevents the next lines from executing more than once when reconnecting
             self.load_resources()
-
             updater = Update(local_version=Client.VERSION, link="https://github.com/Axyss/AutomatiK/releases/")
             threading.Thread(target=updater.check_every_x_days, args=[7], daemon=True).start()
             logger.info(f"AutomatiK bot {Client.VERSION} online")
@@ -192,6 +191,10 @@ class Client(commands.Bot):
                                  value="".join(self.lm.get_message(guild_lang, "embed_field2_value")),
                                  inline=False)
 
+            embed_help.add_field(name=u"\U0001F451 " + self.lm.get_message(guild_lang, "embed_field3_name"),
+                                 value="".join(self.lm.get_message(guild_lang, "embed_field3_value")),
+                                 inline=False)
+
             await ctx.channel.send(embed=embed_help)
             logger.debug(f"Command '{ctx.command}' invoked by {ctx.author}")
 
@@ -244,15 +247,19 @@ class Client(commands.Bot):
                 await ctx.channel.send(self.lm.get_message(guild_lang, "start_already"))
                 return None
 
-            self.main_loop = True  # Changes it to True so the main loop can start
+            self.main_loop = True  # Changes it to True so the main loop can continue
             await ctx.channel.send(self.lm.get_message(guild_lang, "start_success"))
             logger.info(f"Main service was started globally by {str(ctx.author)}")
 
             while self.main_loop:  # MAIN LOOP
                 for module in self.modules:
-                    retrieved_free_games = module.get_free_games()
-                    stored_free_games = self.mongo.get_free_games_by_module_id(module.MODULE_ID)
-                    if retrieved_free_games:
+                    try:
+                        retrieved_free_games = module.get_free_games()
+                        stored_free_games = self.mongo.get_free_games_by_module_id(module.MODULE_ID)
+                    except:  # If this wasn't here, any unhandled exception would crash the function
+                        logger.exception("Unexpected error while retrieving game data")
+                        continue
+                    if retrieved_free_games is not False:
                         for game in retrieved_free_games:  # Looks for free games
                             if game not in stored_free_games:
                                 self.mongo.create_free_game(game)
@@ -263,6 +270,9 @@ class Client(commands.Bot):
                             if game not in retrieved_free_games:
                                 self.mongo.move_to_past_free_games(game)
                                 logger.info(f"'{game.NAME}' ({game.MODULE_ID}) moved to the 'past_free_games' database")
+                    else:
+                        # todo module error message
+                        pass
                 await asyncio.sleep(300)  # 5 minutes until the next iteration
 
         @self.command()
@@ -355,7 +365,7 @@ class Client(commands.Bot):
         @commands.cooldown(2, 10, commands.BucketType.user)
         @commands.has_permissions(administrator=True)
         async def enable(ctx, service):
-            """Global manager to enable/disable modules and other services."""
+            """Guild dependant command to enable/disable modules and other settings."""
             guild_lang = self.mongo.get_guild_config(ctx.guild)["lang"]
 
             introduced_command = str(ctx.invoked_with)
@@ -459,7 +469,19 @@ class Client(commands.Bot):
 
             await ctx.channel.send(embed=embed_stats)
             logger.debug(f"Command '{ctx.command}' invoked by {ctx.author}")
-            
+
+        @self.command()
+        @commands.guild_only()
+        @commands.cooldown(2, 10, commands.BucketType.user)
+        async def shutdown(ctx):
+            """Shuts down the bot process completely."""
+            if str(ctx.author) not in self.cfg.get_general_value("bot_owners"):  # If command author not a bot owner
+                return None
+
+            self.main_loop = False
+            await self.logout()
+            # todo Consider broadcast queues before shutting down
+
 
 if __name__ == "__main__":
     automatik = Client(command_prefix="!mk ", self_bot=False, intents=discord.Intents.default())
