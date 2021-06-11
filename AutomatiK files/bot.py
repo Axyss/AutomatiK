@@ -73,7 +73,9 @@ class Client(commands.Bot):
         self.init_commands()
 
     async def on_ready(self):
-        if self.modules is None:  # Prevents the next lines from executing more than once when reconnecting
+        # The condition below will only be True the first execution, since ModuleLoader.load_modules will return
+        # a list with the module's instances or an empty list if there aren't any modules
+        if self.modules is None:
             self.load_resources()
             self.loop.create_task(self.init_main_loop())
             updater = Update(local_version=Client.VERSION, link="https://github.com/Axyss/AutomatiK/releases/")
@@ -465,6 +467,7 @@ class Client(commands.Bot):
             embed_stats.add_field(name="Server load",
                                   value="CPU: **{}%** \nRAM: **{}%**".format(
                                          psutil.cpu_percent(), psutil.virtual_memory().percent))
+            embed_stats.add_field(name="Message queue", value="There are **0** messages waiting to be delivered.")
 
             await ctx.channel.send(embed=embed_stats)
             logger.debug(f"Command '{ctx.command}' invoked by {ctx.author}")
