@@ -17,8 +17,8 @@
       "status": "Estado",
       "status_main": "Servicio principal",
       "status_description": "Comprueba el estado de varios servicios del bot.",
-      "status_active": "ACTIVO \u2705",
-      "status_inactive": "INACTIVO \u274C",
+      "status_active": "ACTIVADO \u2705",
+      "status_inactive": "DESACTIVADO \u274C",
 
       "mentions": "Menciones",
       "mention_established": "\u2705 Rol establecido con éxito.",
@@ -65,10 +65,8 @@
 
                              "**enable (ModuleID)** - Comando para activar módulos.\n",
                              "**disable (ModuleID)** - Comando para desactivar módulos.\n",
-                             "**modules** - Muestra información sobre los módulos cargados y sus **ModuleID**\n\n",
-
-                             "**mention (@MiRol)** - Elige qué rol será mencionado en los mensajes de AutomatiK\n",
-                             "**notify (name) (link)** - Notifica juegos de forma manual a través del bot.\n\n",
+                             "**modules** - Muestra información sobre los módulos cargados y sus **ModuleID**\n",
+                             "**mention (@MiRol)** - Elige qué rol será mencionado en los mensajes de AutomatiK\n\n",
 
                              "**language (LangID)** - Cambia el idioma de los mensajes.\n",
                              "**languages** - Muestra información sobre los paquetes de idioma y sus **LangID**\n⠀"],

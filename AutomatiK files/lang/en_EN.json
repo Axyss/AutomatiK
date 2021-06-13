@@ -16,9 +16,9 @@
 
       "status": "Status",
       "status_main": "Main service",
-      "status_description": "Check the status of various services of the bot.",
-      "status_active": "ACTIVE \u2705",
-      "status_inactive": "INACTIVE \u274C",
+      "status_description": "Check the status of the bot's modules and settings on this server.",
+      "status_active": "ENABLED \u2705",
+      "status_inactive": "DISABLED \u274C",
 
       "mentions": "Mentions",
       "mention_established": "\u2705 Role successfully established.",
@@ -27,7 +27,7 @@
       "mention_error": "\u274C The introduced role is not valid.",
 
       "modules": "**Modules**",
-      "modules_description": "**ModuleID** column contains the way each module must be called by in commands.",
+      "modules_description": "Modules are extensions that expand the bot's functionality. **ModuleID** column contains the way each module must be called by in commands.",
       "modules_service": "**Service**",
       "modules_author": "**Author**",
 
@@ -36,7 +36,7 @@
       "enable_unknown": "\u274C Unknown parameter. Use **!mk enable (ModuleID)**",
       "disable_unknown": "\u274C Unknown parameter. Use **!mk disable (ModuleID)**",
 
-      "select_invalid_channel": "\u274C Invalid text channel. Use **!mk select [#my-channel]**",
+      "select_invalid_channel": "\u274C Invalid text channel. Use **!mk select [#text-channel]**",
       "select_success": "\u2705 Text channel {} selected.",
 
       "unselect_already": "\u274C There is not a selected channel yet.",
@@ -51,27 +51,28 @@
       "reload_completed": "\u2705 **Reload** completed.",
 
       "embed_footer": "Project page: github.com/Axyss/AutomatiK",
-      "embed_description": "All commands must be preceded by the prefix **!mk**. Example: **!mk start**",
+      "embed_description": "Command syntax: **!mk (mandatory) [optional]**",
       "embed_field1_name": "\u2139 Commands",
       "embed_field1_value": ["⠀\n",
-                             "**help** - Shows all available commands.\n",
-                             "**status** - Shows the status of the loaded modules.\n⠀"],
+                             "**help** - Shows all the available commands.\n",
+                             "**status** - Shows the status of the bot's modules and settings on this server.\n⠀"],
 
       "embed_field2_name": "Administrator commands",
       "embed_field2_value": ["⠀\n",
-                             "**start** - Starts the main process in the channel where the command is executed.\n",
-                             "**stop** - Stops the main process.\n",
-                             "**reload** - Reloads configuration, modules and language packages.\n\n",
+                             "**select [#text-channel]** - Select the channel where AutomatiK will send messages to this server.\n",
+                             "**unselect** - Unselects the previously selected channel. Your server won't receive new messages.\n\n",
 
-                             "**enable (ModuleID)** - Command to enable AutomatiK modules.\n",
-                             "**disable (ModuleID)** - Command to disable AutomatiK modules.\n",
-                             "**modules** - Shows information about loaded modules and their **ModuleID**\n\n",
-
-                             "**mention (@MyRole)** - Select which role will be mentioned in Automatik's messages.\n",
-                             "**notify (name) (link)** - Notify games manually through the bot.\n\n",
+                             "**enable/disable (ModuleID)** - Command to enable/disable AutomatiK modules.\n",
+                             "**modules** - Shows information about loaded modules and their **ModuleID**s.\n",
+                             "**mention (@MyRole)** - Select which role will be mentioned in AutomatiK's messages.\n\n",
 
                              "**language (LangID)** - Change the language of the messages.\n",
-                             "**languages** - Shows information about language packages and their **LangID**\n⠀"],
+                             "**languages** - Shows information about language packages and their **LangID**s.\n⠀"],
+      "embed_field3_name": "Owner commands",
+      "embed_field3_value": ["⠀\n",
+                             "**start/stop** - starts/stops the bot's main service globally.\n",
+                             "**reload** - Reloads configuration, modules and language packages.\n",
+                             "**stats** - Shows some overall statistics of the bot."],
 
       "generic_messages": ["{} is currently free on {}",
                            "Hurry, {} is now free on {}",
