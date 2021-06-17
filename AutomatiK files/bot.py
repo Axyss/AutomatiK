@@ -5,10 +5,11 @@ import asyncio
 import importlib
 import random
 import time
+import queue
 
 import discord
 import psutil
-from discord.ext import commands
+from discord.ext import commands, tasks
 
 from core.update import Update
 from core.log_manager import logger
@@ -68,6 +69,8 @@ class Client(commands.Bot):
         self.AVATAR_URL = "https://avatars3.githubusercontent.com/u/55812692"
         self.modules = None  # Contains the instance of the Main class of every module
         self.main_loop = False  # Variable used to start or stop the main loop
+        self.game_queue = queue.Queue()  # Free games are stored here temporary while the 'broadcaster' routine
+                                         # delivers the messages
 
         self.remove_command("help")
         self.init_commands()
@@ -77,7 +80,8 @@ class Client(commands.Bot):
         # a list with the module's instances or an empty list if there aren't any modules
         if self.modules is None:
             self.load_resources()
-            self.loop.create_task(self.init_main_loop())
+            self.init_main_loop.start()
+            self.init_message_broadcaster.start()
             updater = Update(local_version=Client.VERSION, link="https://github.com/Axyss/AutomatiK/releases/")
             threading.Thread(target=updater.check_every_x_days, args=[7], daemon=True).start()
             logger.info(f"AutomatiK bot {Client.VERSION} online")
@@ -115,21 +119,6 @@ class Client(commands.Bot):
             message = guild_cfg["mention_role"] + " " + message
         return message
 
-    async def broadcast_message(self, game):
-        """Sends a message to the selected channel of every guild."""
-        for guild in self.guilds:
-            guild_cfg = self.mongo.get_guild_config(guild)
-            if guild_cfg["selected_channel"] and guild_cfg["services"][game.MODULE_ID]:
-                selected_channel = guild_cfg["selected_channel"]
-                # Transforms "<#1234>" into 1234
-                selected_channel = int(selected_channel[selected_channel.find("#") + 1: selected_channel.rfind(">")])
-                message = self.generate_message(guild_cfg, game)
-                try:
-                    await guild.get_channel(selected_channel).send(message)
-                except AttributeError:  # If the channel ID is not valid
-                    # todo Handle this error properly
-                    pass
-
     async def on_command_error(self, ctx, error):  # The second parameter is the error's information
         """Method used for error handling regarding the discord.py library."""
         guild_lang = self.mongo.get_guild_config(ctx.guild)["lang"]
@@ -138,6 +127,10 @@ class Client(commands.Bot):
             await ctx.channel.send(self.lm.get_message(guild_lang, "missing_permissions"))
 
         elif isinstance(error, discord.ext.commands.errors.NoPrivateMessage):
+            pass
+
+        elif isinstance(error, discord.ext.commands.CommandInvokeError):
+            # Bot kicked or lacks permissions to send messages
             pass
 
         elif isinstance(error, discord.ext.commands.errors.CommandNotFound):
@@ -151,32 +144,61 @@ class Client(commands.Bot):
             except:
                 logger.exception("Unexpected error")
 
+    @tasks.loop(seconds=10)
     async def init_main_loop(self):
-        while True:
-            while self.main_loop:  # MAIN LOOP
-                for module in self.modules:
-                    try:
-                        retrieved_free_games = module.get_free_games()
-                        stored_free_games = self.mongo.get_free_games_by_module_id(module.MODULE_ID)
-                    except:  # If this wasn't here, any unhandled exception would crash the method
-                        logger.exception("Unexpected error while retrieving game data")
-                        continue
-                    if retrieved_free_games is not False:
-                        for game in retrieved_free_games:  # Looks for free games
-                            if game not in stored_free_games:
-                                self.mongo.create_free_game(game)
-                                logger.info(f"New game '{game.NAME}' ({game.MODULE_ID}) added to the database")
-                                await self.broadcast_message(game)
+        if self.main_loop:  # MAIN LOOP
+            for module in self.modules:
+                try:
+                    retrieved_free_games = module.get_free_games()
+                    stored_free_games = self.mongo.get_free_games_by_module_id(module.MODULE_ID)
+                except:  # If this wasn't here, any unhandled exception would crash the loop
+                    logger.exception("Unexpected error while retrieving game data")
+                    continue
+                if retrieved_free_games is not False:
+                    for game in retrieved_free_games:  # Looks for free games
+                        if game not in stored_free_games:
+                            self.mongo.create_free_game(game)
+                            logger.info(f"New game '{game.NAME}' ({game.MODULE_ID}) added to the database")
+                            self.game_queue.put(game)
 
-                        for game in stored_free_games:  # Looks for games that are no longer free
-                            if game not in retrieved_free_games:
-                                self.mongo.move_to_past_free_games(game)
-                                logger.info(f"'{game.NAME}' ({game.MODULE_ID}) moved to the 'past_free_games' database")
-                    else:
-                        # todo module error message
-                        pass
-                await asyncio.sleep(300)  # 5 minutes until the next iteration
-            await asyncio.sleep(10)
+                    for game in stored_free_games:  # Looks for games that are no longer free
+                        if game not in retrieved_free_games:
+                            self.mongo.move_to_past_free_games(game)
+                            logger.info(f"'{game.NAME}' ({game.MODULE_ID}) moved to the 'past_free_games' database")
+                else:
+                    logger.debug(f"Ignoring results from the '{module.MODULE_ID}' module this iteration")
+            await asyncio.sleep(300)  # 5 minutes until the next iteration
+
+    @tasks.loop(seconds=10)
+    async def init_message_broadcaster(self):
+        if not self.game_queue.empty():
+            games = []
+            success, fail = 0, 0
+
+            for i in range(self.game_queue.qsize()):  # We move the current elements of the queue to a list
+                games.append(self.game_queue.get())   # so we can send all games at once to each guild, making
+                                                      # a single call to the database per guild.
+            for guild in self.guilds:
+                guild_cfg = self.mongo.get_guild_config(guild)
+                for game in games:
+                    if guild_cfg["selected_channel"] and guild_cfg["services"][game.MODULE_ID]:
+                        selected_channel = guild_cfg["selected_channel"]
+                        # Transforms "<#1234>" into 1234
+                        selected_channel = int(selected_channel[selected_channel.find("#") + 1: selected_channel.rfind(">")])
+                        message = self.generate_message(guild_cfg, game)
+                        try:
+                            await guild.get_channel(selected_channel).send(message)
+                            success += 1
+                        except (AttributeError, discord.errors.Forbidden):
+                            # If the channel ID is invalid or the message couldn't be sent for other reasons
+                            fail += 1
+                        except:
+                            fail += 1
+                            logger.exception("Unexpected error")
+                        finally:
+                            pass
+
+            logger.info(f"Messages sent to all guilds. Success: {success} | Fail: {fail}")
 
     def init_commands(self):
 
@@ -453,7 +475,7 @@ class Client(commands.Bot):
 
             if str(ctx.author) not in self.cfg.get_general_value("bot_owners"):  # If command author not a bot owner
                 return None
-            
+
             embed_stats = discord.Embed(title="\U0001f4c8 Statistics",
                                         description="Shows additional information and stats about this bot's instance.",
                                         color=0x00BFFF
@@ -479,9 +501,6 @@ class Client(commands.Bot):
             """Shuts down the bot process completely."""
             if str(ctx.author) not in self.cfg.get_general_value("bot_owners"):  # If command author not a bot owner
                 return None
-
-            self.main_loop = False
-            await self.logout()
             # todo Consider broadcast queues before shutting down
 
 
