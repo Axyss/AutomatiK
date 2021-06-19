@@ -71,6 +71,7 @@ class Client(commands.Bot):
         self.main_loop = False  # Variable used to start or stop the main loop
         self.game_queue = queue.Queue()  # Free games are stored here temporary while the 'broadcaster' routine
                                          # delivers the messages
+        self.game_queue_cache = []
 
         self.remove_command("help")
         self.init_commands()
@@ -109,6 +110,7 @@ class Client(commands.Bot):
     def load_resources(self):
         """Loads configuration, modules and language packages."""
         self.modules = ModuleLoader.load_modules()
+        self.mongo.add_new_services([i.MODULE_ID for i in self.modules])
         self.cfg.load_config()
         self.lm.load_lang_packages()
 
@@ -131,6 +133,7 @@ class Client(commands.Bot):
 
         elif isinstance(error, discord.ext.commands.CommandInvokeError):
             # Bot kicked or lacks permissions to send messages
+            # todo Every is exception raises this one and that is definitely a problem
             pass
 
         elif isinstance(error, discord.ext.commands.errors.CommandNotFound):
@@ -158,13 +161,11 @@ class Client(commands.Bot):
                     for game in retrieved_free_games:  # Looks for free games
                         if game not in stored_free_games:
                             self.mongo.create_free_game(game)
-                            logger.info(f"New game '{game.NAME}' ({game.MODULE_ID}) added to the database")
                             self.game_queue.put(game)
 
                     for game in stored_free_games:  # Looks for games that are no longer free
                         if game not in retrieved_free_games:
                             self.mongo.move_to_past_free_games(game)
-                            logger.info(f"'{game.NAME}' ({game.MODULE_ID}) moved to the 'past_free_games' database")
                 else:
                     logger.debug(f"Ignoring results from the '{module.MODULE_ID}' module this iteration")
             await asyncio.sleep(300)  # 5 minutes until the next iteration
@@ -172,15 +173,16 @@ class Client(commands.Bot):
     @tasks.loop(seconds=10)
     async def init_message_broadcaster(self):
         if not self.game_queue.empty():
-            games = []
             success, fail = 0, 0
 
-            for i in range(self.game_queue.qsize()):  # We move the current elements of the queue to a list
-                games.append(self.game_queue.get())   # so we can send all games at once to each guild, making
-                                                      # a single call to the database per guild.
+            for i in range(self.game_queue.qsize()):
+                # We move the current elements of the queue to a list so we can send all games at once to each guild
+                # making a single call to the database per guild.
+                self.game_queue_cache.append(self.game_queue.get())
+
             for guild in self.guilds:
                 guild_cfg = self.mongo.get_guild_config(guild)
-                for game in games:
+                for game in self.game_queue_cache:
                     if guild_cfg["selected_channel"] and guild_cfg["services"][game.MODULE_ID]:
                         selected_channel = guild_cfg["selected_channel"]
                         # Transforms "<#1234>" into 1234
@@ -197,7 +199,7 @@ class Client(commands.Bot):
                             logger.exception("Unexpected error")
                         finally:
                             pass
-
+            self.game_queue_cache = []  # todo Delete element by element the list instead deleting at all once
             logger.info(f"Messages sent to all guilds. Success: {success} | Fail: {fail}")
 
     def init_commands(self):
@@ -286,33 +288,41 @@ class Client(commands.Bot):
             self.mongo.update_guild_config(ctx.guild, {"selected_channel": None})
             await ctx.channel.send(self.lm.get_message(guild_lang, "unselect_success").format(guild_selected_channel))
 
-        @self.command(aliases=["stop"])
+        @self.command()
         @commands.guild_only()
         @commands.cooldown(2, 10, commands.BucketType.user)
         async def start(ctx):
             """Starts/stops the main loop that will look for free games every 5 minutes."""
             guild_lang = self.mongo.get_guild_config(ctx.guild)["lang"]
-            introduced_command = str(ctx.invoked_with)
 
             if str(ctx.author) not in self.cfg.get_general_value("bot_owners"):  # If command author not a bot owner
                 return None
 
-            # If the main loop is already started/stopped
-            if introduced_command == "start" and self.main_loop:
+            if self.main_loop:
                 await ctx.channel.send(self.lm.get_message(guild_lang, "start_already"))
                 return None
-            elif introduced_command == "stop" and not self.main_loop:
+
+            self.main_loop = True
+            await ctx.channel.send(self.lm.get_message(guild_lang, "start_success"))
+            logger.info(f"Main service was started globally by {str(ctx.author)}")
+
+        @self.command()
+        @commands.guild_only()
+        @commands.cooldown(2, 10, commands.BucketType.user)
+        async def stop(ctx):
+            """Stops the loop that looks for free games GLOBALLY."""
+            guild_lang = self.mongo.get_guild_config(ctx.guild)["lang"]
+
+            if str(ctx.author) not in self.cfg.get_general_value("bot_owners"):  # If command author not a bot owner
+                return None
+
+            if not self.main_loop:  # If service already stopped
                 await ctx.channel.send(self.lm.get_message(guild_lang, "stop_already"))
                 return None
 
-            if introduced_command == "start":
-                self.main_loop = True
-                await ctx.channel.send(self.lm.get_message(guild_lang, "start_success"))
-                logger.info(f"Main service was started globally by {str(ctx.author)}")
-            elif introduced_command == "stop":
-                self.main_loop = False
-                await ctx.channel.send(self.lm.get_message(guild_lang, "stop_success"))
-                logger.info(f"Main service was stopped globally by {str(ctx.author)}")
+            self.main_loop = False
+            await ctx.channel.send(self.lm.get_message(guild_lang, "stop_success"))
+            logger.info(f"Main service was stopped globally by {str(ctx.author)}")
 
         @self.command()
         @commands.guild_only()
@@ -397,12 +407,12 @@ class Client(commands.Bot):
                     self.mongo.update_guild_config(ctx.guild, {"services." + service.lower(): user_decision})
 
                     await ctx.channel.send(
-                        self.lm.get_message(guild_lang, f"module_{introduced_command}d").format(f"**{service}**")
+                        self.lm.get_message(guild_lang, f"module_{introduced_command}d").format(service)
                     )
                     logger.info(f"{service.capitalize()} module {introduced_command}d by {ctx.author}")
                     return True
 
-            await ctx.channel.send(self.lm.get_message(guild_lang, f"{introduced_command}_unknown"))
+            await ctx.channel.send(self.lm.get_message(guild_lang, f"enable_unknown").format(introduced_command))
             return False
 
         @self.command()
@@ -470,26 +480,34 @@ class Client(commands.Bot):
         @commands.guild_only()
         @commands.cooldown(2, 10, commands.BucketType.user)
         async def stats(ctx):
-            """Starts the GLOBAL main loop that will look for free games every 5 minutes."""
+            """Shows some overall statistics of the bot."""
             guild_lang = self.mongo.get_guild_config(ctx.guild)["lang"]
+            message_queue_len = len(self.guilds) * (len(self.game_queue_cache) + self.game_queue.qsize())
 
             if str(ctx.author) not in self.cfg.get_general_value("bot_owners"):  # If command author not a bot owner
                 return None
 
-            embed_stats = discord.Embed(title="\U0001f4c8 Statistics",
+            embed_stats = discord.Embed(title="\U0001f4c8 " + self.lm.get_message(guild_lang, "stats"),
                                         description="Shows additional information and stats about this bot's instance.",
-                                        color=0x00BFFF
-                                        )
+                                        color=0x00BFFF)
             embed_stats.set_footer(text=self.lm.get_message(guild_lang, "embed_footer"),
-                                   icon_url=self.AVATAR_URL
-                                   )
+                                   icon_url=self.AVATAR_URL)
             embed_stats.set_thumbnail(url=self.LOGO_URL)
+
             embed_stats.add_field(name="Guilds", value=str(len(self.guilds)))
-            embed_stats.add_field(name="Owners", value="\n".join(self.cfg.get_general_value("bot_owners")))
-            embed_stats.add_field(name="Server load",
+            embed_stats.add_field(name=self.lm.get_message(guild_lang, "stats_owners_field"),
+                                  value="\n".join(self.cfg.get_general_value("bot_owners")))
+            embed_stats.add_field(name=self.lm.get_message(guild_lang, "stats_server_load_field"),
                                   value="CPU: **{}%** \nRAM: **{}%**".format(
-                                         psutil.cpu_percent(), psutil.virtual_memory().percent))
-            embed_stats.add_field(name="Message queue", value="There are **0** messages waiting to be delivered.")
+                                  psutil.cpu_percent(), psutil.virtual_memory().percent))
+            if message_queue_len:
+                embed_stats.add_field(name=self.lm.get_message(guild_lang, "stats_message_queue_field"),
+                                      value=self.lm.get_message(guild_lang, "stats_message_queue_value")
+                                      .format(message_queue_len))
+            else:  # No messages in the queues
+                embed_stats.add_field(name=self.lm.get_message(guild_lang, "stats_message_queue_field"),
+                                      value=self.lm.get_message(guild_lang, "stats_message_queue_empty_value")
+                                      .format(message_queue_len))
 
             await ctx.channel.send(embed=embed_stats)
             logger.debug(f"Command '{ctx.command}' invoked by {ctx.author}")
@@ -499,9 +517,20 @@ class Client(commands.Bot):
         @commands.cooldown(2, 10, commands.BucketType.user)
         async def shutdown(ctx):
             """Shuts down the bot process completely."""
+            guild_lang = self.mongo.get_guild_config(ctx.guild)["lang"]
+            message_queue_len = len(self.guilds) * (len(self.game_queue_cache) + self.game_queue.qsize())
+
             if str(ctx.author) not in self.cfg.get_general_value("bot_owners"):  # If command author not a bot owner
                 return None
-            # todo Consider broadcast queues before shutting down
+
+            if not self.game_queue.empty() or self.game_queue_cache:
+                await ctx.channel.send(self.lm.get_message(guild_lang, "shutdown_abort"))
+                return None
+
+            await ctx.channel.send(self.lm.get_message(guild_lang, "shutdown_success"))
+            logger.info("Shutting down..")
+            self.main_loop = False
+            await self.close()
 
 
 if __name__ == "__main__":

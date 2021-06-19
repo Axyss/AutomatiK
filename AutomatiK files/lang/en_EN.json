@@ -22,8 +22,6 @@
 
       "mentions": "Mentions",
       "mention_established": "\u2705 Role successfully established.",
-      "mention_enabled": "\u2705 Mention module enabled.",
-      "mention_disabled": "\u2705 Mention module disabled.",
       "mention_error": "\u274C The introduced role is not valid.",
 
       "modules": "**Modules**",
@@ -31,10 +29,9 @@
       "modules_service": "**Service**",
       "modules_author": "**Author**",
 
-      "module_enabled": "\u2705 {} module enabled.",
-      "module_disabled": "\u2705 {} module disabled.",
-      "enable_unknown": "\u274C Unknown parameter. Use **!mk enable (ModuleID)**",
-      "disable_unknown": "\u274C Unknown parameter. Use **!mk disable (ModuleID)**",
+      "module_enabled": "\u2705 **{}** module enabled.",
+      "module_disabled": "\u2705 **{}** module disabled.",
+      "enable_unknown": "\u274C Unknown parameter. Use **!mk {} (ModuleID)**",
 
       "select_invalid_channel": "\u274C Invalid text channel. Use **!mk select [#text-channel]**",
       "select_success": "\u2705 Text channel {} selected.",
@@ -50,8 +47,18 @@
 
       "reload_completed": "\u2705 **Reload** completed.",
 
+      "stats": "Statistics",
+      "stats_owners_field": "Owners",
+      "stats_server_load_field": "Server load",
+      "stats_message_queue_field": "Message queue",
+      "stats_message_queue_value": "There are approximated **{}** messages waiting to be delivered.",
+      "stats_message_queue_empty_value": "No messages are waiting to be delivered.",
+
+      "shutdown_success": "\u2705 Shutting down...",
+      "shutdown_abort": "\u274C Error, there are still messages waiting to be delievered. Try again later.",
+
       "embed_footer": "Project page: github.com/Axyss/AutomatiK",
-      "embed_description": "Command syntax: **!mk (mandatory) [optional]**",
+      "embed_description": "Command syntax: **!mk (required) [optional]**",
       "embed_field1_name": "\u2139 Commands",
       "embed_field1_value": ["⠀\n",
                              "**help** - Shows all the available commands.\n",
@@ -72,12 +79,12 @@
       "embed_field3_value": ["⠀\n",
                              "**start/stop** - starts/stops the bot's main service globally.\n",
                              "**reload** - Reloads configuration, modules and language packages.\n",
-                             "**stats** - Shows some overall statistics of the bot."],
+                             "**stats** - Shows some overall statistics of the bot.\n",
+                             "**shutdown** - Shuts down the bot completely."],
 
       "generic_messages": ["{} is currently free on {}",
                            "Hurry, {} is now free on {}",
                            "{} can be found for free on {}",
                            "{} is available for free on {}"]
-
     }
 }

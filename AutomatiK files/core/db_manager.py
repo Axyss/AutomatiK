@@ -2,6 +2,7 @@ import pymongo
 import datetime
 
 from core.game import Game
+from core.lang_manager import logger
 
 
 class DatabaseManager:
@@ -20,9 +21,7 @@ class DatabaseManager:
                 "selected_channel": None,  # Structure: <#1234>
                 "mention_role": None,  # Structure: <@&1234>
                 "lang": "en_EN",
-                "services": {
-                    "mention": True,
-                },
+                "services": {},  # Services are represented with their MODULE_IDs
                 "join_date": str(datetime.datetime.now())
             }
 
@@ -52,6 +51,7 @@ class DatabaseManager:
     def create_free_game(self, game_obj):
         """Creates a new document in the 'free_games' collection."""
         self._db["free_games"].insert(Game.to_dict(game_obj))
+        logger.info(f"New game '{game_obj.NAME}' ({game_obj.MODULE_ID}) added to the database")
         return True
 
     def get_free_games_by_module_id(self, module_id):
@@ -66,9 +66,15 @@ class DatabaseManager:
         past_free_game_dict = self._db["free_games"].find_one_and_delete({"link": game_obj.LINK,
                                                                           "module_id": game_obj.MODULE_ID})
         self._db["past_free_games"].insert_one(past_free_game_dict)
+        logger.info(f"'{game_obj.NAME}' ({game_obj.MODULE_ID}) moved to the 'past_free_games' database")
         return True
 
-    def add_new_service_field(self, module_id):
-        pass
+    def add_new_services(self, current_services):
+        """Adds new service fields to the 'configs' database when new modules are added."""
+        retrieved_services = list(self._db["configs"].aggregate([{"$sample": {"size": 1}}]))[0]["services"].keys()
 
-
+        for service in current_services:
+            if service not in retrieved_services:
+                self._db["configs"].update_many({}, {"$set": {f"services.{service}": True}})
+                logger.debug(f"New service '{service}' added to the database")
+        return True
