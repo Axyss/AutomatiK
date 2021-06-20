@@ -8,11 +8,30 @@
       "cooldown_error":  "\u274C Escribes demasiado rápido. Inténtalo de nuevo en **{}** segundos.",
       "unexpected_error": "\u274C Error inesperado.",
 
-      "language": "Idioma",
-      "languages": "Idiomas",
-      "languages_description": "La columna **LangID** contiene el nombre con el que cada paquete de idioma debe ser llamado en los comandos.",
-      "language_changed": "\u2705 Idioma cambiado a español (España).",
-      "language_error": "\u274C Idioma no encontrado.",
+      "help_field1_name": "\u2139 Comandos",
+      "help_field1_value": ["⠀\n",
+                             "**help** - Muestra todos los comandos disponibles.\n",
+                             "**status** - Muestra el estado de los módulos y la configuración del bot en este servidor.\n⠀"],
+
+      "help_field2_name": "Comandos de administrador",
+      "help_field2_value": ["⠀\n",
+                             "**select [#canal-de-texo]** - Selecciona el canal donde AutomatiK enviará mensajes a este servidor.\n",
+                             "**unselect** - Deselecciona el canal previamente seleccionado. Tu servidor no recibirá nuevos mensajes.\n\n",
+
+                             "**enable/disable (ModuleID)** - Comando para activar/desactivar módulos de AutomatiK.\n",
+                             "**modules** - Muestra información sobre los módulos cargados y sus **ModuleID**.\n",
+                             "**mention (@MiRol)** - Elige qué rol será mencionado en los mensajes de AutomatiK.\n\n",
+
+                             "**language (LangID)** - Cambia el idioma de los mensajes.\n",
+                             "**languages** - Muestra información sobre los paquetes de idioma y sus **LangID**.\n⠀"],
+      "help_field3_name": "Comandos de dueño",
+      "help_field3_value": ["⠀\n",
+                             "**start/stop** - inicia/para el servicio principal del bot globalmente.\n",
+                             "**reload** - Recarga la configuración, los módulos y los paquetes de idiomas.\n",
+                             "**stats** - Muestra algunas estadísticas generales del bot.\n",
+                             "**shutdown** - Apaga el bot completamente."],
+      "help_footer": "Página del proyecto: github.com/Axyss/AutomatiK",
+      "help_description": "Sintaxis de los comandos: **!mk (necesario) [opcional]**",
 
       "status": "Estado",
       "status_main": "Servicio principal",
@@ -20,24 +39,30 @@
       "status_active": "ACTIVADO \u2705",
       "status_inactive": "DESACTIVADO \u274C",
 
-      "mentions": "Menciones",
-      "mention_established": "\u2705 Rol establecido con éxito.",
-      "mention_error": "\u274C El rol introducido no es válido.",
+      "select_invalid_channel": "\u274C Canal de texto no válido. Usa **!mk select [#canal-de-texto]**",
+      "select_success": "\u2705 Canal de texto {} seleccionado.",
+
+      "unselect_already": "\u274C No hay ningún canal de texto seleccionado.",
+      "unselect_success": "\u2705 Canal de texto {} deseleccionado.",
+
+      "module_enabled": "\u2705 Se ha activado el módulo {}.",
+      "module_disabled": "\u2705 Se ha desactivado el módulo {}.",
+      "enable_unknown": "\u274C Parámetro desconocido. Usa **!mk {} (ModuleID)**",
 
       "modules": "**Módulos**",
       "modules_description": "La columna **ModuleID** contiene el nombre con el que cada módulo debe ser llamado en los comandos.",
       "modules_service": "**Servicio**",
       "modules_author": "**Autor**",
 
-      "module_enabled": "\u2705 Se ha activado el módulo {}.",
-      "module_disabled": "\u2705 Se ha desactivado el módulo {}.",
-      "enable_unknown": "\u274C Parámetro desconocido. Usa **!mk {} (ModuleID)**",
+      "mentions": "Menciones",
+      "mention_established": "\u2705 Rol establecido con éxito.",
+      "mention_error": "\u274C El rol introducido no es válido.",
 
-      "select_invalid_channel": "\u274C Canal de texto no válido. Usa **!mk select [#canal-de-texto]**",
-      "select_success": "\u2705 Canal de texto {} seleccionado.",
-
-      "unselect_already": "\u274C No hay ningún canal de texto seleccionado.",
-      "unselect_success": "\u2705 Canal de texto {} deseleccionado.",
+      "language": "Idioma",
+      "languages": "Idiomas",
+      "languages_description": "La columna **LangID** contiene el nombre con el que cada paquete de idioma debe ser llamado en los comandos.",
+      "language_changed": "\u2705 Idioma cambiado a español (España).",
+      "language_error": "\u274C Idioma no encontrado.",
 
       "start_already": "\u274C El servicio principal ya se encuentra iniciado.",
       "start_success": "\u2705 Se ha iniciado el servicio principal.",
@@ -55,32 +80,7 @@
       "stats_message_queue_empty_value": "No hay mensajes esperando a ser enviados.",
 
       "shutdown_success": "\u2705 Apagando...",
-      "shutdown_abort": "\u274C Error, aún hay mensajes esperando a ser enviados. Inténtalo más tarde.",
-
-      "embed_footer": "Página del proyecto: github.com/Axyss/AutomatiK",
-      "embed_description": "Sintaxis de los comandos: **!mk (necesario) [opcional]**",
-      "embed_field1_name": "\u2139 Comandos",
-      "embed_field1_value": ["⠀\n",
-                             "**help** - Muestra todos los comandos disponibles.\n",
-                             "**status** - Muestra el estado de los módulos y la configuración del bot en este servidor.\n⠀"],
-
-      "embed_field2_name": "Comandos de administrador",
-      "embed_field2_value": ["⠀\n",
-                             "**select [#canal-de-texo]** - Selecciona el canal donde AutomatiK enviará mensajes a este servidor.\n",
-                             "**unselect** - Deselecciona el canal previamente seleccionado. Tu servidor no recibirá nuevos mensajes.\n\n",
-
-                             "**enable/disable (ModuleID)** - Comando para activar/desactivar módulos de AutomatiK.\n",
-                             "**modules** - Muestra información sobre los módulos cargados y sus **ModuleID**.\n",
-                             "**mention (@MiRol)** - Elige qué rol será mencionado en los mensajes de AutomatiK.\n\n",
-
-                             "**language (LangID)** - Cambia el idioma de los mensajes.\n",
-                             "**languages** - Muestra información sobre los paquetes de idioma y sus **LangID**.\n⠀"],
-      "embed_field3_name": "Comandos de dueño",
-      "embed_field3_value": ["⠀\n",
-                             "**start/stop** - inicia/para el servicio principal del bot globalmente.\n",
-                             "**reload** - Recarga la configuración, los módulos y los paquetes de idiomas.\n",
-                             "**stats** - Muestra algunas estadísticas generales del bot.\n",
-                             "**shutdown** - Apaga el bot completamente."],
+      "shutdown_abort": "\u274C Aún hay **{}** mensajes esperando a ser enviados. Inténtalo más tarde.",
 
       "generic_messages": ["{} se encuentra gratis en {}",
                            "Date prisa, {} se encuentra gratis en {}",
