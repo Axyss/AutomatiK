@@ -123,24 +123,29 @@ class Client(commands.Bot):
 
     async def on_command_error(self, ctx, error):  # The second parameter is the error's information
         """Method used for error handling regarding the discord.py library."""
+        if isinstance(error, discord.ext.commands.NoPrivateMessage) or isinstance(ctx.channel, discord.DMChannel):
+            # Highest priority situation
+            return None
+
+        if isinstance(error, discord.ext.commands.CommandInvokeError):
+            error = error.original  # CommandInvokeError is too generic, this gets the exception which raised it
+
         guild_lang = self.mongo.get_guild_config(ctx.guild)["lang"]
 
         if isinstance(error, discord.ext.commands.MissingPermissions):
+            # User lacks permissions
             await ctx.channel.send(self.lm.get_message(guild_lang, "missing_permissions"))
-
-        elif isinstance(error, discord.ext.commands.errors.NoPrivateMessage):
-            pass
-
-        elif isinstance(error, discord.ext.commands.CommandInvokeError):
-            # Bot kicked or lacks permissions to send messages
-            # todo Every is exception raises this one and that is definitely a problem
-            pass
 
         elif isinstance(error, discord.ext.commands.errors.CommandNotFound):
             await ctx.channel.send(self.lm.get_message(guild_lang, "invalid_command"))
 
         elif isinstance(error, discord.ext.commands.errors.CommandOnCooldown):
             await ctx.channel.send(self.lm.get_message(guild_lang, "cooldown_error").format(int(error.retry_after)))
+
+        elif isinstance(error, discord.errors.Forbidden):
+            # Bot kicked or lacks permissions to send messages
+            pass
+
         else:  # Without this, unexpected errors wouldn't show up
             try:
                 raise error
