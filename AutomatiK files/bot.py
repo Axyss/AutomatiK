@@ -152,7 +152,7 @@ class Client(commands.Bot):
             except:
                 logger.exception("Unexpected error")
 
-    @tasks.loop(seconds=10)
+    @tasks.loop(seconds=1)
     async def init_main_loop(self):
         if self.main_loop:  # MAIN LOOP
             for module in self.modules:
@@ -162,7 +162,7 @@ class Client(commands.Bot):
                 except:  # If this wasn't here, any unhandled exception in any module would crash the loop
                     logger.exception("Unexpected error while retrieving game data")
                     continue
-                if retrieved_free_games is not False:
+                if retrieved_free_games is not False:  # Module returned valid data
                     for game in retrieved_free_games:  # Looks for free games
                         if game not in stored_free_games:
                             self.mongo.create_free_game(game)
@@ -171,12 +171,13 @@ class Client(commands.Bot):
                     for game in stored_free_games:  # Looks for games that are no longer free
                         if game not in retrieved_free_games:
                             self.mongo.move_to_past_free_games(game)
-                else:
+                else:  # Module failed and returned False
                     logger.debug(f"Ignoring results from the '{module.MODULE_ID}' module this iteration")
             await asyncio.sleep(300)  # 5 minutes until the next iteration
 
-    @tasks.loop(seconds=10)
+    @tasks.loop(seconds=1)
     async def init_message_broadcaster(self):
+        self.game_queue_cache = []  # Being here avoids not getting executed and not letting the bot to shutdown
         if not self.game_queue.empty():
             success, fail = 0, 0
 
@@ -204,7 +205,6 @@ class Client(commands.Bot):
                             logger.exception("Unexpected error")
                         finally:
                             pass
-            self.game_queue_cache = []  # todo Delete element by element the list instead deleting at all once
             logger.info(f"Messages sent to all guilds. Success: {success} | Fail: {fail}")
 
     def init_commands(self):
@@ -426,6 +426,7 @@ class Client(commands.Bot):
             await ctx.channel.send(embed=embed_langs)
 
         # Owner commands
+        # todo Replace if statements that check owners in commands for decorators
 
         @self.command()
         @commands.guild_only()
