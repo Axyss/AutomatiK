@@ -44,7 +44,7 @@ class ModuleLoader:
 
 
 class Client(commands.Bot):
-    VERSION = "v1.4"
+    VERSION = "v2.0"
     ascii_art = r"""                  _                        _   _ _  __
         /\        | |                      | | (_) |/ /
        /  \  _   _| |_ ___  _ __ ___   __ _| |_ _| ' /
@@ -83,7 +83,7 @@ class Client(commands.Bot):
             self.load_resources()
             self.init_main_loop.start()
             self.init_message_broadcaster.start()
-            updater = Update(local_version=Client.VERSION, link="https://github.com/Axyss/AutomatiK/releases/")
+            updater = Update(local_version=Client.VERSION)
             threading.Thread(target=updater.check_every_x_days, args=[7], daemon=True).start()
             logger.info(f"AutomatiK bot {Client.VERSION} online")
 
