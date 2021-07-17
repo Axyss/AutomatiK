@@ -73,6 +73,7 @@
       "reload_completed": "\u2705 **Reload** completado.",
 
       "stats": "Estadísticas",
+      "stats_description": "Muestra información y estadísticas adicionales sobre esta instancia del bot.",
       "stats_owners_field": "Dueños",
       "stats_server_load_field": "Carga del servidor",
       "stats_message_queue_field": "Cola de mensajes",

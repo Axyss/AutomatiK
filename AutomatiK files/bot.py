@@ -203,8 +203,6 @@ class Client(commands.Bot):
                         except:
                             fail += 1
                             logger.exception("Unexpected error")
-                        finally:
-                            pass
             logger.info(f"Messages sent to all guilds. Success: {success} | Fail: {fail}")
 
     def init_commands(self):
@@ -500,7 +498,7 @@ class Client(commands.Bot):
                 return None
 
             embed_stats = discord.Embed(title="\U0001f4c8 " + self.lm.get_message(guild_lang, "stats"),
-                                        description="Shows additional information and stats about this bot's instance.",
+                                        description=self.lm.get_message(guild_lang, "stats_description"),
                                         color=0x00BFFF)
             embed_stats.set_footer(text=self.lm.get_message(guild_lang, "help_footer"),
                                    icon_url=self.AVATAR_URL)

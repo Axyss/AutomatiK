@@ -73,6 +73,7 @@
       "reload_completed": "\u2705 **Reload** completed.",
 
       "stats": "Statistics",
+      "stats_description": "Shows additional information and stats about this bot's instance.",
       "stats_owners_field": "Owners",
       "stats_server_load_field": "Server load",
       "stats_message_queue_field": "Message queue",
