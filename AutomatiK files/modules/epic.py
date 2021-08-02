@@ -4,6 +4,7 @@ from requests.exceptions import HTTPError, Timeout
 
 from core.game import Game
 from core.log_manager import logger
+from core.errors import InvalidDataException
 
 
 class Main:
@@ -13,39 +14,32 @@ class Main:
         self.MODULE_ID = "epic"
         self.AUTHOR = "Default"
         self.URL = "https://www.epicgames.com/store/us-US/product/"
-        self.ENDPOINT = "https://store-site-backend-static.ak.epicgames.com/freeGamesPromotions?locale=es-ES&country" \
-                        "=ES&allowCountries=ES"
+        self.ENDPOINT = "https://store-site-backend-static.ak.epicgames.com/freeGamesPromotions"
 
     def make_request(self):
-        """Makes the request and removes the unnecessary JSON data."""
+        """Makes the HTTP request to the Epic Games' backend."""
         try:
             raw_data = requests.get(self.ENDPOINT)
-            raw_data = json.loads(raw_data.content)  # Bytes to json object
-            raw_data = raw_data["data"]["Catalog"]["searchStore"]["elements"]  # Cleans the data
-            return raw_data
         except (HTTPError, Timeout, requests.exceptions.ConnectionError):
             logger.error(f"Request to {self.SERVICE_NAME} by module \'{self.MODULE_ID}\' failed")
-            return False
+            raise InvalidDataException
+        else:
+            return raw_data
 
     def process_request(self, raw_data):
         """Returns a list of free games from the raw data."""
-        processed_data = []
+        parsed_games = []
 
-        if not raw_data:
-            return False
         try:
-            for i in raw_data:
-                # (i["price"]["totalPrice"]["discountPrice"] == i["price"]["totalPrice"]["originalPrice"]) != 0
-                try:
-                    if i["promotions"]["promotionalOffers"]:
-                        game = Game(i["title"], self.URL + i["productSlug"], self.MODULE_ID)
-                        processed_data.append(game)
-                except TypeError:  # This gets executed when ["promotionalOffers"] is empty or does not exist
-                    pass
-        except KeyError:
-            logger.exception(f"Data from module \'{self.MODULE_ID}\' couldn't be processed")
-
-        return processed_data
+            processed_data = json.loads(raw_data.content)["data"]["Catalog"]["searchStore"]["elements"]
+            for i in processed_data:
+                if i["promotions"] and i["promotions"]["promotionalOffers"]:
+                    game = Game(i["title"], self.URL + i["productSlug"], self.MODULE_ID)
+                    parsed_games.append(game)
+        except (TypeError, KeyError, json.decoder.JSONDecodeError):
+            raise InvalidDataException
+        else:
+            return parsed_games
 
     def get_free_games(self):
         free_games = self.process_request(self.make_request())

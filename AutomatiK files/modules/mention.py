@@ -7,4 +7,4 @@ class Main:
         self.AUTHOR = "Default"
 
     def get_free_games(self):
-        return False
+        return []
