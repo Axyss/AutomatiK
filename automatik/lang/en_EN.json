@@ -1,0 +1,91 @@
+{
+    "language": "English (England)",
+    "author": "Default",
+    "messages": {
+
+      "missing_permissions": "\u274C You don't have enough permissions to execute this command.",
+      "invalid_command": "\u274C Unknown command. Use **!mk help** to see the available commands.",
+      "cooldown_error":  "\u274C You type very fast. Please retry in **{}** seconds.",
+      "unexpected_error": "\u274C Unexpected error.",
+
+      "help_field1_name": "\u2139 Commands",
+      "help_field1_value": ["⠀\n",
+                             "**help** - Shows all the available commands.\n",
+                             "**status** - Shows the status of the bot's modules and settings on this server.\n⠀"],
+
+      "help_field2_name": "Administrator commands",
+      "help_field2_value": ["⠀\n",
+                             "**select [#text-channel]** - Select the channel where AutomatiK will send messages to this server.\n",
+                             "**unselect** - Unselects the previously selected channel. Your server won't receive new messages.\n\n",
+
+                             "**enable/disable (ModuleID)** - Command to enable/disable AutomatiK modules.\n",
+                             "**modules** - Shows information about loaded modules and their **ModuleID**s.\n",
+                             "**mention (@MyRole)** - Select which role will be mentioned in AutomatiK's messages.\n\n",
+
+                             "**language (LangID)** - Change the language of the messages.\n",
+                             "**languages** - Shows information about language packages and their **LangID**s.\n⠀"],
+      "help_field3_name": "Owner commands",
+      "help_field3_value": ["⠀\n",
+                             "**start/stop** - starts/stops the bot's main service globally.\n",
+                             "**reload** - Reloads configuration, modules and language packages.\n",
+                             "**stats** - Shows some overall statistics of the bot.\n",
+                             "**shutdown** - Shuts down the bot completely."],
+      "help_footer": "Project page: github.com/Axyss/AutomatiK",
+      "help_description": "Command syntax: **!mk (required) [optional]**",
+
+      "status": "Status",
+      "status_main": "Main service",
+      "status_description": "Check the status of the bot's modules and settings on this server.",
+      "status_active": "ENABLED \u2705",
+      "status_inactive": "DISABLED \u274C",
+
+      "select_invalid_channel": "\u274C Invalid text channel. Use **!mk select [#text-channel]**",
+      "select_success": "\u2705 Text channel {} selected.",
+
+      "unselect_already": "\u274C There is not a selected channel yet.",
+      "unselect_success": "\u2705 Text channel {} unselected.",
+
+      "module_enabled": "\u2705 **{}** module enabled.",
+      "module_disabled": "\u2705 **{}** module disabled.",
+      "enable_unknown": "\u274C Unknown parameter. Use **!mk {} (ModuleID)**",
+
+      "modules": "**Modules**",
+      "modules_description": "Modules are extensions that expand the bot's functionality. **ModuleID** column contains the way each module must be called by in commands.",
+      "modules_service": "**Service**",
+      "modules_author": "**Author**",
+
+      "mentions": "Mentions",
+      "mention_established": "\u2705 Role successfully established.",
+      "mention_error": "\u274C The introduced role is not valid.",
+
+      "language": "Language",
+      "languages": "Languages",
+      "languages_description": "**LangID** column contains the way each language package must be called by in commands.",
+      "language_changed": "\u2705 Language changed to English (England).",
+      "language_error": "\u274C Language not found.",
+
+      "start_already": "\u274C Main service is already started.",
+      "start_success": "\u2705 Main service started.",
+
+      "stop_already": "\u274C Main service is already stopped.",
+      "stop_success": "\u2705 Main service stopped.",
+
+      "reload_completed": "\u2705 **Reload** completed.",
+
+      "stats": "Statistics",
+      "stats_description": "Shows additional information and stats about this bot's instance.",
+      "stats_owners_field": "Owners",
+      "stats_server_load_field": "Server load",
+      "stats_message_queue_field": "Message queue",
+      "stats_message_queue_value": "There are approximated **{}** messages waiting to be delivered.",
+      "stats_message_queue_empty_value": "No messages are waiting to be delivered.",
+
+      "shutdown_success": "\u2705 Shutting down...",
+      "shutdown_abort": "\u274C There are still **{}** messages waiting to be delivered. Try again later.",
+
+      "generic_messages": ["{} is currently free on {}",
+                           "Hurry, {} is now free on {}",
+                           "{} can be found for free on {}",
+                           "{} is available for free on {}"]
+    }
+}

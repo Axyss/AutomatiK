@@ -8,3 +8,5 @@ class Main:
 
     def get_free_games(self):
         return []
+
+# todo Altering the state of the mentions should have nothing to do with modules

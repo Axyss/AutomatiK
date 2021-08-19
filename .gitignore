@@ -2,6 +2,6 @@
 venv/
 logs/
 __pycache__/
-AutomatiK files/*.json
-AutomatiK files/*.yml
-AutomatiK files/*.db
+automatik/*.json
+automatik/*.yml
+automatik/*.db

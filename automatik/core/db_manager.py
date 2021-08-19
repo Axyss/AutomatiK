@@ -1,8 +1,8 @@
 import pymongo
 import datetime
 
-from core.game import Game
-from core.lang_manager import logger
+from automatik.core.game import Game
+from automatik.core.lang_manager import logger
 
 
 class DatabaseManager:

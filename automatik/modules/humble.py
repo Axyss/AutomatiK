@@ -3,9 +3,9 @@ import json
 import requests
 from requests.exceptions import HTTPError, Timeout
 
-from core.errors import InvalidDataException
-from core.game import Game
-from core.log_manager import logger
+from automatik import logger
+from automatik.core.errors import InvalidDataException
+from automatik.core.game import Game
 
 
 class Main:
