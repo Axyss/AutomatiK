@@ -8,17 +8,18 @@ that will scrape the free games from an imaginary platform called **Great Games*
 ### Structure of a module:
 
 ```python
-from core.log_manager import logger
+from core.logging import logger
 from core.module_manager import Game
+
 
 class Main:
     def __init__(self):
         self.SERVICE_NAME = "Great Games"
         self.MODULE_ID = "ggames"
         self.AUTHOR = "Axyss"
-    
+
     def get_free_games(self):
-        return [Game("Minecraft", "https://.../minecraft"), 
+        return [Game("Minecraft", "https://.../minecraft"),
                 Game("The Stanley Parable", "https://.../stanley")]
 ```
 

@@ -10,10 +10,10 @@ import psutil
 from discord.ext import commands, tasks
 
 from automatik import *
-from automatik.core.config import ConfigManager
-from automatik.core.db_manager import DatabaseManager
-from automatik.core.errors import InvalidDataException
-from automatik.core.lang_manager import LangManager
+from .core.config import ConfigManager
+from .core.db import Database
+from .core.errors import InvalidDataException
+from .core.lang import LangLoader
 
 
 class ModuleLoader:
@@ -44,14 +44,14 @@ class ModuleLoader:
 class AutomatikBot(commands.Bot):
     def __init__(self, command_prefix, self_bot, intents):
         commands.Bot.__init__(self, command_prefix=command_prefix, self_bot=self_bot, intents=intents)
-        self.lm = LangManager("./automatik/lang")
+        self.lm = LangLoader("./automatik/lang")
         self.cfg = ConfigManager("./automatik/config.yml")
-        self.mongo = DatabaseManager(host=self.cfg.get_mongo_value("host"),
-                                     port=self.cfg.get_mongo_value("port"),
-                                     username=self.cfg.get_mongo_value("user"),
-                                     password=self.cfg.get_mongo_value("password"),
-                                     auth_source=self.cfg.get_mongo_value("auth_source"),
-                                     auth_mechanism=self.cfg.get_mongo_value("auth_mechanism"))
+        self.mongo = Database(host=self.cfg.get_mongo_value("host"),
+                              port=self.cfg.get_mongo_value("port"),
+                              username=self.cfg.get_mongo_value("user"),
+                              password=self.cfg.get_mongo_value("password"),
+                              auth_source=self.cfg.get_mongo_value("auth_source"),
+                              auth_mechanism=self.cfg.get_mongo_value("auth_mechanism"))
 
         self.modules = None  # Contains the instance of the Main class of every module.
         self.main_loop = False  # Variable used to start or stop the main loop

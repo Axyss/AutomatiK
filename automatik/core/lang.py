@@ -4,7 +4,7 @@ import json
 from automatik import logger
 
 
-class LangManager:
+class LangLoader:
     def __init__(self, lang_dir):
         self.lang_data = {}  # Language packages are stored in memory in this var
         self.lang_dir = lang_dir if lang_dir[-1] == "/" else lang_dir + "/"

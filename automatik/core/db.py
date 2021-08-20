@@ -2,10 +2,10 @@ import pymongo
 import datetime
 
 from automatik.core.game import Game
-from automatik.core.lang_manager import logger
+from automatik.core.lang import logger
 
 
-class DatabaseManager:
+class Database:
     def __init__(self, host, port, username, password, auth_source, auth_mechanism):
         self._db = pymongo.MongoClient(host=host,
                                        port=port,
