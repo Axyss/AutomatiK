@@ -9,7 +9,7 @@ import discord
 import psutil
 from discord.ext import commands, tasks
 
-from automatik import *
+from automatik import logger, __version__, LOGO_URL, AVATAR_URL
 from .core.config import ConfigManager
 from .core.db import Database
 from .core.errors import InvalidDataException

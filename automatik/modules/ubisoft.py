@@ -11,16 +11,20 @@ from automatik.core.game import Game
 class Main:
     def __init__(self):
         """Defines the module parameters."""
-        self.SERVICE_NAME = "Humble Bundle"
-        self.MODULE_ID = "humble"
+        self.SERVICE_NAME = "Ubisoft Connect"
+        self.MODULE_ID = "ubisoft"
         self.AUTHOR = "Default"
-        self.ENDPOINT = "https://www.humblebundle.com/store/api/search?sort=discount&filter=onsale&request=1"
-        self.URL = "https://www.humblebundle.com/store/"
+        self.ENDPOINT = "https://public-ubiservices.ubi.com/v1/spaces/news?spaceId=6d0af36b-8226-44b6-a03b" \
+                        "-4660073a6349"
+        self.HEADERS = {"ubi-appid": "314d4fef-e568-454a-ae06-43e3bece12a6",
+                        "ubi-localecode": "en-US",
+                        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, "
+                                      "like Gecko) Chrome/70.0.3538.77 Safari/537.36"}
 
     def make_request(self):
-        """Makes the HTTP request to the Humble Bundle's backend."""
+        """Makes the HTTP request to the Ubisoft's backend."""
         try:
-            raw_data = requests.get(self.ENDPOINT)
+            raw_data = requests.get(self.ENDPOINT, headers=self.HEADERS)
         except (HTTPError, Timeout, requests.exceptions.ConnectionError):
             logger.error(f"Request to {self.SERVICE_NAME} by module \'{self.MODULE_ID}\' failed")
             raise InvalidDataException
@@ -32,10 +36,10 @@ class Main:
         parsed_games = []
 
         try:
-            processed_data = json.loads(raw_data.content)["results"]
+            processed_data = json.loads(raw_data.content)["news"]
             for i in processed_data:
-                if i["current_price"]["amount"] == 0:  # If game's price is 0
-                    game = Game(i["human_name"], self.URL + i["human_url"], self.MODULE_ID)
+                if i["type"] == "freegame" and i["expirationDate"]:
+                    game = Game(i["title"], i["links"][0]["param"], self.MODULE_ID)
                     parsed_games.append(game)
         except (TypeError, KeyError, json.decoder.JSONDecodeError):
             raise InvalidDataException

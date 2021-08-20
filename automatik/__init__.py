@@ -7,7 +7,7 @@ LOGO_URL = "https://raw.githubusercontent.com/Axyss/AutomatiK/master/docs/assets
 AVATAR_URL = "https://avatars3.githubusercontent.com/u/55812692"
 __all__ = ["logger", "__version__", "LOGO_URL", "AVATAR_URL"]
 
-_debug = _ConfigManager("./automatik/config.yml", ignore_logger=True).get_general_value("debug")
+_debug = _ConfigManager("./automatik/config.yml").get_general_value("debug")
 _logging_level = "DEBUG" if _debug else "INFO"
 _create_logs_folder()
 logger = _create_custom_logger("automatik_logger", _logging_level)

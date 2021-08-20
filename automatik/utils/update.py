@@ -22,7 +22,7 @@ def get_remote_version_data():
 
 
 def check_every_x_days(x):
-    """Use this function inside a daemon thread. Looks"""
+    """Use this function inside a daemon thread. Looks for newer versions periodically."""
     while True:
         remote_version, remote_version_url = get_remote_version_data()
         if LooseVersion(remote_version) > LooseVersion(__version__):
