@@ -53,7 +53,7 @@ class AutomatikBot(commands.Bot):
                                      auth_source=self.cfg.get_mongo_value("auth_source"),
                                      auth_mechanism=self.cfg.get_mongo_value("auth_mechanism"))
 
-        self.modules = []  # Contains the instance of the Main class of every module
+        self.modules = None  # Contains the instance of the Main class of every module.
         self.main_loop = False  # Variable used to start or stop the main loop
         self.game_queue = queue.Queue()  # Free games are stored here temporary while the 'broadcaster' routine
         # delivers the messages
