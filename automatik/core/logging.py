@@ -7,7 +7,9 @@ def create_logs_folder():
     try:
         os.mkdir("./automatik/logs")
     except FileExistsError:
-        pass
+        return False
+    else:
+        return True
 
 
 def create_custom_logger(logger_name, logging_level):

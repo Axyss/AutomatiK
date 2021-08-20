@@ -1,12 +1,14 @@
 import os
+import logging
 from distutils.util import strtobool
 
 import yaml
 
+logger = logging.getLogger("automatik_logger")
+
 
 class ConfigManager:
-
-    def __init__(self, filename):
+    def __init__(self, filename, ignore_logger=False):
         self.CONFIG_TEMPLATE = ("# We know writing important credentials inside a plain text file\n"
                                 "# might feel a bit scary. That's why now you can use environment variables!\n"
                                 "# To use them, follow the next syntax: env(my_new_env_variable).\n\n"
@@ -27,21 +29,26 @@ class ConfigManager:
                                 "SECRET:\n"
                                 "  discord_bot_token: ''")
         self.FILENAME = filename
+        self.IGNORE_LOGGER = ignore_logger
         self.config = None
         self._create_config()
         self.load_config()
+        # todo Add config_version field
 
     def _create_config(self):
         """Creates the configuration file and dumps in it the configuration template if the file does not exist."""
         try:
             open(self.FILENAME, "x")
         except FileExistsError:
+            if not self.IGNORE_LOGGER:
+                logger.debug(f"'{self.FILENAME}' already exists")
             return False
         else:
             with open(self.FILENAME, "w") as f:
                 f.write(self.CONFIG_TEMPLATE)
+            if not self.IGNORE_LOGGER:
+                logger.debug(f"'{self.FILENAME}' created")
             return True
-        # todo Find a solution for when the logger object is called before its creation
 
     def load_config(self):
         """Loads into memory the information of the configuration file."""
