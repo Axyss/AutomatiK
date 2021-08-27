@@ -4,7 +4,7 @@ import requests
 from requests.exceptions import HTTPError, Timeout
 
 from automatik import logger
-from automatik.core.errors import InvalidDataException
+from automatik.core.errors import InvalidGameDataException
 from automatik.core.game import Game
 
 
@@ -23,7 +23,7 @@ class Main:
             raw_data = requests.get(self.ENDPOINT)
         except (HTTPError, Timeout, requests.exceptions.ConnectionError):
             logger.error(f"Request to {self.SERVICE_NAME} by module \'{self.MODULE_ID}\' failed")
-            raise InvalidDataException
+            raise InvalidGameDataException
         else:
             return raw_data
 
@@ -38,7 +38,7 @@ class Main:
                     game = Game(i["human_name"], self.URL + i["human_url"], self.MODULE_ID)
                     parsed_games.append(game)
         except (TypeError, KeyError, json.decoder.JSONDecodeError):
-            raise InvalidDataException
+            raise InvalidGameDataException
         else:
             return parsed_games
 

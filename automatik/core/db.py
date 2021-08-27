@@ -1,8 +1,11 @@
-import pymongo
 import datetime
+
+import pymongo
+from pymongo.errors import DuplicateKeyError
 
 from automatik.core.game import Game
 from automatik.core.lang import logger
+from automatik.core.modules import ModuleLoader
 
 
 class Database:
@@ -31,20 +34,26 @@ class Database:
         config["_id"] = str(guild.id)
         config["name"] = guild.name
         config["members"] = guild.member_count
+        config["services"] = dict.fromkeys(ModuleLoader.get_module_ids(), True)
         try:
             self._db["configs"].insert(config)
             return True
-        except pymongo.errors.DuplicateKeyError:
+        except DuplicateKeyError:
             return False
 
+    def insert_missing_or_new_services(self):
+        """Inserts fields into the 'services' object of each document from the 'configs' collection."""
+        for service in ModuleLoader.get_module_ids():
+            self._db["configs"].update_many({f"services.{service}": {"$exists": False}},
+                                            {"$set": {f"services.{service}": True}})
+        return True
+
     def get_guild_config(self, guild):
-        """Returns the configuration from a guild."""
-        self.create_guild_config(guild)
+        """Returns the configuration from a guild, creates said config if it didn't already exist."""
         return self._db["configs"].find_one({"_id": str(guild.id)})
 
     def update_guild_config(self, guild, update):
         """Updates the value of a determined field."""
-        self.create_guild_config(guild)
         self._db["configs"].update_one({"_id": str(guild.id)}, {"$set": update})
         return True
 
@@ -67,14 +76,4 @@ class Database:
                                                                           "module_id": game_obj.MODULE_ID})
         self._db["past_free_games"].insert_one(past_free_game_dict)
         logger.info(f"'{game_obj.NAME}' ({game_obj.MODULE_ID}) moved to the 'past_free_games' database")
-        return True
-
-    def add_new_services(self, current_services):
-        """Adds new service fields to the 'configs' database when new modules are added."""
-        retrieved_services = list(self._db["configs"].aggregate([{"$sample": {"size": 1}}]))[0]["services"].keys()
-
-        for service in current_services:
-            if service not in retrieved_services:
-                self._db["configs"].update_many({}, {"$set": {f"services.{service}": True}})
-                logger.debug(f"New service '{service}' added to the database")
         return True

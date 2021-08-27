@@ -1,7 +1,5 @@
 # coding=utf-8
 import asyncio
-import importlib
-import os
 import queue
 import random
 
@@ -12,38 +10,15 @@ from discord.ext import commands, tasks
 from automatik import logger, __version__, LOGO_URL, AVATAR_URL
 from .core.config import ConfigManager
 from .core.db import Database
-from .core.errors import InvalidDataException
+from .core.errors import InvalidGameDataException
 from .core.lang import LangLoader
-
-
-class ModuleLoader:
-
-    @staticmethod
-    def load_modules():
-        """Imports and instances all the modules automagically."""
-        modules = []
-
-        for i in os.listdir("./automatik/modules"):
-            module_name, module_extension = os.path.splitext(i)
-
-            if module_extension == ".py" and module_name != "__init__":
-                try:
-                    imported_module = importlib.import_module(f"automatik.modules.{module_name}")
-                    # Creates an instance of the Main class of the imported module
-                    Klass = getattr(imported_module, "Main")
-                    modules.append(Klass())
-                except AttributeError:
-                    logger.exception(f"Module '{module_name}' couldn't be loaded")
-                except:
-                    logger.exception(f"Unexpected error while loading module {module_name}")
-
-        logger.info(f"{len(modules)} modules loaded")
-        return modules
+from .core.modules import ModuleLoader
 
 
 class AutomatikBot(commands.Bot):
     def __init__(self, command_prefix, self_bot, intents):
         commands.Bot.__init__(self, command_prefix=command_prefix, self_bot=self_bot, intents=intents)
+        self.is_first_exec = True  # Used inside 'on_ready' to execute certain parts of the method only once
         self.lm = LangLoader("./automatik/lang")
         self.cfg = ConfigManager("./automatik/config.yml")
         self.mongo = Database(host=self.cfg.get_mongo_value("host"),
@@ -53,34 +28,34 @@ class AutomatikBot(commands.Bot):
                               auth_source=self.cfg.get_mongo_value("auth_source"),
                               auth_mechanism=self.cfg.get_mongo_value("auth_mechanism"))
 
-        self.modules = None  # Contains the instance of the Main class of every module.
         self.main_loop = False  # Variable used to start or stop the main loop
         self.game_queue = queue.Queue()  # Free games are stored here temporary while the 'broadcaster' routine
         # delivers the messages
         self.game_queue_cache = []
 
-        self.remove_command("help")
+        self.load_resources()
+        self.init_main_loop.start()
+        self.init_message_broadcaster.start()
+        self.remove_command("help")  # Must be removed before command init. so the 'help' alias is available
         self.init_commands()
 
     async def on_ready(self):
-        # The condition below will only be True the first execution, since ModuleLoader.load_modules will return
-        # a list with the module's instances or an empty list if there aren't any modules
-        if self.modules is None:
-            self.load_resources()
-            self.init_main_loop.start()
-            self.init_message_broadcaster.start()
+        if self.is_first_exec:
             logger.info(f"AutomatiK bot {__version__} online")
-
-        # Outside the if block so it does execute more than once to prevent the presence message from
-        # disappearing forever.
+            self.is_first_exec = False
         await self.change_presence(status=discord.Status.online, activity=discord.Game("!mk help"))
+
+    async def on_guild_join(self, guild):
+        self.mongo.create_guild_config(guild)
 
     def load_resources(self):
         """Loads configuration, modules and language packages."""
-        self.modules = ModuleLoader.load_modules()
-        self.mongo.add_new_services([i.MODULE_ID for i in self.modules])
+        ModuleLoader.load_modules()
         self.cfg.load_config()
         self.lm.load_lang_packages()
+        # Services are added to the documents from the 'configs' collection on runtime
+        self.mongo.insert_missing_or_new_services()
+        # todo add the equivalent to 'Database.insert_missing_or_new_services' for guild configs
 
     def generate_message(self, guild_cfg, game):
         """Generates a 'X free on Y' type message."""
@@ -91,7 +66,7 @@ class AutomatikBot(commands.Bot):
             message = guild_cfg["mention_role"] + " " + message
         return message
 
-    async def on_command_error(self, ctx, error):  # The second parameter is the error's information
+    async def on_command_error(self, ctx, error):
         """Method used for error handling regarding the discord.py library."""
         if isinstance(error, discord.ext.commands.NoPrivateMessage) or isinstance(ctx.channel, discord.DMChannel):
             # Highest priority situation
@@ -125,11 +100,11 @@ class AutomatikBot(commands.Bot):
     @tasks.loop(seconds=1)
     async def init_main_loop(self):
         if self.main_loop:  # MAIN LOOP
-            for module in self.modules:
+            for module in ModuleLoader.modules:
                 try:
                     retrieved_free_games = module.get_free_games()
                     stored_free_games = self.mongo.get_free_games_by_module_id(module.MODULE_ID)
-                except InvalidDataException:
+                except InvalidGameDataException:
                     logger.debug(f"Ignoring results from the '{module.MODULE_ID}' module this iteration")
                 except:  # If this wasn't here, any unhandled exception in any module would crash the loop
                     logger.exception("Unexpected error while retrieving game data")
@@ -237,7 +212,7 @@ class AutomatikBot(commands.Bot):
 
             embed_status.add_field(name=self.lm.get_message(guild_lang, "status_main"), value=temp_value)
 
-            for i in self.modules:
+            for i in ModuleLoader.modules:
                 if guild_cfg["services"][i.MODULE_ID]:
                     value = self.lm.get_message(guild_lang, "status_active")
                 else:
@@ -297,7 +272,7 @@ class AutomatikBot(commands.Bot):
             introduced_command = str(ctx.invoked_with)
             user_decision = True if introduced_command == "enable" else False
 
-            for module in self.modules:
+            for module in ModuleLoader.modules:
                 if service.lower() == module.MODULE_ID.lower():
                     self.mongo.update_guild_config(ctx.guild, {"services." + service.lower(): user_decision})
 
@@ -318,25 +293,20 @@ class AutomatikBot(commands.Bot):
             """Shows information about the loaded modules."""
             guild_lang = self.mongo.get_guild_config(ctx.guild)["lang"]
 
-            module_ids = [i.MODULE_ID for i in self.modules]
-            module_names = [i.SERVICE_NAME for i in self.modules]
-            module_authors = [i.AUTHOR for i in self.modules]
-
             embed_module = discord.Embed(title=self.lm.get_message(guild_lang, "modules"),
                                          description=self.lm.get_message(guild_lang, "modules_description"),
-                                         color=0x00BFFF
-                                         )
-            embed_module.set_footer(text=self.lm.get_message(guild_lang, "help_footer"),
-                                    icon_url=AVATAR_URL
-                                    )
+                                         color=0x00BFFF)
+
+            embed_module.set_footer(text=self.lm.get_message(guild_lang, "help_footer"), icon_url=AVATAR_URL)
             embed_module.set_thumbnail(url=LOGO_URL)
-            embed_module.add_field(name="**ModuleID**", value="\n".join(module_ids))
+
+            embed_module.add_field(name="**ModuleID**", value="\n".join(ModuleLoader.get_module_ids()))
+
             embed_module.add_field(name=self.lm.get_message(guild_lang, "modules_service"),
-                                   value="\n".join(module_names)
-                                   )
+                                   value="\n".join(ModuleLoader.get_service_names()))
+
             embed_module.add_field(name=self.lm.get_message(guild_lang, "modules_author"),
-                                   value="\n".join(module_authors)
-                                   )
+                                   value="\n".join(ModuleLoader.get_module_authors()))
 
             await ctx.channel.send(embed=embed_module)
 
