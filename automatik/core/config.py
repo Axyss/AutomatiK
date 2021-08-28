@@ -4,7 +4,6 @@ from distutils.util import strtobool
 
 import yaml
 
-from automatik import __version__
 
 logger = logging.getLogger("automatik_logger")
 
@@ -30,7 +29,8 @@ class ConfigManager:
                                 "  auth_source: ''\n"
                                 "  auth_mechanism: 'DEFAULT'\n"
                                 "SECRET:\n"
-                                "  discord_bot_token: ''").format(__version__)
+                                "  discord_bot_token: ''").format("v2.0")
+        # todo Cannot import automatik.__version__
         self.FILENAME = filename
         self.IGNORE_LOGGER = ignore_logger
         self.config = None

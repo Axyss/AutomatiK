@@ -10,6 +10,7 @@ AutomatiK is a <b>Discord bot</b> whose task is to notify users about free games
 <br>
 The default modules support the next services:
 
+- Steam
 - Epic Games
 - Humble Bundle
 - Ubisoft Connect
