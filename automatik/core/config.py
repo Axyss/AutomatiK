@@ -1,8 +1,10 @@
-import os
 import logging
+import os
 from distutils.util import strtobool
 
 import yaml
+
+from automatik import __version__
 
 logger = logging.getLogger("automatik_logger")
 
@@ -19,6 +21,7 @@ class ConfigManager:
                                 "  bot_owners:\n"
                                 "#    - 'Axyss#5593'\n"
                                 "  debug: false\n"
+                                "  config_version: '{0}'  # Do not modify this value\n"
                                 "MONGODB:\n"
                                 "  host: '127.0.0.1'\n"
                                 "  port: 27017\n"
@@ -27,13 +30,12 @@ class ConfigManager:
                                 "  auth_source: ''\n"
                                 "  auth_mechanism: 'DEFAULT'\n"
                                 "SECRET:\n"
-                                "  discord_bot_token: ''")
+                                "  discord_bot_token: ''").format(__version__)
         self.FILENAME = filename
         self.IGNORE_LOGGER = ignore_logger
         self.config = None
         self._create_config()
         self.load_config()
-        # todo Add config_version field
 
     def _create_config(self):
         """Creates the configuration file and dumps in it the configuration template if the file does not exist."""

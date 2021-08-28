@@ -61,8 +61,7 @@ class AutomatikBot(commands.Bot):
         """Generates a 'X free on Y' type message."""
         message = random.choice(self.lm.get_message(guild_cfg["lang"], "generic_messages")).format(game.NAME, game.LINK)
 
-        if guild_cfg["services"]["mention"]:
-            # todo Fix exception when the upper condition is True but there is no mention role set
+        if guild_cfg["services"]["mention"] and guild_cfg["mention_role"]:
             message = guild_cfg["mention_role"] + " " + message
         return message
 
@@ -364,7 +363,7 @@ class AutomatikBot(commands.Bot):
             await ctx.channel.send(embed=embed_langs)
 
         # Owner commands
-        # todo Replace if statements that check owners in commands for decorators
+        # todo Replace if statements that check owners in commands with decorators
 
         @self.command()
         @commands.guild_only()
