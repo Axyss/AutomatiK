@@ -28,13 +28,11 @@ class Database:
                 "join_date": str(datetime.datetime.now())
             }
 
-    def create_guild_config(self, guild):
+    def _create_guild_config(self, guild):
         """Creates a new document in the 'configs' collection."""
-        config = self.CONFIG_TEMPLATE
-        config["_id"] = str(guild.id)
-        config["name"] = guild.name
-        config["members"] = guild.member_count
-        config["services"] = dict.fromkeys(ModuleLoader.get_module_ids(), True)
+        config = dict(self.CONFIG_TEMPLATE)
+        config.update({"_id": str(guild.id), "name": guild.name, "members": guild.member_count,
+                       "services": dict.fromkeys(ModuleLoader.get_module_ids(), True)})
         try:
             self._db["configs"].insert(config)
             return True
@@ -50,6 +48,7 @@ class Database:
 
     def get_guild_config(self, guild):
         """Returns the configuration from a guild, creates said config if it didn't already exist."""
+        self._create_guild_config(guild)  # This might be removed in the future to improve scalability
         return self._db["configs"].find_one({"_id": str(guild.id)})
 
     def update_guild_config(self, guild, update):

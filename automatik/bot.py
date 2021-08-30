@@ -45,9 +45,6 @@ class AutomatikBot(commands.Bot):
             self.is_first_exec = False
         await self.change_presence(status=discord.Status.online, activity=discord.Game("!mk help"))
 
-    async def on_guild_join(self, guild):
-        self.mongo.create_guild_config(guild)
-
     def load_resources(self):
         """Loads configuration, modules and language packages."""
         ModuleLoader.load_modules()
@@ -71,10 +68,9 @@ class AutomatikBot(commands.Bot):
             # Highest priority situation
             return None
 
+        guild_lang = self.mongo.get_guild_config(ctx.guild)["lang"]
         if isinstance(error, discord.ext.commands.CommandInvokeError):
             error = error.original  # CommandInvokeError is too generic, this gets the exception which raised it
-
-        guild_lang = self.mongo.get_guild_config(ctx.guild)["lang"]
 
         if isinstance(error, discord.ext.commands.MissingPermissions):
             # User lacks permissions
@@ -91,10 +87,7 @@ class AutomatikBot(commands.Bot):
             pass
 
         else:  # Without this, unexpected errors wouldn't show up
-            try:
-                raise error
-            except:
-                logger.exception("Unexpected error")
+            logger.exception("Unexpected error", exc_info=error)
 
     @tasks.loop(seconds=1)
     async def init_main_loop(self):
