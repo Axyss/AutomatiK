@@ -55,8 +55,7 @@ class ConfigManager:
     def load_config(self):
         """Loads into memory the information of the configuration file."""
         with open(self.FILENAME, "r") as f:
-            config = yaml.safe_load(f.read())
-            self.config = config
+            self.config = yaml.safe_load(f.read())
 
     @staticmethod
     def _get_env_var(value):

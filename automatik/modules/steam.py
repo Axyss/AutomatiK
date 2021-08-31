@@ -16,7 +16,7 @@ class Main:
         self.MODULE_ID = "steam"
         self.AUTHOR = "Default"
         self.URL = "https://store.steampowered.com/app/"
-        self.ENDPOINT = "https://store.steampowered.com/search/results/?query&start=0&count=50&sort_by=Price_ASC" \
+        self.ENDPOINT = "https://store.steampowered.com/search/results/?query&start=0&count=25&sort_by=Price_ASC" \
                         "&specials=1&infinite=1"
 
     def is_dlc(self, app_id):
@@ -42,11 +42,14 @@ class Main:
             processed_data = json.loads(raw_data.content)["results_html"]
             soup = BeautifulSoup(processed_data, "html.parser")
             for tag in soup.find_all("a", {"class": "search_result_row ds_collapse_flag"}):
-                app_id = tag["data-ds-appid"]
+                app_id = tag.get("data-ds-appid")
+                bundle_id = tag.get("data-ds-bundleid")  # Walrus operator would shine here :(
+                product_id = app_id if app_id is not None else bundle_id
+
                 is_free = str(tag.find("div", {"class": "col search_discount responsive_secondrow"})
                                  .find("span").text) == "-100%"
-                if is_free and not self.is_dlc(app_id):
-                    game = Game(tag.find("span", {"class": "title"}).text, self.URL + app_id, self.MODULE_ID)
+                if is_free and not self.is_dlc(product_id):
+                    game = Game(tag.find("span", {"class": "title"}).text, self.URL + product_id, self.MODULE_ID)
                     parsed_games.append(game)
         except (TypeError, KeyError, json.decoder.JSONDecodeError):
             raise InvalidGameDataException

@@ -98,6 +98,8 @@ class AutomatikBot(commands.Bot):
                     stored_free_games = self.mongo.get_free_games_by_module_id(module.MODULE_ID)
                 except InvalidGameDataException:
                     logger.debug(f"Ignoring results from the '{module.MODULE_ID}' module this iteration")
+                    # todo The upper logging message should belong to the INFO category and the exception \
+                    # todo should only be shown when debug mode is enabled
                 except:  # If this wasn't here, any unhandled exception in any module would crash the loop
                     logger.exception("Unexpected error while retrieving game data")
                 else:
@@ -135,7 +137,7 @@ class AutomatikBot(commands.Bot):
                             await guild.get_channel(selected_channel).send(message)
                             success += 1
                         except (AttributeError, discord.errors.Forbidden):
-                            # If the channel ID is invalid or the message couldn't be sent for other reasons
+                            # If the channel ID is invalid or the bot lacks permissions
                             fail += 1
                         except:
                             fail += 1
