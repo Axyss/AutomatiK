@@ -10,7 +10,7 @@ class ModuleLoader:
     @staticmethod
     def load_modules():
         """Instantiates the 'Main' class of each module and appends said instance to 'ModuleLoader.modules'"""
-
+        ModuleLoader.modules = []  # Avoids module duplication after reload
         for i in os.listdir("./automatik/modules"):
             module_name, module_extension = os.path.splitext(i)
 

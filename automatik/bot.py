@@ -52,7 +52,6 @@ class AutomatikBot(commands.Bot):
         self.lm.load_lang_packages()
         # Services are added to the documents from the 'configs' collection on runtime
         self.mongo.insert_missing_or_new_services()
-        # todo add the equivalent to 'Database.insert_missing_or_new_services' for guild configs
 
     def generate_message(self, guild_cfg, game):
         """Generates a 'X free on Y' type message."""
@@ -96,10 +95,11 @@ class AutomatikBot(commands.Bot):
                 try:
                     retrieved_free_games = module.get_free_games()
                     stored_free_games = self.mongo.get_free_games_by_module_id(module.MODULE_ID)
-                except InvalidGameDataException:
-                    logger.debug(f"Ignoring results from the '{module.MODULE_ID}' module this iteration")
-                    # todo The upper logging message should belong to the INFO category and the exception \
-                    # todo should only be shown when debug mode is enabled
+                except InvalidGameDataException as error:
+                    logger.info(f"Ignoring this cycle's results from the next module: {module.MODULE_ID}."
+                                f" Enable debug mode for more information")
+                    logger.debug(f"InvalidGameDataException raised by module with MODULE_ID: '{module.MODULE_ID}'",
+                                 exc_info=error)
                 except:  # If this wasn't here, any unhandled exception in any module would crash the loop
                     logger.exception("Unexpected error while retrieving game data")
                 else:

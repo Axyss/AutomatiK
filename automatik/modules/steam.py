@@ -51,7 +51,7 @@ class Main:
                 if is_free and not self.is_dlc(product_id):
                     game = Game(tag.find("span", {"class": "title"}).text, self.URL + product_id, self.MODULE_ID)
                     parsed_games.append(game)
-        except (TypeError, KeyError, json.decoder.JSONDecodeError):
+        except (AttributeError, TypeError, KeyError, json.decoder.JSONDecodeError):
             raise InvalidGameDataException
         else:
             return parsed_games
