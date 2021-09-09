@@ -33,10 +33,12 @@ class Main:
 
         try:
             processed_data = json.loads(raw_data.content)["data"]["Catalog"]["searchStore"]["elements"]
-            for i in processed_data:
-                # Order matters, since the 'promotionalOffers' field  will not exist if 'promotions' doesn't
-                if i["promotions"] and i["promotions"]["promotionalOffers"]:
-                    game = Game(i["title"], self.URL + i["productSlug"], self.MODULE_ID)
+            for element in processed_data:
+                element_price_info = element["price"]["totalPrice"]
+
+                if element_price_info["originalPrice"] != 0 and element_price_info["discount"] != 0 and \
+                   element_price_info["originalPrice"] == element_price_info["discount"]:
+                    game = Game(element["title"], self.URL + element["productSlug"], self.MODULE_ID)
                     parsed_games.append(game)
         except (TypeError, KeyError, json.decoder.JSONDecodeError):
             raise InvalidGameDataException
