@@ -64,25 +64,29 @@ class AutomatikBot(commands.Bot):
     async def on_command_error(self, ctx, error):
         """Method used for error handling regarding the discord.py library."""
         if isinstance(error, discord.ext.commands.NoPrivateMessage) or isinstance(ctx.channel, discord.DMChannel):
-            # Highest priority situation
+            # First case check because said error instances are prioritized by the discord.py lib
             return None
 
         guild_lang = self.mongo.get_guild_config(ctx.guild)["lang"]
-        if isinstance(error, discord.ext.commands.CommandInvokeError):
+        if isinstance(error, commands.CommandInvokeError):
             error = error.original  # CommandInvokeError is too generic, this gets the exception which raised it
 
-        if isinstance(error, discord.ext.commands.MissingPermissions):
+        if isinstance(error, commands.MissingPermissions):
             # User lacks permissions
             await ctx.channel.send(self.lm.get_message(guild_lang, "missing_permissions"))
 
-        elif isinstance(error, discord.ext.commands.errors.CommandNotFound):
+        elif isinstance(error, commands.errors.CommandNotFound):
             await ctx.channel.send(self.lm.get_message(guild_lang, "invalid_command"))
 
-        elif isinstance(error, discord.ext.commands.errors.CommandOnCooldown):
+        elif isinstance(error, commands.errors.CommandOnCooldown):
             await ctx.channel.send(self.lm.get_message(guild_lang, "cooldown_error").format(int(error.retry_after)))
 
         elif isinstance(error, discord.errors.Forbidden):
             # Bot kicked or lacks permissions to send messages
+            pass
+
+        elif isinstance(error, commands.errors.CheckFailure):
+            # todo debug message
             pass
 
         else:  # Without this, unexpected errors wouldn't show up
@@ -144,6 +148,9 @@ class AutomatikBot(commands.Bot):
                             logger.exception("Unexpected error")
             logger.info(f"Messages sent to all guilds. Success: {success} | Fail: {fail}")
 
+    async def is_an_owner(self, ctx):
+        return str(ctx.author) in self.cfg.get_general_value("bot_owners")
+
     def init_commands(self):
 
         # Public commands
@@ -173,7 +180,7 @@ class AutomatikBot(commands.Bot):
                                      value="".join(self.lm.get_message(guild_lang, "help_field2_value")),
                                      inline=False
                                      )
-            if str(ctx.author) in self.cfg.get_general_value("bot_owners"):  # If command author a bot owner
+            if await self.is_an_owner(ctx):  # If command author a bot owner
                 embed_help.add_field(name=u"\U0001F451 " + self.lm.get_message(guild_lang, "help_field3_name"),
                                      value="".join(self.lm.get_message(guild_lang, "help_field3_value")),
                                      inline=False
@@ -358,17 +365,14 @@ class AutomatikBot(commands.Bot):
             await ctx.channel.send(embed=embed_langs)
 
         # Owner commands
-        # todo Replace if statements that check owners in commands with decorators
 
         @self.command()
         @commands.guild_only()
         @commands.cooldown(2, 10, commands.BucketType.user)
+        @commands.check(self.is_an_owner)
         async def start(ctx):
             """Starts/stops the main loop that will look for free games every 5 minutes."""
             guild_lang = self.mongo.get_guild_config(ctx.guild)["lang"]
-
-            if str(ctx.author) not in self.cfg.get_general_value("bot_owners"):  # If command author not a bot owner
-                return None
 
             if self.main_loop:
                 await ctx.channel.send(self.lm.get_message(guild_lang, "start_already"))
@@ -381,12 +385,10 @@ class AutomatikBot(commands.Bot):
         @self.command()
         @commands.guild_only()
         @commands.cooldown(2, 10, commands.BucketType.user)
+        @commands.check(self.is_an_owner)
         async def stop(ctx):
             """Stops the loop that looks for free games GLOBALLY."""
             guild_lang = self.mongo.get_guild_config(ctx.guild)["lang"]
-
-            if str(ctx.author) not in self.cfg.get_general_value("bot_owners"):  # If command author not a bot owner
-                return None
 
             if not self.main_loop:  # If service already stopped
                 await ctx.channel.send(self.lm.get_message(guild_lang, "stop_already"))
@@ -399,15 +401,13 @@ class AutomatikBot(commands.Bot):
         @self.command()
         @commands.guild_only()
         @commands.cooldown(2, 10, commands.BucketType.user)
-        @commands.has_permissions(administrator=True)
+        @commands.check(self.is_an_owner)
         async def reload(ctx):
             """Reloads configuration, modules and language packages."""
             guild_lang = self.mongo.get_guild_config(ctx.guild)["lang"]
 
-            if str(ctx.author) not in self.cfg.get_general_value("bot_owners"):  # If command author not a bot owner
-                return None
             logger.info("Reloading..")
-            was_started = self.main_loop
+            was_started = bool(self.main_loop)
             self.main_loop = False
             try:
                 self.load_resources()
@@ -417,18 +417,16 @@ class AutomatikBot(commands.Bot):
                 await ctx.channel.send(self.lm.get_message(guild_lang, "unexpected_error"))
                 logger.error("An error ocurred while reloading")
             finally:
-                self.main_loop = was_started
+                self.main_loop = bool(was_started)
 
         @self.command(aliases=["statistics"])
         @commands.guild_only()
         @commands.cooldown(2, 10, commands.BucketType.user)
+        @commands.check(self.is_an_owner)
         async def stats(ctx):
             """Shows some overall statistics of the bot."""
             guild_lang = self.mongo.get_guild_config(ctx.guild)["lang"]
             message_queue_len = len(self.guilds) * (len(self.game_queue_cache) + self.game_queue.qsize())
-
-            if str(ctx.author) not in self.cfg.get_general_value("bot_owners"):  # If command author not a bot owner
-                return None
 
             embed_stats = discord.Embed(title="\U0001f4c8 " + self.lm.get_message(guild_lang, "stats"),
                                         description=self.lm.get_message(guild_lang, "stats_description"),
@@ -458,13 +456,11 @@ class AutomatikBot(commands.Bot):
         @self.command()
         @commands.guild_only()
         @commands.cooldown(2, 10, commands.BucketType.user)
+        @commands.check(self.is_an_owner)
         async def shutdown(ctx):
             """Shuts down the bot process completely."""
             guild_lang = self.mongo.get_guild_config(ctx.guild)["lang"]
             message_queue_len = len(self.guilds) * (len(self.game_queue_cache) + self.game_queue.qsize())
-
-            if str(ctx.author) not in self.cfg.get_general_value("bot_owners"):  # If command author not a bot owner
-                return None
 
             if not self.game_queue.empty() or self.game_queue_cache:
                 await ctx.channel.send(self.lm.get_message(guild_lang, "shutdown_abort").format(message_queue_len))
