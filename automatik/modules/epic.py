@@ -14,7 +14,7 @@ class Main:
         self.SERVICE_NAME = "Epic Games"
         self.MODULE_ID = "epic"
         self.AUTHOR = "Default"
-        self.URL = "https://www.epicgames.com/store/us-US/product/"
+        self.URL = "https://www.epicgames.com/store/us-US/p/"
         self.ENDPOINT = "https://store-site-backend-static.ak.epicgames.com/freeGamesPromotions"
 
     def make_request(self):
@@ -38,7 +38,7 @@ class Main:
 
                 if element_price_info["originalPrice"] != 0 and element_price_info["discount"] != 0 and \
                    element_price_info["originalPrice"] == element_price_info["discount"]:
-                    game = Game(element["title"], self.URL + element["productSlug"], self.MODULE_ID)
+                    game = Game(element["title"], self.URL + element["urlSlug"], self.MODULE_ID)
                     parsed_games.append(game)
         except (TypeError, KeyError, json.decoder.JSONDecodeError):
             raise InvalidGameDataException

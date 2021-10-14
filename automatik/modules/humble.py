@@ -34,7 +34,7 @@ class Main:
         try:
             processed_data = json.loads(raw_data.content)["results"]
             for i in processed_data:
-                if i["current_price"]["amount"] == 0:  # If game's price is 0
+                if i["current_price"]["amount"] == 0:
                     game = Game(i["human_name"], self.URL + i["human_url"], self.MODULE_ID)
                     parsed_games.append(game)
         except (TypeError, KeyError, json.decoder.JSONDecodeError):
