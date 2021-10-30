@@ -3,7 +3,7 @@ import datetime
 import pymongo
 from pymongo.errors import DuplicateKeyError
 
-from automatik.core.game import Game
+from automatik.core.game import GameAdapter
 from automatik.core.lang import logger
 from automatik.core.modules import ModuleLoader
 
@@ -58,7 +58,7 @@ class Database:
 
     def create_free_game(self, game_obj):
         """Creates a new document in the 'free_games' collection."""
-        self._db["free_games"].insert(Game.to_dict(game_obj))
+        self._db["free_games"].insert(GameAdapter.to_dict(game_obj))
         logger.info(f"New game '{game_obj.NAME}' ({game_obj.MODULE_ID}) added to the database")
         return True
 
@@ -66,7 +66,7 @@ class Database:
         """Returns every document from the 'free_games' collection with a certain module ID."""
         free_games = []
         for game_dict in self._db["free_games"].find({"module_id": module_id}):
-            free_games.append(Game.to_object(game_dict))
+            free_games.append(GameAdapter.to_object(game_dict))
         return free_games
 
     def move_to_past_free_games(self, game_obj):

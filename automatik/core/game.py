@@ -12,6 +12,8 @@ class Game:
         """When comparing two Game objects only the link and module ID attributes will matter."""
         return True if self.LINK == other.LINK and self.MODULE_ID == other.MODULE_ID else False
 
+
+class GameAdapter:
     @staticmethod
     def to_dict(game_obj):
         """Converts a 'Game' instance into a dictionary."""

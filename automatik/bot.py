@@ -20,7 +20,7 @@ class AutomatikBot(commands.Bot):
         commands.Bot.__init__(self, command_prefix=command_prefix, self_bot=self_bot, intents=intents)
         self.is_first_exec = True  # Used inside 'on_ready' to execute certain parts of the method only once
         self.lm = LangLoader("./automatik/lang")
-        self.cfg = ConfigManager("./automatik/config.yml")
+        self.cfg = ConfigManager("./automatik/config.yml", __version__)
         self.mongo = Database(host=self.cfg.get_mongo_value("host"),
                               port=self.cfg.get_mongo_value("port"),
                               username=self.cfg.get_mongo_value("user"),

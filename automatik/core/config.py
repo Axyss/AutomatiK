@@ -9,7 +9,7 @@ logger = logging.getLogger("automatik_logger")
 
 
 class ConfigManager:
-    def __init__(self, filename, ignore_logger=False):
+    def __init__(self, filename, bot_version, ignore_logger=False):
         self.CONFIG_TEMPLATE = ("# We know writing important credentials inside a plain text file\n"
                                 "# might feel a bit scary. That's why now you can use environment variables!\n"
                                 "# To use them, follow the next syntax: env(my_new_env_variable).\n\n"
@@ -29,8 +29,7 @@ class ConfigManager:
                                 "  auth_source: ''\n"
                                 "  auth_mechanism: 'DEFAULT'\n"
                                 "SECRET:\n"
-                                "  discord_bot_token: ''").format("v2.0")
-        # todo Cannot import automatik.__version__
+                                "  discord_bot_token: ''").format(bot_version)
         self.FILENAME = filename
         self.IGNORE_LOGGER = ignore_logger
         self.config = None
