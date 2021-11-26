@@ -22,7 +22,15 @@ class Main:
     def is_dlc(self, app_id):
         response = self.make_request(self.URL + app_id)
         soup = BeautifulSoup(response.content, "html.parser")
-        return bool(soup.find("div", {"class": "game_area_dlc_bubble"}))
+        dlc_area = bool(soup.find("div", {"class": "game_area_dlc_bubble"}))
+        purchase_area = bool(soup.find("div", {"class": "game_area_purchase_game_wrapper"}))
+
+        if dlc_area and purchase_area:
+            return True
+        elif not dlc_area and purchase_area:
+            return False
+        else:
+            return None
 
     def make_request(self, endpoint):
         """Makes the HTTP request to the Steam's backend."""
@@ -48,7 +56,8 @@ class Main:
 
                 is_free = str(tag.find("div", {"class": "col search_discount responsive_secondrow"})
                                  .find("span").text) == "-100%"
-                if is_free and not self.is_dlc(product_id):
+                # DLCs must be compared carefully since 'not None' is equal to 'True'.
+                if is_free and self.is_dlc(product_id) is False:
                     game = Game(tag.find("span", {"class": "title"}).text, self.URL + product_id, self.MODULE_ID)
                     parsed_games.append(game)
         except (AttributeError, TypeError, KeyError, json.decoder.JSONDecodeError):
