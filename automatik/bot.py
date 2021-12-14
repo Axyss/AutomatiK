@@ -2,12 +2,13 @@
 import asyncio
 import queue
 import random
+import os
 
 import discord
 import psutil
 from discord.ext import commands, tasks
 
-from automatik import logger, __version__, LOGO_URL, AVATAR_URL
+from automatik import logger, __version__, LOGO_URL, AVATAR_URL, SRC_DIR
 from .core.config import ConfigManager
 from .core.db import Database
 from .core.errors import InvalidGameDataException
@@ -19,8 +20,8 @@ class AutomatikBot(commands.Bot):
     def __init__(self, command_prefix, self_bot, intents):
         commands.Bot.__init__(self, command_prefix=command_prefix, self_bot=self_bot, intents=intents)
         self.is_first_exec = True  # Used inside 'on_ready' to execute certain parts of the method only once
-        self.lm = LangLoader("./automatik/lang")
-        self.cfg = ConfigManager("./automatik/config.yml", __version__)
+        self.lm = LangLoader(os.path.join(SRC_DIR, "lang"))
+        self.cfg = ConfigManager(os.path.join(SRC_DIR, "config.yml"), __version__)
         self.mongo = Database(host=self.cfg.get_mongo_value("host"),
                               port=self.cfg.get_mongo_value("port"),
                               username=self.cfg.get_mongo_value("user"),

@@ -1,7 +1,7 @@
 import importlib
 import os
 
-from automatik import logger
+from automatik import logger, SRC_DIR
 
 
 class ModuleLoader:
@@ -11,7 +11,7 @@ class ModuleLoader:
     def load_modules():
         """Instantiates the 'Main' class of each module and appends said instance to 'ModuleLoader.modules'"""
         ModuleLoader.modules = []  # Avoids module duplication after reload
-        for i in os.listdir("./automatik/modules"):
+        for i in os.listdir(os.path.join(SRC_DIR, "modules")):
             module_name, module_extension = os.path.splitext(i)
 
             if module_extension == ".py" and module_name != "__init__":
