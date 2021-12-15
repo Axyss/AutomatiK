@@ -1,7 +1,7 @@
 import json
 
-import requests
-from requests.exceptions import HTTPError, Timeout
+import cloudscraper
+from requests.exceptions import HTTPError, Timeout, ConnectionError
 
 from automatik import logger
 from automatik.core.errors import InvalidGameDataException
@@ -20,8 +20,8 @@ class Main:
     def make_request(self):
         """Makes the HTTP request to the Humble Bundle's backend."""
         try:
-            raw_data = requests.get(self.ENDPOINT)
-        except (HTTPError, Timeout, requests.exceptions.ConnectionError):
+            raw_data = cloudscraper.create_scraper().get(self.ENDPOINT)
+        except (HTTPError, Timeout, ConnectionError):
             logger.error(f"Request to {self.SERVICE_NAME} by module \'{self.MODULE_ID}\' failed")
             raise InvalidGameDataException
         else:
@@ -32,7 +32,7 @@ class Main:
         parsed_games = []
 
         try:
-            processed_data = json.loads(raw_data.content)["results"]
+            processed_data = json.loads(raw_data.text)["results"]
             for i in processed_data:
                 if i["current_price"]["amount"] == 0:
                     game = Game(i["human_name"], self.URL + i["human_url"], self.MODULE_ID)
