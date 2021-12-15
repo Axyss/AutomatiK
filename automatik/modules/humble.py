@@ -16,11 +16,12 @@ class Main:
         self.AUTHOR = "Default"
         self.ENDPOINT = "https://www.humblebundle.com/store/api/search?sort=discount&filter=onsale&request=1"
         self.URL = "https://www.humblebundle.com/store/"
+        self.CF = cloudscraper.create_scraper()
 
     def make_request(self):
         """Makes the HTTP request to the Humble Bundle's backend."""
         try:
-            raw_data = cloudscraper.create_scraper().get(self.ENDPOINT)
+            raw_data = self.CF.get(self.ENDPOINT)
         except (HTTPError, Timeout, ConnectionError):
             logger.error(f"Request to {self.SERVICE_NAME} by module \'{self.MODULE_ID}\' failed")
             raise InvalidGameDataException
