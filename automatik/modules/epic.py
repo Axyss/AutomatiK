@@ -40,7 +40,7 @@ class Main:
 
                 # The order of the next if statement is crucial since 'promotions' may be None
                 if current_price == 0 and promotions and promotions["promotionalOffers"] != list():
-                    game = Game(element["title"], self.URL + element["urlSlug"], self.MODULE_ID)
+                    game = Game(element["title"], self.URL + element["productSlug"], self.MODULE_ID)
                     parsed_games.append(game)
         except (TypeError, KeyError, json.decoder.JSONDecodeError):
             raise InvalidGameDataException
