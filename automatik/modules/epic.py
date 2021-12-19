@@ -34,10 +34,12 @@ class Main:
         try:
             processed_data = json.loads(raw_data.content)["data"]["Catalog"]["searchStore"]["elements"]
             for element in processed_data:
-                element_price_info = element["price"]["totalPrice"]
+                current_price = element["price"]["totalPrice"]["originalPrice"] - \
+                                element["price"]["totalPrice"]["discount"]
+                promotions = element["promotions"]  # None if there aren't any, so there's no need to use 'get'
 
-                if element_price_info["originalPrice"] != 0 and element_price_info["discount"] != 0 and \
-                   element_price_info["originalPrice"] == element_price_info["discount"]:
+                # The order of the next if statement is crucial since 'promotions' may be None
+                if current_price == 0 and promotions and promotions["promotionalOffers"] != list():
                     game = Game(element["title"], self.URL + element["urlSlug"], self.MODULE_ID)
                     parsed_games.append(game)
         except (TypeError, KeyError, json.decoder.JSONDecodeError):
