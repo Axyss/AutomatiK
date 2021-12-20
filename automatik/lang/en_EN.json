@@ -50,7 +50,7 @@
       "enable_unknown": "\u274C Unknown parameter. Use **!mk {} (ModuleID)**",
 
       "modules": "**Modules**",
-      "modules_description": "Modules are extensions that expand the bot's functionality. **ModuleID** column contains the way each module must be called by in commands.",
+      "modules_description": "Modules are extensions that expand the bot's functionality. The **ModuleID** column contains the way each module must be called by in commands.",
       "modules_service": "**Service**",
       "modules_author": "**Author**",
 
@@ -60,7 +60,7 @@
 
       "language": "Language",
       "languages": "Languages",
-      "languages_description": "**LangID** column contains the way each language package must be called by in commands.",
+      "languages_description": "The **LangID** column contains the way each language package must be called by in commands.",
       "language_changed": "\u2705 Language changed to English (England).",
       "language_error": "\u274C Language not found.",
 

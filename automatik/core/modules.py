@@ -36,4 +36,4 @@ class ModuleLoader:
 
     @staticmethod
     def get_module_authors():
-        return [i.SERVICE_NAME for i in ModuleLoader.modules]
+        return [i.AUTHOR for i in ModuleLoader.modules]

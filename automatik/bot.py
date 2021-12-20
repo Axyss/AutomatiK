@@ -37,12 +37,13 @@ class AutomatikBot(commands.Bot):
         self.load_resources()
         self.init_main_loop.start()
         self.init_message_broadcaster.start()
-        self.remove_command("help")  # Must be removed before command init. so the 'help' alias is available
+        self.remove_command("help")  # There is a default 'help' command which shows docstrings
         self.init_commands()
 
     async def on_ready(self):
         if self.is_first_exec:
-            logger.info(f"AutomatiK bot {__version__} online")
+            logger.info("Connection established with Discord")
+            logger.info("Bot Online")
             self.is_first_exec = False
         await self.change_presence(status=discord.Status.online, activity=discord.Game("!mk help"))
 
@@ -152,6 +153,10 @@ class AutomatikBot(commands.Bot):
     async def is_an_owner(self, ctx):
         return str(ctx.author) in self.cfg.get_general_value("bot_owners")
 
+    async def is_invoked(self, ctx):
+        logger.debug(f"{ctx.command.name} invoked by {str(ctx.author)} on {ctx.guild.id}")
+        return True
+
     def init_commands(self):
 
         # Public commands
@@ -159,6 +164,7 @@ class AutomatikBot(commands.Bot):
         @self.command(aliases=["help"])
         @commands.guild_only()
         @commands.cooldown(1, 60, commands.BucketType.user)
+        @commands.check(self.is_invoked)
         async def helpme(ctx):
             """Help command that uses embeds."""
             guild_lang = self.mongo.get_guild_config(ctx.guild)["lang"]
@@ -187,11 +193,11 @@ class AutomatikBot(commands.Bot):
                                      inline=False
                                      )
             await ctx.channel.send(embed=embed_help)
-            logger.debug(f"Command '{ctx.command}' invoked by {ctx.author}")
 
         @self.command()
         @commands.guild_only()
         @commands.cooldown(2, 10, commands.BucketType.user)
+        @commands.check(self.is_invoked)
         async def status(ctx):
             """Shows information about the bot based on the guild (modules, selected channel...)."""
             guild_cfg = self.mongo.get_guild_config(ctx.guild)
@@ -224,7 +230,6 @@ class AutomatikBot(commands.Bot):
                                        value=value,
                                        )
             await ctx.channel.send(embed=embed_status)
-            logger.debug(f"Command '{ctx.command}' invoked by {ctx.author}")
 
         # Guild administrator commands
 
@@ -232,6 +237,7 @@ class AutomatikBot(commands.Bot):
         @commands.guild_only()
         @commands.cooldown(2, 10, commands.BucketType.user)
         @commands.has_permissions(administrator=True)
+        @commands.check(self.is_invoked)
         async def select(ctx, channel=None):
             """Starts announcing free games in the guild where it is executed or in the specified channel."""
             guild_cfg = self.mongo.get_guild_config(ctx.guild)
@@ -249,6 +255,7 @@ class AutomatikBot(commands.Bot):
         @commands.guild_only()
         @commands.cooldown(2, 10, commands.BucketType.user)
         @commands.has_permissions(administrator=True)
+        @commands.check(self.is_invoked)
         async def unselect(ctx):
             """Stops announcing free games in the guild."""
             guild_cfg = self.mongo.get_guild_config(ctx.guild)
@@ -267,6 +274,7 @@ class AutomatikBot(commands.Bot):
         @commands.guild_only()
         @commands.cooldown(2, 10, commands.BucketType.user)
         @commands.has_permissions(administrator=True)
+        @commands.check(self.is_invoked)
         async def enable(ctx, service):
             """Guild dependant command to enable/disable modules and other settings."""
             guild_lang = self.mongo.get_guild_config(ctx.guild)["lang"]
@@ -291,6 +299,7 @@ class AutomatikBot(commands.Bot):
         @commands.guild_only()
         @commands.cooldown(2, 10, commands.BucketType.user)
         @commands.has_permissions(administrator=True)
+        @commands.check(self.is_invoked)
         async def modules(ctx):
             """Shows information about the loaded modules."""
             guild_lang = self.mongo.get_guild_config(ctx.guild)["lang"]
@@ -316,6 +325,7 @@ class AutomatikBot(commands.Bot):
         @commands.guild_only()
         @commands.cooldown(2, 10, commands.BucketType.user)
         @commands.has_permissions(administrator=True)
+        @commands.check(self.is_invoked)
         async def mention(ctx, mention_role):
             """Manages the mentions of the bot's messages."""
             guild_lang = self.mongo.get_guild_config(ctx.guild)["lang"]
@@ -332,6 +342,7 @@ class AutomatikBot(commands.Bot):
         @commands.guild_only()
         @commands.cooldown(2, 10, commands.BucketType.user)
         @commands.has_permissions(administrator=True)
+        @commands.check(self.is_invoked)
         async def language(ctx, lang_code):
             guild_lang = self.mongo.get_guild_config(ctx.guild)["lang"]
 
@@ -347,6 +358,7 @@ class AutomatikBot(commands.Bot):
         @commands.guild_only()
         @commands.cooldown(2, 10, commands.BucketType.user)
         @commands.has_permissions(administrator=True)
+        @commands.check(self.is_invoked)
         async def languages(ctx):
             guild_lang = self.mongo.get_guild_config(ctx.guild)["lang"]
             lang_ids, lang_names, lang_authors = self.lm.get_lang_packages_metadata()
@@ -370,6 +382,7 @@ class AutomatikBot(commands.Bot):
         @self.command()
         @commands.guild_only()
         @commands.cooldown(2, 10, commands.BucketType.user)
+        @commands.check(self.is_invoked)
         @commands.check(self.is_an_owner)
         async def start(ctx):
             """Starts/stops the main loop that will look for free games every 5 minutes."""
@@ -386,6 +399,7 @@ class AutomatikBot(commands.Bot):
         @self.command()
         @commands.guild_only()
         @commands.cooldown(2, 10, commands.BucketType.user)
+        @commands.check(self.is_invoked)
         @commands.check(self.is_an_owner)
         async def stop(ctx):
             """Stops the loop that looks for free games GLOBALLY."""
@@ -402,6 +416,7 @@ class AutomatikBot(commands.Bot):
         @self.command()
         @commands.guild_only()
         @commands.cooldown(2, 10, commands.BucketType.user)
+        @commands.check(self.is_invoked)
         @commands.check(self.is_an_owner)
         async def reload(ctx):
             """Reloads configuration, modules and language packages."""
@@ -423,6 +438,7 @@ class AutomatikBot(commands.Bot):
         @self.command(aliases=["statistics"])
         @commands.guild_only()
         @commands.cooldown(2, 10, commands.BucketType.user)
+        @commands.check(self.is_invoked)
         @commands.check(self.is_an_owner)
         async def stats(ctx):
             """Shows some overall statistics of the bot."""
@@ -452,11 +468,11 @@ class AutomatikBot(commands.Bot):
                                       .format(message_queue_len))
 
             await ctx.channel.send(embed=embed_stats)
-            logger.debug(f"Command '{ctx.command}' invoked by {ctx.author}")
 
         @self.command()
         @commands.guild_only()
         @commands.cooldown(2, 10, commands.BucketType.user)
+        @commands.check(self.is_invoked)
         @commands.check(self.is_an_owner)
         async def shutdown(ctx):
             """Shuts down the bot process completely."""
