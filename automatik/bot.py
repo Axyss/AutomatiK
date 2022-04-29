@@ -77,6 +77,8 @@ class AutomatikBot(commands.Bot):
             # User lacks permissions
             await ctx.channel.send(self.lm.get_message(guild_lang, "missing_permissions"))
 
+        # todo Add MissingRequiredArgument
+
         elif isinstance(error, commands.errors.CommandNotFound):
             await ctx.channel.send(self.lm.get_message(guild_lang, "invalid_command"))
 

@@ -16,7 +16,9 @@ class Main:
         self.AUTHOR = "Default"
         self.ENDPOINT = "https://www.humblebundle.com/store/api/search?sort=discount&filter=onsale&request=1"
         self.URL = "https://www.humblebundle.com/store/"
-        self.CF = cloudscraper.create_scraper()
+        self.CF = cloudscraper.create_scraper(browser={"custom": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                                                                 "AppleWebKit/537.36 (KHTML, like Gecko) "
+                                                                 "Chrome/96.0.4664.45 Safari/537.36"})
 
     def make_request(self):
         """Makes the HTTP request to the Humble Bundle's backend."""
