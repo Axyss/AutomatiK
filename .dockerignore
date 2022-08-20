@@ -1,0 +1,8 @@
+.env
+.idea/
+venv/
+logs/
+__pycache__/
+automatik/*.json
+automatik/*.yml
+automatik/*.db
