@@ -16,7 +16,7 @@ class Config:
         attr = attr.upper()
         try:
             return ast.literal_eval(self._config[attr])
-        except ValueError:
+        except (ValueError, SyntaxError):
             # todo this exception should at least be shown in the debug mode
             pass
         return self._config[attr]

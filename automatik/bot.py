@@ -24,8 +24,8 @@ class AutomatikBot(commands.Bot):
         self.cfg = Config(".env")
         self.mongo = Database(host=self.cfg.db_host,
                               port=self.cfg.db_port,
-                              username=self.cfg.db_user,
-                              password=self.cfg.db_password,
+                              username=self.cfg.db_root_user,
+                              password=self.cfg.db_root_password,
                               auth_source=self.cfg.db_auth_source,
                               auth_mechanism=self.cfg.db_auth_mechanism)
 
@@ -35,8 +35,8 @@ class AutomatikBot(commands.Bot):
         self.game_queue_cache = []
 
         self.load_resources()
-        self.init_main_loop.start()
-        self.init_message_broadcaster.start()
+        #self.init_main_loop.start()
+        #self.init_message_broadcaster.start()
         self.remove_command("help")  # There is a default 'help' command which shows docstrings
         self.init_commands()
 
