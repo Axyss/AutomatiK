@@ -5,10 +5,9 @@ from automatik import __version__
 
 def clear_console():
     """Clears the console in a different way depending on the OS."""
-    local_os = os.name
-    if local_os in ("nt", "dos"):
+    if os.name in ("nt", "dos"):
         os.system("cls")
-    elif local_os in ("linux", "osx", "posix"):
+    elif os.name in ("linux", "osx", "posix"):
         os.system("clear")
     else:
         print("\n" * 120)

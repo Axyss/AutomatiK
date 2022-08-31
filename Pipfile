@@ -9,8 +9,8 @@ beautifulsoup4 = "*"
 psutil = "*"
 pymongo = "*"
 requests = "*"
-pyyaml = "*"
 cloudscraper = "*"
+python-dotenv = "*"
 
 [dev-packages]
 

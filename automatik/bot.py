@@ -9,7 +9,7 @@ import psutil
 from discord.ext import commands, tasks
 
 from automatik import logger, __version__, LOGO_URL, AVATAR_URL, SRC_DIR
-from .core.config import ConfigManager
+from .core.config import Config
 from .core.db import Database
 from .core.errors import InvalidGameDataException
 from .core.lang import LangLoader
@@ -21,13 +21,13 @@ class AutomatikBot(commands.Bot):
         commands.Bot.__init__(self, command_prefix=command_prefix, self_bot=self_bot, intents=intents)
         self.is_first_exec = True  # Used inside 'on_ready' to execute certain parts of the method only once
         self.lm = LangLoader(os.path.join(SRC_DIR, "lang"))
-        self.cfg = ConfigManager(os.path.join(SRC_DIR, "config.yml"), __version__)
-        self.mongo = Database(host=self.cfg.get_mongo_value("host"),
-                              port=self.cfg.get_mongo_value("port"),
-                              username=self.cfg.get_mongo_value("user"),
-                              password=self.cfg.get_mongo_value("password"),
-                              auth_source=self.cfg.get_mongo_value("auth_source"),
-                              auth_mechanism=self.cfg.get_mongo_value("auth_mechanism"))
+        self.cfg = Config(".env")
+        self.mongo = Database(host=self.cfg.db_host,
+                              port=self.cfg.db_port,
+                              username=self.cfg.db_user,
+                              password=self.cfg.db_password,
+                              auth_source=self.cfg.db_auth_source,
+                              auth_mechanism=self.cfg.db_auth_mechanism)
 
         self.main_loop = False  # Variable used to start or stop the main loop
         self.game_queue = queue.Queue()  # Free games are stored here temporary while the 'broadcaster' routine
@@ -50,7 +50,8 @@ class AutomatikBot(commands.Bot):
     def load_resources(self):
         """Loads configuration, modules and language packages."""
         ModuleLoader.load_modules()
-        self.cfg.load_config()
+        # todo Refactor this method 'load_resources'
+        # self.cfg.load_config()
         self.lm.load_lang_packages()
         # Services are added to the documents from the 'configs' collection on runtime
         self.mongo.insert_missing_or_new_services()
@@ -153,7 +154,7 @@ class AutomatikBot(commands.Bot):
             logger.info(f"Messages sent to all guilds. Success: {success} | Fail: {fail}")
 
     async def is_an_owner(self, ctx):
-        return str(ctx.author) in self.cfg.get_general_value("bot_owners")
+        return str(ctx.author) in self.cfg.bot_owner
 
     async def is_invoked(self, ctx):
         logger.debug(f"{ctx.command.name} invoked by {str(ctx.author)} on {ctx.guild.id}")
@@ -456,7 +457,7 @@ class AutomatikBot(commands.Bot):
 
             embed_stats.add_field(name="Guilds", value=str(len(self.guilds)))
             embed_stats.add_field(name=self.lm.get_message(guild_lang, "stats_owners_field"),
-                                  value="\n".join(self.cfg.get_general_value("bot_owners")))
+                                  value="\n".join(self.cfg.bot_owner))
             embed_stats.add_field(name=self.lm.get_message(guild_lang, "stats_server_load_field"),
                                   value="CPU: **{}%** \nRAM: **{}%**".format(
                                       psutil.cpu_percent(), psutil.virtual_memory().percent))
