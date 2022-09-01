@@ -34,7 +34,7 @@ class Database:
         config.update({"_id": str(guild.id), "name": guild.name, "members": guild.member_count,
                        "services": dict.fromkeys(ModuleLoader.get_module_ids(), True)})
         try:
-            self._db["configs"].insert(config)
+            self._db["configs"].insert_one(config)
             return True
         except DuplicateKeyError:
             return False
@@ -58,7 +58,7 @@ class Database:
 
     def create_free_game(self, game_obj):
         """Creates a new document in the 'free_games' collection."""
-        self._db["free_games"].insert(GameAdapter.to_dict(game_obj))
+        self._db["free_games"].insert_one(GameAdapter.to_dict(game_obj))
         logger.info(f"New game '{game_obj.NAME}' ({game_obj.MODULE_ID}) added to the database")
         return True
 

@@ -5,12 +5,12 @@ name = "pypi"
 
 [packages]
 beautifulsoup4 = "*"
-"discord.py" = "*"
 psutil = "*"
 pymongo = "*"
 requests = "*"
 cloudscraper = "*"
 python-dotenv = "*"
+"discord.py" = "*"
 
 [dev-packages]
 
