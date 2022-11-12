@@ -7,6 +7,7 @@ import os
 import discord
 import psutil
 from discord.ext import commands, tasks
+from discord import app_commands
 
 from automatik import logger, __version__, LOGO_URL, AVATAR_URL, SRC_DIR
 from .core.config import Config
@@ -35,16 +36,18 @@ class AutomatikBot(commands.Bot):
         self.game_queue_cache = []
 
         self.load_resources()
-        #self.init_main_loop.start()
-        #self.init_message_broadcaster.start()
         self.remove_command("help")  # There is a default 'help' command which shows docstrings
         self.init_commands()
 
     async def on_ready(self):
         if self.is_first_exec:
-            logger.info("Connection established with Discord")
-            logger.info("Bot Online")
             self.is_first_exec = False
+
+            self.init_main_loop.start()
+            self.init_message_broadcaster.start()
+
+            await self.tree.sync(guild=discord.Object(id=649270300982247449))
+            logger.info("Bot Online")
         await self.change_presence(status=discord.Status.online, activity=discord.Game("!mk help"))
 
     def load_resources(self):
@@ -64,27 +67,24 @@ class AutomatikBot(commands.Bot):
             message = guild_cfg["mention_role"] + " " + message
         return message
 
-    async def on_command_error(self, ctx, error):
+    async def on_command_error(self, interaction, error):
         """Method used for error handling regarding the discord.py library."""
-        if isinstance(error, discord.ext.commands.NoPrivateMessage) or isinstance(ctx.channel, discord.DMChannel):
-            # First case check because said error instances are prioritized by the discord.py lib
-            return None
 
-        guild_lang = self.mongo.get_guild_config(ctx.guild)["lang"]
+        guild_lang = self.mongo.get_guild_config(interaction.guild)["lang"]
         if isinstance(error, commands.CommandInvokeError):
             error = error.original  # CommandInvokeError is too generic, this gets the exception which raised it
 
         if isinstance(error, commands.MissingPermissions):
             # User lacks permissions
-            await ctx.channel.send(self.lm.get_message(guild_lang, "missing_permissions"))
+            await interaction.response.send_message(self.lm.get_message(guild_lang, "missing_permissions"))
 
         # todo Add MissingRequiredArgument
 
         elif isinstance(error, commands.errors.CommandNotFound):
-            await ctx.channel.send(self.lm.get_message(guild_lang, "invalid_command"))
+            await interaction.response.send_message(self.lm.get_message(guild_lang, "invalid_command"))
 
         elif isinstance(error, commands.errors.CommandOnCooldown):
-            await ctx.channel.send(self.lm.get_message(guild_lang, "cooldown_error").format(int(error.retry_after)))
+            await interaction.response.send_message(self.lm.get_message(guild_lang, "cooldown_error").format(int(error.retry_after)))
 
         elif isinstance(error, discord.errors.Forbidden):
             # Bot kicked or lacks permissions to send messages
@@ -105,7 +105,7 @@ class AutomatikBot(commands.Bot):
                     retrieved_free_games = module.get_free_games()
                     stored_free_games = self.mongo.get_free_games_by_module_id(module.MODULE_ID)
                 except InvalidGameDataException as error:
-                    logger.info(f"Ignoring this cycle's results from the next module: {module.MODULE_ID}."
+                    logger.info(f"Ignoring latest results from module: {module.MODULE_ID}."
                                 f" Enable debug mode for more information")
                     logger.debug(f"InvalidGameDataException raised by module with MODULE_ID: '{module.MODULE_ID}'",
                                  exc_info=error)
@@ -153,159 +153,114 @@ class AutomatikBot(commands.Bot):
                             logger.exception("Unexpected error")
             logger.info(f"Messages sent to all guilds. Success: {success} | Fail: {fail}")
 
-    async def is_an_owner(self, ctx):
-        return str(ctx.author) in self.cfg.bot_owner
+    async def is_an_owner(self, interaction):
+        return str(interaction) in self.cfg.bot_owner
 
-    async def is_invoked(self, ctx):
-        logger.debug(f"{ctx.command.name} invoked by {str(ctx.author)} on {ctx.guild.id}")
+    async def is_invoked(self, interaction):
+        logger.debug(f"{interaction.command.name} invoked by {str(interaction.author)} on {interaction.guild.id}")
         return True
 
     def init_commands(self):
 
         # Public commands
 
-        @self.command(aliases=["help"])
-        @commands.guild_only()
-        @commands.cooldown(1, 60, commands.BucketType.user)
-        @commands.check(self.is_invoked)
-        async def helpme(ctx):
+        @self.tree.command(name="help", description="A simple help command.", guild=discord.Object(id=649270300982247449))
+        async def help(interaction: discord.Interaction):
             """Help command that uses embeds."""
-            guild_lang = self.mongo.get_guild_config(ctx.guild)["lang"]
+            guild_lang = self.mongo.get_guild_config(interaction.guild)["lang"]
 
             embed_help = discord.Embed(title=f"AutomatiK {__version__} Help ",
                                        description=self.lm.get_message(guild_lang, "help_description"),
-                                       color=0x00BFFF
-                                       )
-            embed_help.set_footer(text=self.lm.get_message(guild_lang, "help_footer"),
-                                  icon_url=AVATAR_URL
-                                  )
+                                       color=0x00BFFF)
             embed_help.set_thumbnail(url=LOGO_URL)
-
             embed_help.add_field(name=self.lm.get_message(guild_lang, "help_field1_name"),
                                  value="".join(self.lm.get_message(guild_lang, "help_field1_value")),
-                                 inline=False
-                                 )
-            if ctx.author.guild_permissions.administrator:
+                                 inline=False)
+
+            if interaction.user.guild_permissions.administrator:
                 embed_help.add_field(name=u"\U0001F6E0 " + self.lm.get_message(guild_lang, "help_field2_name"),
                                      value="".join(self.lm.get_message(guild_lang, "help_field2_value")),
-                                     inline=False
-                                     )
-            if await self.is_an_owner(ctx):  # If command author a bot owner
+                                     inline=False)
+            if await self.is_an_owner(interaction.user):  # If command author a bot owner
                 embed_help.add_field(name=u"\U0001F451 " + self.lm.get_message(guild_lang, "help_field3_name"),
                                      value="".join(self.lm.get_message(guild_lang, "help_field3_value")),
                                      inline=False
                                      )
-            await ctx.channel.send(embed=embed_help)
+            await interaction.response.send_message(embed=embed_help)
 
-        @self.command()
-        @commands.guild_only()
-        @commands.cooldown(2, 10, commands.BucketType.user)
-        @commands.check(self.is_invoked)
-        async def status(ctx):
+        @self.tree.command(name="status", description="Shows your current bot config.", guild=discord.Object(id=649270300982247449))
+        async def status(interaction):
             """Shows information about the bot based on the guild (modules, selected channel...)."""
-            guild_cfg = self.mongo.get_guild_config(ctx.guild)
+            guild_cfg = self.mongo.get_guild_config(interaction.guild)
             guild_lang = guild_cfg["lang"]
-            temp_value = None
 
             embed_status = discord.Embed(title=self.lm.get_message(guild_lang, "status"),
                                          description=self.lm.get_message(guild_lang, "status_description"),
-                                         color=0x00BFFF
-                                         )
-            embed_status.set_footer(text=self.lm.get_message(guild_lang, "help_footer"),
-                                    icon_url=AVATAR_URL
-                                    )
+                                         color=0x00BFFF)
+            embed_status.set_footer(text=self.lm.get_message(guild_lang, "help_footer"), icon_url=AVATAR_URL)
             embed_status.set_thumbnail(url=LOGO_URL)
-
-            if guild_cfg["selected_channel"]:
-                temp_value = self.lm.get_message(guild_lang, "status_active") + "\n" + guild_cfg["selected_channel"]
-            else:
-                temp_value = self.lm.get_message(guild_lang, "status_inactive")
-
-            embed_status.add_field(name=self.lm.get_message(guild_lang, "status_main"), value=temp_value)
+            embed_status.add_field(name=self.lm.get_message(guild_lang, "status_main"),
+                                   value=self.lm.get_message(guild_lang, "status_active" if guild_cfg.get("selected_channel") else "status_inactive") + "\n" + guild_cfg[
+                                             "selected_channel"])
 
             for i in ModuleLoader.modules:
                 if guild_cfg["services"][i.MODULE_ID]:
                     value = self.lm.get_message(guild_lang, "status_active")
                 else:
                     value = self.lm.get_message(guild_lang, "status_inactive")
-
-                embed_status.add_field(name=i.SERVICE_NAME,
-                                       value=value,
-                                       )
-            await ctx.channel.send(embed=embed_status)
+                embed_status.add_field(name=i.SERVICE_NAME, value=value)
+            await interaction.response.send_message(embed=embed_status)
 
         # Guild administrator commands
 
-        @self.command()
-        @commands.guild_only()
-        @commands.cooldown(2, 10, commands.BucketType.user)
-        @commands.has_permissions(administrator=True)
-        @commands.check(self.is_invoked)
-        async def select(ctx, channel=None):
+        @self.tree.command(name="select", description="Select a Text Channel to start receiving freebies.", guild=discord.Object(id=649270300982247449))
+        @app_commands.checks.has_permissions(administrator=True)
+        async def select(interaction, channel: discord.TextChannel):
             """Starts announcing free games in the guild where it is executed or in the specified channel."""
-            guild_cfg = self.mongo.get_guild_config(ctx.guild)
+            guild_cfg = self.mongo.get_guild_config(interaction.guild)
             guild_lang = guild_cfg["lang"]
-            selected_channel = ctx.channel.mention if channel is None else channel
 
-            if channel is not None and not (channel.startswith("<#") and channel.endswith(">")):
-                await ctx.channel.send(self.lm.get_message(guild_lang, "select_invalid_channel"))
-                return None
+            self.mongo.update_guild_config(interaction.guild, {"selected_channel": channel.mention})
+            await interaction.response.send_message(self.lm.get_message(guild_lang, "select_success").format(channel.mention))
 
-            self.mongo.update_guild_config(ctx.guild, {"selected_channel": selected_channel})
-            await ctx.channel.send(self.lm.get_message(guild_lang, "select_success").format(selected_channel))
-
-        @self.command()
-        @commands.guild_only()
-        @commands.cooldown(2, 10, commands.BucketType.user)
-        @commands.has_permissions(administrator=True)
-        @commands.check(self.is_invoked)
-        async def unselect(ctx):
+        @self.tree.command(name="unselect", description="Unselects the previously selected Text Channel.", guild=discord.Object(id=649270300982247449))
+        @app_commands.checks.has_permissions(administrator=True)
+        async def unselect(interaction):
             """Stops announcing free games in the guild."""
-            guild_cfg = self.mongo.get_guild_config(ctx.guild)
+            guild_cfg = self.mongo.get_guild_config(interaction.guild)
             guild_lang = guild_cfg["lang"]
             guild_selected_channel = guild_cfg["selected_channel"]
 
             if guild_selected_channel is None:
-                await ctx.channel.send(self.lm.get_message(guild_lang, "unselect_already")
+                await interaction.response.send_message(self.lm.get_message(guild_lang, "unselect_already")
                                        .format(guild_selected_channel))
                 return None
 
-            self.mongo.update_guild_config(ctx.guild, {"selected_channel": None})
-            await ctx.channel.send(self.lm.get_message(guild_lang, "unselect_success").format(guild_selected_channel))
+            self.mongo.update_guild_config(interaction.guild, {"selected_channel": None})
+            await interaction.response.send_message(self.lm.get_message(guild_lang, "unselect_success").format(guild_selected_channel))
 
-        @self.command(aliases=["disable"])
-        @commands.guild_only()
-        @commands.cooldown(2, 10, commands.BucketType.user)
-        @commands.has_permissions(administrator=True)
-        @commands.check(self.is_invoked)
-        async def enable(ctx, service):
+        @self.tree.command(name="module", description="Modify the list of services you are interested in.", guild=discord.Object(id=649270300982247449))
+        @app_commands.checks.has_permissions(administrator=True)
+        async def enable(interaction, choice: str):
             """Guild dependant command to enable/disable modules and other settings."""
-            guild_lang = self.mongo.get_guild_config(ctx.guild)["lang"]
+            guild_lang = self.mongo.get_guild_config(interaction.guild)["lang"]
 
-            introduced_command = str(ctx.invoked_with)
-            user_decision = True if introduced_command == "enable" else False
+            user_decision = True if choice == "enable" else False
 
             for module in ModuleLoader.modules:
-                if service.lower() == module.MODULE_ID.lower():
-                    self.mongo.update_guild_config(ctx.guild, {"services." + service.lower(): user_decision})
-
-                    await ctx.channel.send(
-                        self.lm.get_message(guild_lang, f"module_{introduced_command}d").format(service)
-                    )
-                    logger.info(f"{service.capitalize()} module {introduced_command}d by {ctx.author}")
+                if choice.lower() == module.MODULE_ID.lower():
+                    self.mongo.update_guild_config(interaction.guild, {"services." + choice.lower(): user_decision})
+                    await interaction.response.send_message(self.lm.get_message(guild_lang, f"module_{choice}d").format(choice))
+                    logger.info(f"{choice.capitalize()} module {choice}d by {interaction.author}")
                     return True
 
-            await ctx.channel.send(self.lm.get_message(guild_lang, f"enable_unknown").format(introduced_command))
-            return False
+            await interaction.response.send_message(self.lm.get_message(guild_lang, f"enable_unknown").format(choice))
 
-        @self.command(aliases=["module"])
-        @commands.guild_only()
-        @commands.cooldown(2, 10, commands.BucketType.user)
-        @commands.has_permissions(administrator=True)
-        @commands.check(self.is_invoked)
-        async def modules(ctx):
+        @self.tree.command(name="modules", description="Shows information about the loaded modules.", guild=discord.Object(id=649270300982247449))
+        @app_commands.checks.has_permissions(administrator=True)
+        async def modules(interaction):
             """Shows information about the loaded modules."""
-            guild_lang = self.mongo.get_guild_config(ctx.guild)["lang"]
+            guild_lang = self.mongo.get_guild_config(interaction.guild)["lang"]
 
             embed_module = discord.Embed(title=self.lm.get_message(guild_lang, "modules"),
                                          description=self.lm.get_message(guild_lang, "modules_description"),
@@ -322,48 +277,35 @@ class AutomatikBot(commands.Bot):
             embed_module.add_field(name=self.lm.get_message(guild_lang, "modules_author"),
                                    value="\n".join(ModuleLoader.get_module_authors()))
 
-            await ctx.channel.send(embed=embed_module)
+            await interaction.response.send_message(embed=embed_module)
 
-        @self.command()
-        @commands.guild_only()
-        @commands.cooldown(2, 10, commands.BucketType.user)
-        @commands.has_permissions(administrator=True)
-        @commands.check(self.is_invoked)
-        async def mention(ctx, mention_role):
+        @self.tree.command(name="mention", description="Select which role will be notified of freebies.", guild=discord.Object(id=649270300982247449))
+        @app_commands.checks.has_permissions(administrator=True)
+        async def mention(interaction, role: discord.Role):
             """Manages the mentions of the bot's messages."""
-            guild_lang = self.mongo.get_guild_config(ctx.guild)["lang"]
+            guild_lang = self.mongo.get_guild_config(interaction.guild)["lang"]
 
-            # If the string follows the std structure of a role <@&1234>
-            if mention_role.startswith("<@&") and mention_role.endswith(">"):
-                self.mongo.update_guild_config(ctx.guild, {"mention_role": mention_role})
-                await ctx.channel.send(self.lm.get_message(guild_lang, "mention_established"))
-                logger.info(f"AutomatiK will now mention '{mention_role}'")
-            else:
-                await ctx.channel.send(self.lm.get_message(guild_lang, "mention_error"))
+            self.mongo.update_guild_config(interaction.guild, {"mention_role": role.mention})
+            await interaction.response.send_message(self.lm.get_message(guild_lang, "mention_established"))
+            logger.info(f"AutomatiK will now mention '{role}'")
 
-        @self.command()
-        @commands.guild_only()
-        @commands.cooldown(2, 10, commands.BucketType.user)
-        @commands.has_permissions(administrator=True)
-        @commands.check(self.is_invoked)
-        async def language(ctx, lang_code):
-            guild_lang = self.mongo.get_guild_config(ctx.guild)["lang"]
+        @self.tree.command(name="language", description="Select a language.", guild=discord.Object(id=649270300982247449))
+        @app_commands.checks.has_permissions(administrator=True)
+        async def language(interaction, lang_code: str):
+            guild_lang = self.mongo.get_guild_config(interaction.guild)["lang"]
 
             if lang_code not in self.lm.get_lang_packages_metadata()[0]:  # If the language package does not exist
-                await ctx.channel.send(self.lm.get_message(guild_lang, "language_error"))
+                await interaction.response.send_message(self.lm.get_message(guild_lang, "language_error"))
                 return
 
-            self.mongo.update_guild_config(ctx.guild, {"lang": lang_code})
-            await ctx.channel.send(self.lm.get_message(lang_code, "language_changed"))
-            logger.info(f"Language changed to '{lang_code}' by {ctx.author}")
+            self.mongo.update_guild_config(interaction.guild, {"lang": lang_code})
+            await interaction.response.send_message(self.lm.get_message(lang_code, "language_changed"))
+            logger.info(f"Language changed to '{lang_code}' by {interaction.author}")
 
-        @self.command()
-        @commands.guild_only()
-        @commands.cooldown(2, 10, commands.BucketType.user)
-        @commands.has_permissions(administrator=True)
-        @commands.check(self.is_invoked)
-        async def languages(ctx):
-            guild_lang = self.mongo.get_guild_config(ctx.guild)["lang"]
+        @self.tree.command(name="languages", description="Shows a list of the available languages.", guild=discord.Object(id=649270300982247449))
+        @app_commands.checks.has_permissions(administrator=True)
+        async def languages(interaction):
+            guild_lang = self.mongo.get_guild_config(interaction.guild)["lang"]
             lang_ids, lang_names, lang_authors = self.lm.get_lang_packages_metadata()
 
             embed_langs = discord.Embed(title=self.lm.get_message(guild_lang, "languages"),
@@ -378,74 +320,61 @@ class AutomatikBot(commands.Bot):
             embed_langs.add_field(name=self.lm.get_message(guild_lang, "language"), value="\n".join(lang_names))
             embed_langs.add_field(name=self.lm.get_message(guild_lang, "modules_author"), value="\n".join(lang_authors))
 
-            await ctx.channel.send(embed=embed_langs)
+            await interaction.response.send_message(embed=embed_langs)
 
         # Owner commands
 
-        @self.command()
-        @commands.guild_only()
-        @commands.cooldown(2, 10, commands.BucketType.user)
-        @commands.check(self.is_invoked)
-        @commands.check(self.is_an_owner)
-        async def start(ctx):
+        @self.tree.command(name="start", description="Starts the main service globally.", guild=discord.Object(id=649270300982247449))
+        async def start(interaction):
             """Starts/stops the main loop that will look for free games every 5 minutes."""
-            guild_lang = self.mongo.get_guild_config(ctx.guild)["lang"]
+            guild_lang = self.mongo.get_guild_config(interaction.guild)["lang"]
 
             if self.main_loop:
-                await ctx.channel.send(self.lm.get_message(guild_lang, "start_already"))
+                await interaction.response.send_message(self.lm.get_message(guild_lang, "start_already"))
                 return None
 
             self.main_loop = True
-            await ctx.channel.send(self.lm.get_message(guild_lang, "start_success"))
-            logger.info(f"Main service was started globally by {str(ctx.author)}")
+            await interaction.response.send_message(self.lm.get_message(guild_lang, "start_success"))
+            logger.info(f"Main service was started globally by {str(interaction.user)}")
 
-        @self.command()
-        @commands.guild_only()
-        @commands.cooldown(2, 10, commands.BucketType.user)
-        @commands.check(self.is_invoked)
-        @commands.check(self.is_an_owner)
-        async def stop(ctx):
+        @self.tree.command(name="stop", description="Stops the main service globally.", guild=discord.Object(id=649270300982247449))
+        @app_commands.checks.has_permissions(administrator=True)
+        async def stop(interaction):
             """Stops the loop that looks for free games GLOBALLY."""
-            guild_lang = self.mongo.get_guild_config(ctx.guild)["lang"]
+            guild_lang = self.mongo.get_guild_config(interaction.guild)["lang"]
 
             if not self.main_loop:  # If service already stopped
-                await ctx.channel.send(self.lm.get_message(guild_lang, "stop_already"))
+                await interaction.response.send_message(self.lm.get_message(guild_lang, "stop_already"))
                 return None
 
             self.main_loop = False
-            await ctx.channel.send(self.lm.get_message(guild_lang, "stop_success"))
-            logger.info(f"Main service was stopped globally by {str(ctx.author)}")
+            await interaction.response.send_message(self.lm.get_message(guild_lang, "stop_success"))
+            logger.info(f"Main service was stopped globally by {str(interaction.author)}")
 
-        @self.command()
-        @commands.guild_only()
-        @commands.cooldown(2, 10, commands.BucketType.user)
-        @commands.check(self.is_invoked)
-        @commands.check(self.is_an_owner)
-        async def reload(ctx):
+        @self.tree.command(name="reload", description="Reloads configuration, modules and language packages.", guild=discord.Object(id=649270300982247449))
+        @app_commands.checks.has_permissions(administrator=True)
+        async def reload(interaction):
             """Reloads configuration, modules and language packages."""
-            guild_lang = self.mongo.get_guild_config(ctx.guild)["lang"]
+            guild_lang = self.mongo.get_guild_config(interaction.guild)["lang"]
 
             logger.info("Reloading..")
             was_started = bool(self.main_loop)
             self.main_loop = False
             try:
                 self.load_resources()
-                await ctx.channel.send(self.lm.get_message(guild_lang, "reload_completed"))
+                await interaction.response.send_message(self.lm.get_message(guild_lang, "reload_completed"))
                 logger.info("Reload completed")
             except:
-                await ctx.channel.send(self.lm.get_message(guild_lang, "unexpected_error"))
+                await interaction.response.send_message(self.lm.get_message(guild_lang, "unexpected_error"))
                 logger.error("An error ocurred while reloading")
             finally:
                 self.main_loop = bool(was_started)
 
-        @self.command(aliases=["statistics"])
-        @commands.guild_only()
-        @commands.cooldown(2, 10, commands.BucketType.user)
-        @commands.check(self.is_invoked)
-        @commands.check(self.is_an_owner)
-        async def stats(ctx):
+        @self.tree.command(name="stats", description="Shows some overall statistics of the bot.", guild=discord.Object(id=649270300982247449))
+        @app_commands.checks.has_permissions(administrator=True)
+        async def stats(interaction):
             """Shows some overall statistics of the bot."""
-            guild_lang = self.mongo.get_guild_config(ctx.guild)["lang"]
+            guild_lang = self.mongo.get_guild_config(interaction.guild)["lang"]
             message_queue_len = len(self.guilds) * (len(self.game_queue_cache) + self.game_queue.qsize())
 
             embed_stats = discord.Embed(title="\U0001f4c8 " + self.lm.get_message(guild_lang, "stats"),
@@ -470,23 +399,20 @@ class AutomatikBot(commands.Bot):
                                       value=self.lm.get_message(guild_lang, "stats_message_queue_empty_value")
                                       .format(message_queue_len))
 
-            await ctx.channel.send(embed=embed_stats)
+            await interaction.response.send_message(embed=embed_stats)
 
-        @self.command()
-        @commands.guild_only()
-        @commands.cooldown(2, 10, commands.BucketType.user)
-        @commands.check(self.is_invoked)
-        @commands.check(self.is_an_owner)
-        async def shutdown(ctx):
+        @self.tree.command(name="shutdown", description="Shuts down the bot process completely.", guild=discord.Object(id=649270300982247449))
+        @app_commands.checks.has_permissions(administrator=True)
+        async def shutdown(interaction):
             """Shuts down the bot process completely."""
-            guild_lang = self.mongo.get_guild_config(ctx.guild)["lang"]
+            guild_lang = self.mongo.get_guild_config(interaction.guild)["lang"]
             message_queue_len = len(self.guilds) * (len(self.game_queue_cache) + self.game_queue.qsize())
 
             if not self.game_queue.empty() or self.game_queue_cache:
-                await ctx.channel.send(self.lm.get_message(guild_lang, "shutdown_abort").format(message_queue_len))
+                await interaction.response.send_message(self.lm.get_message(guild_lang, "shutdown_abort").format(message_queue_len))
                 return None
 
-            await ctx.channel.send(self.lm.get_message(guild_lang, "shutdown_success"))
+            await interaction.response.send_message(self.lm.get_message(guild_lang, "shutdown_success"))
             logger.info("Shutting down..")
             self.main_loop = False
             await self.close()
