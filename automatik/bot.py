@@ -164,9 +164,9 @@ class AutomatikBot(commands.Bot):
 
         # Public commands
 
-        @self.tree.command(name="help", description="A simple help command.", guild=discord.Object(id=649270300982247449))
+        @self.tree.command(guild=discord.Object(id=649270300982247449))
         async def help(interaction: discord.Interaction):
-            """Help command that uses embeds."""
+            """A simple help command."""
             guild_lang = self.mongo.get_guild_config(interaction.guild)["lang"]
 
             embed_help = discord.Embed(title=f"AutomatiK {__version__} Help ",
@@ -188,9 +188,9 @@ class AutomatikBot(commands.Bot):
                                      )
             await interaction.response.send_message(embed=embed_help)
 
-        @self.tree.command(name="status", description="Shows your current bot config.", guild=discord.Object(id=649270300982247449))
+        @self.tree.command(guild=discord.Object(id=649270300982247449))
         async def status(interaction):
-            """Shows information about the bot based on the guild (modules, selected channel...)."""
+            """Shows your current AutomatiK config."""
             guild_cfg = self.mongo.get_guild_config(interaction.guild)
             guild_lang = guild_cfg["lang"]
 
@@ -213,20 +213,20 @@ class AutomatikBot(commands.Bot):
 
         # Guild administrator commands
 
-        @self.tree.command(name="select", description="Select a Text Channel to start receiving freebies.", guild=discord.Object(id=649270300982247449))
+        @self.tree.command(guild=discord.Object(id=649270300982247449))
         @app_commands.checks.has_permissions(administrator=True)
         async def select(interaction, channel: discord.TextChannel):
-            """Starts announcing free games in the guild where it is executed or in the specified channel."""
+            """Select a Text Channel to start receiving freebies."""
             guild_cfg = self.mongo.get_guild_config(interaction.guild)
             guild_lang = guild_cfg["lang"]
 
             self.mongo.update_guild_config(interaction.guild, {"selected_channel": channel.mention})
             await interaction.response.send_message(self.lm.get_message(guild_lang, "select_success").format(channel.mention))
 
-        @self.tree.command(name="unselect", description="Unselects the previously selected Text Channel.", guild=discord.Object(id=649270300982247449))
+        @self.tree.command(guild=discord.Object(id=649270300982247449))
         @app_commands.checks.has_permissions(administrator=True)
         async def unselect(interaction):
-            """Stops announcing free games in the guild."""
+            """Unselects the previously selected Text Channel."""
             guild_cfg = self.mongo.get_guild_config(interaction.guild)
             guild_lang = guild_cfg["lang"]
             guild_selected_channel = guild_cfg["selected_channel"]
@@ -239,10 +239,10 @@ class AutomatikBot(commands.Bot):
             self.mongo.update_guild_config(interaction.guild, {"selected_channel": None})
             await interaction.response.send_message(self.lm.get_message(guild_lang, "unselect_success").format(guild_selected_channel))
 
-        @self.tree.command(name="module", description="Modify the list of services you are interested in.", guild=discord.Object(id=649270300982247449))
+        @self.tree.command(name="module", guild=discord.Object(id=649270300982247449))
         @app_commands.checks.has_permissions(administrator=True)
         async def enable(interaction, choice: str):
-            """Guild dependant command to enable/disable modules and other settings."""
+            """Modify the list of services you are interested in."""
             guild_lang = self.mongo.get_guild_config(interaction.guild)["lang"]
 
             user_decision = True if choice == "enable" else False
@@ -256,7 +256,7 @@ class AutomatikBot(commands.Bot):
 
             await interaction.response.send_message(self.lm.get_message(guild_lang, f"enable_unknown").format(choice))
 
-        @self.tree.command(name="modules", description="Shows information about the loaded modules.", guild=discord.Object(id=649270300982247449))
+        @self.tree.command(guild=discord.Object(id=649270300982247449))
         @app_commands.checks.has_permissions(administrator=True)
         async def modules(interaction):
             """Shows information about the loaded modules."""
@@ -279,19 +279,20 @@ class AutomatikBot(commands.Bot):
 
             await interaction.response.send_message(embed=embed_module)
 
-        @self.tree.command(name="mention", description="Select which role will be notified of freebies.", guild=discord.Object(id=649270300982247449))
+        @self.tree.command(guild=discord.Object(id=649270300982247449))
         @app_commands.checks.has_permissions(administrator=True)
         async def mention(interaction, role: discord.Role):
-            """Manages the mentions of the bot's messages."""
+            """Select which role will be notified freebies."""
             guild_lang = self.mongo.get_guild_config(interaction.guild)["lang"]
 
             self.mongo.update_guild_config(interaction.guild, {"mention_role": role.mention})
             await interaction.response.send_message(self.lm.get_message(guild_lang, "mention_established"))
             logger.info(f"AutomatiK will now mention '{role}'")
 
-        @self.tree.command(name="language", description="Select a language.", guild=discord.Object(id=649270300982247449))
+        @self.tree.command(guild=discord.Object(id=649270300982247449))
         @app_commands.checks.has_permissions(administrator=True)
         async def language(interaction, lang_code: str):
+            """Select a language."""
             guild_lang = self.mongo.get_guild_config(interaction.guild)["lang"]
 
             if lang_code not in self.lm.get_lang_packages_metadata()[0]:  # If the language package does not exist
@@ -302,9 +303,10 @@ class AutomatikBot(commands.Bot):
             await interaction.response.send_message(self.lm.get_message(lang_code, "language_changed"))
             logger.info(f"Language changed to '{lang_code}' by {interaction.author}")
 
-        @self.tree.command(name="languages", description="Shows a list of the available languages.", guild=discord.Object(id=649270300982247449))
+        @self.tree.command(guild=discord.Object(id=649270300982247449))
         @app_commands.checks.has_permissions(administrator=True)
         async def languages(interaction):
+            """Shows a list of the available languages."""
             guild_lang = self.mongo.get_guild_config(interaction.guild)["lang"]
             lang_ids, lang_names, lang_authors = self.lm.get_lang_packages_metadata()
 
@@ -324,9 +326,9 @@ class AutomatikBot(commands.Bot):
 
         # Owner commands
 
-        @self.tree.command(name="start", description="Starts the main service globally.", guild=discord.Object(id=649270300982247449))
+        @self.tree.command(guild=discord.Object(id=649270300982247449))
         async def start(interaction):
-            """Starts/stops the main loop that will look for free games every 5 minutes."""
+            """Starts the main service globally."""
             guild_lang = self.mongo.get_guild_config(interaction.guild)["lang"]
 
             if self.main_loop:
@@ -337,10 +339,10 @@ class AutomatikBot(commands.Bot):
             await interaction.response.send_message(self.lm.get_message(guild_lang, "start_success"))
             logger.info(f"Main service was started globally by {str(interaction.user)}")
 
-        @self.tree.command(name="stop", description="Stops the main service globally.", guild=discord.Object(id=649270300982247449))
+        @self.tree.command(guild=discord.Object(id=649270300982247449))
         @app_commands.checks.has_permissions(administrator=True)
         async def stop(interaction):
-            """Stops the loop that looks for free games GLOBALLY."""
+            """Stops the main service globally."""
             guild_lang = self.mongo.get_guild_config(interaction.guild)["lang"]
 
             if not self.main_loop:  # If service already stopped
@@ -351,7 +353,7 @@ class AutomatikBot(commands.Bot):
             await interaction.response.send_message(self.lm.get_message(guild_lang, "stop_success"))
             logger.info(f"Main service was stopped globally by {str(interaction.author)}")
 
-        @self.tree.command(name="reload", description="Reloads configuration, modules and language packages.", guild=discord.Object(id=649270300982247449))
+        @self.tree.command(guild=discord.Object(id=649270300982247449))
         @app_commands.checks.has_permissions(administrator=True)
         async def reload(interaction):
             """Reloads configuration, modules and language packages."""
@@ -370,7 +372,7 @@ class AutomatikBot(commands.Bot):
             finally:
                 self.main_loop = bool(was_started)
 
-        @self.tree.command(name="stats", description="Shows some overall statistics of the bot.", guild=discord.Object(id=649270300982247449))
+        @self.tree.command(guild=discord.Object(id=649270300982247449))
         @app_commands.checks.has_permissions(administrator=True)
         async def stats(interaction):
             """Shows some overall statistics of the bot."""
@@ -401,7 +403,7 @@ class AutomatikBot(commands.Bot):
 
             await interaction.response.send_message(embed=embed_stats)
 
-        @self.tree.command(name="shutdown", description="Shuts down the bot process completely.", guild=discord.Object(id=649270300982247449))
+        @self.tree.command(guild=discord.Object(id=649270300982247449))
         @app_commands.checks.has_permissions(administrator=True)
         async def shutdown(interaction):
             """Shuts down the bot process completely."""
