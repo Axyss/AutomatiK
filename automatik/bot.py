@@ -18,9 +18,9 @@ from .core.modules import ModuleLoader
 
 
 class AutomatikBot(commands.Bot):
-    def __init__(self, command_prefix, self_bot, intents):
-        commands.Bot.__init__(self, command_prefix=command_prefix, self_bot=self_bot, intents=intents)
-        self.is_first_exec = True  # Used inside 'on_ready' to execute certain parts of the method only once
+    def __init__(self, command_prefix, intents):
+        commands.Bot.__init__(self, command_prefix=command_prefix, intents=intents)
+        self.is_first_exec = True
         self.lm = LangLoader(os.path.join(SRC_DIR, "lang"))
         self.cfg = Config(".env")
         self.mongo = Database(host=self.cfg.db_host,
