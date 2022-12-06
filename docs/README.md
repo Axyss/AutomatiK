@@ -1,7 +1,7 @@
 <h1 style="text-align:center"> ❗🚧IMPORTANT🚧❗ </h1>
 <h3 style="text-align:center">
 This project is currently undergoing some major refactors. 
-We recommend waiting until version 1.5 is released if you want to give it a try.
+We recommend waiting until version 1.4 is released if you want to give it a try.
 </h3>
 <img src="https://raw.githubusercontent.com/Axyss/AutomatiK/master/docs/assets/ak_logo.png" alt="automatik_logo" align="right" width="180" height="180"></img>
 <h1>AutomatiK</h1>
