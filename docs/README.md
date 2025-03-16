@@ -1,7 +1,7 @@
 <h1 style="text-align:center"> ❗🚧IMPORTANT🚧❗ </h1>
 <h3 style="text-align:center">
 This project is currently undergoing some major refactors. 
-We recommend waiting until version 1.4 is released if you want to give it a try.
+We recommend waiting until version 1.5 is released if you want to give it a try.
 </h3>
 <img src="https://raw.githubusercontent.com/Axyss/AutomatiK/master/docs/assets/ak_logo.png" alt="automatik_logo" align="right" width="180" height="180"></img>
 <h1>AutomatiK</h1>
@@ -15,8 +15,10 @@ AutomatiK is a <b>Discord bot</b> whose task is to notify users about free games
 <br>
 The default modules support the next services:
 
+- Steam
 - Epic Games
 - Humble Bundle
+- Ubisoft Connect
 <br>
 <b>Disclaimer:</b> AutomatiK was never meant to be a public bot, due to that, <b>it does not support more than one Discord server at a time</b>, avoid inviting it to multiple servers. Nevertheless <b>If you just want to receive the free games</b> notifications without setting-up a whole bot, you can always follow <a href="https://twitter.com/AutomatiK_bot">AutomatiK's Twitter account</a> or join <a href="https://discord.gg/psDtnwX">this Discord server.</a>
 

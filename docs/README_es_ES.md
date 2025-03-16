@@ -10,8 +10,10 @@ AutomatiK es un <b>bot de Discord</b> cuya tarea es notificar a los usuarios sob
 <br>
 Las plataformas actualmente soportadas son:
 
+- Steam
 - Epic Games
 - Humble Bundle
+- Ubisoft Connect
 <br>
 <b>Aviso:</b> AutomatiK no fue creado con la intención de ser un bot público, debido a ello, <b>no soporta más de un servidor de Discord a la vez</b>, evita invitarlo a múltiples servidores. No obstante, si lo único que quieres es recibir las notificaciones de los juegos gratis sin tener que configurar un bot, siempre puedes seguir la <a href="https://twitter.com/AutomatiK_bot">cuenta de Twitter de AutomatiK</a> o unirte a <a href="https://discord.gg/psDtnwX">este servidor de Discord.</a>
 

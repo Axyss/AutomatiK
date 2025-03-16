@@ -1,0 +1,11 @@
+version: "3.9"
+services:
+  bot:
+    build: .
+    depends_on:
+      - mongo
+  mongo:
+    image: mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: "${ROOT_USER}"
+      MONGO_INITDB_ROOT_PASSWORD: "${ROOT_PASSWORD}"

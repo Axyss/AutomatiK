@@ -8,17 +8,18 @@ that will scrape the free games from an imaginary platform called **Great Games*
 ### Structure of a module:
 
 ```python
-from core.log_manager import logger
+from core.logging import logger
 from core.module_manager import Game
+
 
 class Main:
     def __init__(self):
         self.SERVICE_NAME = "Great Games"
         self.MODULE_ID = "ggames"
         self.AUTHOR = "Axyss"
-    
+
     def get_free_games(self):
-        return [Game("Minecraft", "https://.../minecraft"), 
+        return [Game("Minecraft", "https://.../minecraft"),
                 Game("The Stanley Parable", "https://.../stanley")]
 ```
 
@@ -77,7 +78,7 @@ There are some minimum elements a module needs to be loaded and integrated prope
    
 3. The next methods inside the **Main** class:
    - **get_free_games()** : Method that will be called by the AutomatiK core, it has to return a list of Game 
-     objects or False/[ ] if no free games were found by the module.
+     objects or **False** if no free games were found by the module.
     
 
 There are also **optional** elements that can be used if needed:
