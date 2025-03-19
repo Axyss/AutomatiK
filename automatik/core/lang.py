@@ -27,7 +27,7 @@ class LangLoader:
     def get_message(self, lang_code, message_id):
         try:
             return self.lang_data[lang_code]["messages"][message_id]
-        except KeyError:  # Fallback if the message in the selected language package does not exists
+        except KeyError:  # Fallback if the message in the selected language package does not exist
             logger.debug(f"Message '{message_id}' could not be found on '{lang_code}.json'. " +
                          "Falling back to 'en_EN'..")
             return self.lang_data["en_EN"]["messages"][message_id]
