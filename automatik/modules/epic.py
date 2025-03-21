@@ -34,13 +34,13 @@ class Main:
         try:
             processed_data = json.loads(raw_data.content)["data"]["Catalog"]["searchStore"]["elements"]
             for element in processed_data:
+                promotions = element["promotions"]  # None if there aren't any, so there's no need to use 'get'
                 current_price = element["price"]["totalPrice"]["originalPrice"] - \
                                 element["price"]["totalPrice"]["discount"]
-                url_slug = element["productSlug"] if element["productSlug"] else element["offerMappings"][0]["pageSlug"]
-                promotions = element["promotions"]  # None if there aren't any, so there's no need to use 'get'
 
                 # The order of the next if statement is crucial since 'promotions' may be None
-                if current_price == 0 and promotions and promotions["promotionalOffers"] != list():
+                if current_price == 0 and promotions and promotions["promotionalOffers"]:
+                    url_slug = element["productSlug"] if element["productSlug"] else element["offerMappings"][0]["pageSlug"]
                     game = Game(element["title"], self.URL + url_slug, self.MODULE_ID)
                     parsed_games.append(game)
         except (TypeError, KeyError, json.decoder.JSONDecodeError):
