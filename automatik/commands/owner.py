@@ -1,10 +1,8 @@
-import os
 import psutil
 import discord
 from discord.ext import commands
 from discord import app_commands
 from automatik import __version__, LOGO_URL, SRC_DIR, AVATAR_URL, logger
-from ..core.modules import ModuleLoader
 
 
 class OwnerSlash(commands.Cog):

@@ -5,15 +5,17 @@ import random
 import discord
 from discord.ext import commands, tasks
 
+import automatik.utils.cli
+import automatik.utils.update
 from automatik import logger, SRC_DIR
-from .commands.admin import AdminSlash
-from .commands.owner import OwnerSlash
-from .commands.public import PublicSlash
-from .core.config import Config
-from .core.db import Database
-from .core.errors import InvalidGameDataException
-from .core.lang import LangLoader
-from .core.modules import ModuleLoader
+from commands.admin import AdminSlash
+from commands.owner import OwnerSlash
+from commands.public import PublicSlash
+from core.config import Config
+from core.db import Database
+from core.errors import InvalidGameDataException
+from core.lang import LangLoader
+from core.modules import ModuleLoader
 
 
 class AutomatikBot(commands.Bot):
@@ -37,16 +39,15 @@ class AutomatikBot(commands.Bot):
 
     async def setup_hook(self):
         # todo Refactor
-        await self.add_cog(PublicSlash(self, self.lm, self.cfg, self.mongo),
-                           guild=discord.Object(id=649270300982247449))
-        await self.add_cog(AdminSlash(self, self.lm, self.cfg, self.mongo), guild=discord.Object(id=649270300982247449))
-        await self.add_cog(OwnerSlash(self, self.lm, self.cfg, self.mongo), guild=discord.Object(id=649270300982247449))
+        await self.add_cog(PublicSlash(self, self.lm, self.cfg, self.mongo),guild=discord.Object(id=485048883131711498))
+        await self.add_cog(AdminSlash(self, self.lm, self.cfg, self.mongo), guild=discord.Object(id=485048883131711498))
+        await self.add_cog(OwnerSlash(self, self.lm, self.cfg, self.mongo), guild=discord.Object(id=485048883131711498))
 
     async def on_ready(self):
         if self.is_first_exec:
             self.is_first_exec = False
             self.look_for_free_games.start()
-            await self.tree.sync(guild=discord.Object(id=649270300982247449))
+            await self.tree.sync(guild=discord.Object(id=485048883131711498))
             logger.info("Bot Online")
         await self.change_presence(status=discord.Status.online, activity=discord.Game("!mk help"))
 
@@ -155,3 +156,15 @@ class AutomatikBot(commands.Bot):
 
     def init_commands(self):
         pass
+
+if __name__ == "__main__":
+    automatik.utils.cli.clear_console()
+    automatik.utils.cli.print_ascii_art()
+    logger.info("Loading..")
+    automatik_bot = AutomatikBot(command_prefix="!mk ", intents=discord.Intents.default())
+    automatik.utils.update.check_updates()
+
+    try:
+        automatik_bot.run(automatik_bot.cfg.discord_bot_token)
+    except discord.errors.LoginFailure:
+        logger.error("Invalid 'discord_bot_token'. Press enter to exit..")
