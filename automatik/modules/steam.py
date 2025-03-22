@@ -50,14 +50,12 @@ class Main:
             processed_data = json.loads(raw_data.content)["results_html"]
             soup = BeautifulSoup(processed_data, "html.parser")
             for tag in soup.find_all("a", {"class": "search_result_row ds_collapse_flag"}):
-                app_id = tag.get("data-ds-appid")
-                bundle_id = tag.get("data-ds-bundleid")  # Walrus operator would shine here :(
-                product_id = app_id if app_id is not None else bundle_id
-
-                is_free = str(tag.find("div", {"class": "col search_discount responsive_secondrow"})
-                                 .find("span").text) == "-100%"
+                product_id = tag.get("data-ds-appid") if tag.get("data-ds-appid") else tag.get("data-ds-bundleid")
+                discount_tag = tag.find("div", {"class": "col search_discount responsive_secondrow"})
                 # DLCs must be compared carefully since 'not None' is equal to 'True'.
-                if is_free and self.is_dlc(product_id) is False:
+                if discount_tag is None:
+                    continue
+                elif discount_tag.find("span").text == "-100%" and self.is_dlc(product_id) is False:
                     game = Game(tag.find("span", {"class": "title"}).text, self.URL + product_id, self.MODULE_ID)
                     parsed_games.append(game)
         except (AttributeError, TypeError, KeyError, json.decoder.JSONDecodeError):
