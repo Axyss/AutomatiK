@@ -1,6 +1,6 @@
 import json
 
-import cloudscraper
+from curl_cffi import requests
 from requests.exceptions import HTTPError, Timeout, ConnectionError
 
 from automatik import logger
@@ -16,14 +16,12 @@ class Main:
         self.AUTHOR = "Default"
         self.ENDPOINT = "https://www.humblebundle.com/store/api/search?sort=discount&filter=onsale&request=1"
         self.URL = "https://www.humblebundle.com/store/"
-        self.CF = cloudscraper.create_scraper(browser={"custom": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-                                                                 "AppleWebKit/537.36 (KHTML, like Gecko) "
-                                                                 "Chrome/96.0.4664.45 Safari/537.36"})
+
 
     def make_request(self):
         """Makes the HTTP request to the Humble Bundle's backend."""
         try:
-            raw_data = self.CF.get(self.ENDPOINT)
+            raw_data = requests.get(self.ENDPOINT, impersonate="chrome")
         except (HTTPError, Timeout, ConnectionError):
             logger.error(f"Request to {self.SERVICE_NAME} by module \'{self.MODULE_ID}\' failed")
             raise InvalidGameDataException
