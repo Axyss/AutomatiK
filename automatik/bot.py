@@ -8,14 +8,14 @@ from discord.ext import commands, tasks
 import automatik.utils.cli
 import automatik.utils.update
 from automatik import logger, SRC_DIR
-from commands.admin import AdminSlash
-from commands.owner import OwnerSlash
-from commands.public import PublicSlash
-from core.config import Config
-from core.db import Database
-from core.errors import InvalidGameDataException
-from core.lang import LangLoader
-from core.modules import ModuleLoader
+from automatik.commands.admin import AdminSlash
+from automatik.commands.owner import OwnerSlash
+from automatik.commands.public import PublicSlash
+from automatik.core.config import Config
+from automatik.core.db import Database
+from automatik.core.errors import InvalidGameDataException
+from automatik.core.lang import LangLoader
+from automatik.core.modules import ModuleLoader
 
 
 class AutomatikBot(commands.Bot):
