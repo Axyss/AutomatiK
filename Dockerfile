@@ -1,4 +1,4 @@
-FROM python:3.9.13-slim-buster
+FROM python:3.11.4-slim-buster
 WORKDIR /automatik-root
 ADD . .
 RUN pip3 install --no-cache-dir -r requirements.txt
