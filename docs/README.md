@@ -20,7 +20,7 @@ The default modules support the next services:
 - Humble Bundle
 - Ubisoft Connect
 <br>
-<b>Disclaimer:</b> AutomatiK was never meant to be a public bot, due to that, <b>it does not support more than one Discord server at a time</b>, avoid inviting it to multiple servers. Nevertheless <b>If you just want to receive the free games</b> notifications without setting-up a whole bot, you can always follow <a href="https://twitter.com/AutomatiK_bot">AutomatiK's Twitter account</a> or join <a href="https://discord.gg/psDtnwX">this Discord server.</a>
+<s><b>Disclaimer:</b> AutomatiK was never meant to be a public bot, due to that, <b>it does not support more than one Discord server at a time</b>, avoid inviting it to multiple servers. Nevertheless <b>If you just want to receive the free games</b> notifications without setting-up a whole bot, you can always follow <a href="https://twitter.com/AutomatiK_bot">AutomatiK's Twitter account</a> or join <a href="https://discord.gg/psDtnwX">this Discord server.</a></s> This will change next update.
 
 <h2>How can I use it?</h2>
 
