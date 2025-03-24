@@ -9,24 +9,18 @@ from automatik.core.modules import ModuleLoader
 
 
 class Database:
-    def __init__(self, host, port, username=None, password=None, auth_source=None, auth_mechanism=None):
-        self._db = pymongo.MongoClient(host=host,
-                                       port=port,
-                                       username=username,
-                                       password=password,
-                                       authSource=auth_source,
-                                       authMechanism=auth_mechanism)[auth_source]
-        self.CONFIG_TEMPLATE = \
-            {
-                "_id": None,
-                "name": None,
-                "members": None,
-                "selected_channel": None,  # Structure: <#1234>
-                "mention_role": None,  # Structure: <@&1234>
-                "lang": "en_EN",
-                "services": {},  # Services are represented by their MODULE_IDs
-                "join_date": str(datetime.datetime.now())
-            }
+    def __init__(self, uri):
+        self._db = pymongo.MongoClient(host=uri)
+        self.CONFIG_TEMPLATE = {
+            "_id": None,
+            "name": None,
+            "members": None,
+            "selected_channel": None,  # Structure: <#1234>
+            "mention_role": None,  # Structure: <@&1234>
+            "lang": "en_EN",
+            "services": {},  # Services are represented by their MODULE_IDs
+            "join_date": str(datetime.datetime.now())
+        }
 
     def _create_guild_config(self, guild):
         """Creates a new document in the 'configs' collection."""

@@ -24,15 +24,9 @@ class AutomatikBot(commands.Bot):
         self.is_first_exec = True
         self.lm = LangLoader(os.path.join(SRC_DIR, "lang"))
         self.cfg = Config(".env")
-        self.mongo = Database(host=self.cfg.db_host,
-                              port=self.cfg.db_port,
-                              username=self.cfg.db_root_user,
-                              password=self.cfg.db_root_password,
-                              auth_source=self.cfg.db_auth_source,
-                              auth_mechanism=self.cfg.db_auth_mechanism)
+        self.mongo = Database(self.cfg.DB_URI)
 
         self.main_loop = True  # Variable used to start or stop the main loop
-
         self.load_resources()
         self.remove_command("help")  # There is a default 'help' command which shows docstrings
         self.init_commands()
@@ -139,8 +133,7 @@ class AutomatikBot(commands.Bot):
                     try:
                         await guild.get_channel(guild_config["selected_channel"]).send(message)
                         success += 1
-                    except (AttributeError, discord.errors.Forbidden):
-                        # 'TextChannel.id' is invalid or bot lacks permissions
+                    except (AttributeError, discord.errors.Forbidden):  # Channel id invalid or bot lacks permissions
                         fail += 1
                     except:
                         fail += 1
