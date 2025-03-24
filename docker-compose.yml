@@ -1,11 +1,26 @@
 version: "3.9"
 services:
+  mongo:
+    image: mongo
+    environment:
+      # Database auth
+      #MONGO_INITDB_ROOT_USERNAME: "admin"
+      #MONGO_INITDB_ROOT_PASSWORD: "your_admin_password"
+      MONGO_INITDB_DATABASE: "automatik"
+
   bot:
     build: .
     depends_on:
       - mongo
-  mongo:
-    image: mongo
     environment:
-      MONGO_INITDB_ROOT_USERNAME: "${ROOT_USER}"
-      MONGO_INITDB_ROOT_PASSWORD: "${ROOT_PASSWORD}"
+      DISCORD_TOKEN: "${DISCORD_TOKEN}"
+      BOT_OWNER: 0
+      DEBUG: true
+      DB_HOST: "mongo"
+      DB_PORT: 27017
+      # Database auth
+      #DB_ROOT_USER=admin
+      #DB_ROOT_PASSWORD: "your_admin_password
+      #DB_AUTH_SOURCE=automatik
+      #DB_AUTH_MECHANISM=DEFAULT
+

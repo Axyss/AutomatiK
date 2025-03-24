@@ -165,6 +165,6 @@ if __name__ == "__main__":
     automatik.utils.update.check_updates()
 
     try:
-        automatik_bot.run(automatik_bot.cfg.discord_bot_token)
+        automatik_bot.run(automatik_bot.cfg.discord_token)
     except discord.errors.LoginFailure:
         logger.error("Invalid 'discord_bot_token'. Press enter to exit..")
