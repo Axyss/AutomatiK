@@ -6,14 +6,13 @@ services:
       # Database auth
       #MONGO_INITDB_ROOT_USERNAME: "admin"
       #MONGO_INITDB_ROOT_PASSWORD: "your_admin_password"
-      MONGO_INITDB_DATABASE: "automatik"
 
   bot:
     build: .
     depends_on:
       - mongo
     environment:
-      DB_URI: "mongodb://mongo:27017/automatik"
+      DB_URI: "mongodb://mongo:27017"
       DISCORD_TOKEN: "${DISCORD_TOKEN}"
       BOT_OWNER: "${BOT_OWNER}"
       DEBUG: true

@@ -10,7 +10,7 @@ from automatik.core.modules import ModuleLoader
 
 class Database:
     def __init__(self, uri):
-        self._db = pymongo.MongoClient(host=uri)
+        self._db = pymongo.MongoClient(host=uri)["automatik"]
         self.CONFIG_TEMPLATE = {
             "_id": None,
             "name": None,
