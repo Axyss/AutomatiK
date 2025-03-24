@@ -9,7 +9,7 @@ from automatik.core.modules import ModuleLoader
 
 
 class Database:
-    def __init__(self, host, port, username, password, auth_source, auth_mechanism):
+    def __init__(self, host, port, username=None, password=None, auth_source=None, auth_mechanism=None):
         self._db = pymongo.MongoClient(host=host,
                                        port=port,
                                        username=username,
