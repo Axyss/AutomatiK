@@ -2,11 +2,9 @@ version: "3.9"
 services:
   mongo:
     image: mongo
-    environment:
-      # Database auth
+    #environment:
       #MONGO_INITDB_ROOT_USERNAME: "admin"
       #MONGO_INITDB_ROOT_PASSWORD: "your_admin_password"
-
   bot:
     build: .
     depends_on:
@@ -16,3 +14,7 @@ services:
       DISCORD_TOKEN: "${DISCORD_TOKEN}"
       BOT_OWNER: "${BOT_OWNER}"
       DEBUG: true
+    volumes:
+      - automatik-mongo:/data
+volumes:
+  automatik-mongo:
