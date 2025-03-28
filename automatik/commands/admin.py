@@ -103,7 +103,7 @@ class AdminSlash(commands.Cog):
 
         self.mongo.update_guild_config(interaction.guild, {"lang": lang_code})
         await interaction.response.send_message(self.lm.get_message(lang_code, "language_changed"))
-        logger.info(f"Language changed to '{lang_code}' by {interaction.author}")
+        logger.info(f"Language changed to '{lang_code}' on {interaction.guild}")
 
     @app_commands.command()
     @app_commands.checks.has_permissions(administrator=True)
