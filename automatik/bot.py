@@ -138,7 +138,8 @@ class AutomatikBot(commands.Bot):
                     except:
                         fail += 1
                         logger.exception("Unexpected error")
-        logger.info(f"Messages sent to all guilds. Success: {success} | Fail: {fail}")
+        if success or fail:
+            logger.info(f"Messages sent to all guilds. Success: {success} | Fail: {fail}")
 
     async def is_an_owner(self, interaction):
         return str(interaction) in self.cfg.bot_owner
