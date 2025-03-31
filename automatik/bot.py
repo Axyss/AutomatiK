@@ -33,6 +33,7 @@ class AutomatikBot(commands.Bot):
 
     async def setup_hook(self):
         # todo Refactor
+        self.tree.clear_commands(guild=discord.Object(id=485048883131711498))
         await self.add_cog(PublicSlash(self, self.lm, self.cfg, self.mongo),guild=discord.Object(id=485048883131711498))
         await self.add_cog(AdminSlash(self, self.lm, self.cfg, self.mongo), guild=discord.Object(id=485048883131711498))
         await self.add_cog(OwnerSlash(self, self.lm, self.cfg, self.mongo), guild=discord.Object(id=485048883131711498))
