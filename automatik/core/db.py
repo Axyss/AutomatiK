@@ -17,7 +17,7 @@ class Database:
             "members": None,
             "selected_channel": None,  # Structure: <#1234>
             "mention_role": None,  # Structure: <@&1234>
-            "lang": "en_EN",
+            "lang": "en",
             "services": {},  # Services are represented by their MODULE_IDs
             "join_date": str(datetime.datetime.now())
         }
