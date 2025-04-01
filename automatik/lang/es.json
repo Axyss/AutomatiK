@@ -1,6 +1,7 @@
 {
     "language": "Español",
     "author": "Default",
+    "emoji": "\uD83C\uDDEA\uD83C\uDDF8",
     "messages": {
 
       "missing_permissions": "\u274C No tienes suficientes permisos para ejecutar este comando.",

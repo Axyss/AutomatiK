@@ -14,7 +14,7 @@ from automatik.commands.public import PublicSlash
 from automatik.core.config import Config
 from automatik.core.db import Database
 from automatik.core.errors import InvalidGameDataException
-from automatik.core.lang import LangLoader
+from automatik.core.lang import LanguageLoader
 from automatik.core.modules import ModuleLoader
 
 
@@ -22,7 +22,7 @@ class AutomatikBot(commands.Bot):
     def __init__(self, command_prefix, intents):
         commands.Bot.__init__(self, command_prefix=command_prefix, intents=intents)
         self.is_first_exec = True
-        self.lm = LangLoader(os.path.join(SRC_DIR, "lang"))
+        self.lm = LanguageLoader(os.path.join(SRC_DIR, "lang"))
         self.cfg = Config(".env")
         self.mongo = Database(self.cfg.DB_URI)
 
@@ -33,16 +33,16 @@ class AutomatikBot(commands.Bot):
 
     async def setup_hook(self):
         # todo Refactor
-        self.tree.clear_commands(guild=discord.Object(id=485048883131711498))
-        await self.add_cog(PublicSlash(self, self.lm, self.cfg, self.mongo),guild=discord.Object(id=485048883131711498))
-        await self.add_cog(AdminSlash(self, self.lm, self.cfg, self.mongo), guild=discord.Object(id=485048883131711498))
-        await self.add_cog(OwnerSlash(self, self.lm, self.cfg, self.mongo), guild=discord.Object(id=485048883131711498))
+        self.tree.clear_commands(guild=discord.Object(id=649270300982247449))
+        await self.add_cog(PublicSlash(self, self.lm, self.cfg, self.mongo),guild=discord.Object(id=649270300982247449))
+        await self.add_cog(AdminSlash(self, self.lm, self.cfg, self.mongo), guild=discord.Object(id=649270300982247449))
+        await self.add_cog(OwnerSlash(self, self.lm, self.cfg, self.mongo), guild=discord.Object(id=649270300982247449))
 
     async def on_ready(self):
         if self.is_first_exec:
             self.is_first_exec = False
             self.look_for_free_games.start()
-            await self.tree.sync(guild=discord.Object(id=485048883131711498))
+            await self.tree.sync(guild=discord.Object(id=649270300982247449))
             logger.info("Bot Online")
         await self.change_presence(status=discord.Status.online, activity=discord.Game("!mk help"))
 
