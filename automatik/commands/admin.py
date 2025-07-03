@@ -93,29 +93,14 @@ class AdminSlash(commands.Cog):
 
     @app_commands.command()
     @app_commands.checks.has_permissions(administrator=True)
-    async def language(self, interaction, lang_code: str):
-        """Select a language."""
-        guild_lang = self.mongo.get_guild_config(interaction.guild)["lang"]
-
-        if lang_code not in self.lm.get_lang_packages_metadata()[0]:  # If the language package does not exist
-            await interaction.response.send_message(self.lm.get_message(guild_lang, "language_error"))
-            return
-
-        self.mongo.update_guild_config(interaction.guild, {"lang": lang_code})
-        await interaction.response.send_message(self.lm.get_message(lang_code, "language_changed"))
-        logger.info(f"Language changed to '{lang_code}' on {interaction.guild}")
-
-    @app_commands.command()
-    @app_commands.checks.has_permissions(administrator=True)
-    async def languages(self, interaction):
+    async def language(self, interaction):
         """Shows a list of the available languages with interactive components."""
         guild_lang = self.mongo.get_guild_config(interaction.guild)["lang"]
 
-        # Crear un embed más visual y moderno
         embed_langs = discord.Embed(
             title=f"{self.lm.get_message(guild_lang, 'languages')} 🌐",
             description=self.lm.get_message(guild_lang, "languages_description"),
-            color=0x5865F2  # Color oficial de Discord
+            color=0x5865F2
         )
 
         embed_langs.set_footer(
@@ -124,7 +109,6 @@ class AdminSlash(commands.Cog):
         )
         embed_langs.set_thumbnail(url=LOGO_URL)
 
-        # Mostrar el idioma actual
         current_language = self.lm.lang_pkgs[guild_lang].language
         embed_langs.add_field(
             name="📌 " + self.lm.get_message(guild_lang, "language") + " " + "(actual)",
@@ -132,38 +116,7 @@ class AdminSlash(commands.Cog):
             inline=False
         )
 
-        # Crear la vista con el selector de idiomas
         view = LanguageView(self.lm.lang_pkgs, self.lm, self.mongo)
-
-        # Añadir un manejador personalizado para el botón de actualización
-        async def refresh_callback(interaction):
-            # Obtener el idioma actualizado
-            updated_guild_lang = self.mongo.get_guild_config(interaction.guild)["lang"]
-            updated_language = self.lm.lang_pkgs[updated_guild_lang].language
-
-            # Actualizar el embed
-            new_embed = discord.Embed(
-                title=f"{self.lm.get_message(updated_guild_lang, 'languages')} 🌐",
-                description=self.lm.get_message(updated_guild_lang, "languages_description"),
-                color=0x5865F2
-            )
-            new_embed.set_footer(
-                text=self.lm.get_message(updated_guild_lang, "help_footer"),
-                icon_url=AVATAR_URL
-            )
-            new_embed.set_thumbnail(url=LOGO_URL)
-            new_embed.add_field(
-                name="📌 " + self.lm.get_message(updated_guild_lang, "language") + " " + "(actual)",
-                value=f"{self.lm.lang_pkgs[updated_guild_lang].emoji} **{updated_language}** (`{updated_guild_lang}`)",
-                inline=False
-            )
-
-            # Responder con el embed actualizado
-            await interaction.response.edit_message(embed=new_embed, view=view)
-
-        # Asignar el callback al botón de actualización
-        view.refresh_button.callback = refresh_callback
-
         await interaction.response.send_message(embed=embed_langs, view=view)
 
 
@@ -202,8 +155,3 @@ class LanguageView(ui.View):
     def __init__(self, lang_options, lm, mongo):
         super().__init__(timeout=300)
         self.add_item(LanguageSelector(lang_options, lm, mongo))
-
-    @ui.button(label="Refresh", style=discord.ButtonStyle.secondary, emoji="🔄")
-    async def refresh_button(self, interaction, button):
-        # This will be handled in the command function
-        pass
