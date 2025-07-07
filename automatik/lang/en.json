@@ -87,6 +87,18 @@
       "generic_messages": ["{} is currently free on {}",
                            "Hurry, {} is now free on {}",
                            "{} can be found for free on {}",
-                           "{} is available for free on {}"]
+                           "{} is available for free on {}"],
+
+      "channel_management": "Channel Management",
+      "channel_description": "From here you can manage the notification channel for free games.",
+      "channel_selected": "Channel Selected",
+      "current_channel": "Current Channel",
+      "channel_not_found": "Channel Not Found",
+      "no_channel_selected": "No Channel Selected",
+      "select_channel_instruction": "Please select a channel to receive free game notifications.",
+      "select_channel_placeholder": "Select a channel...",
+      "unselect_channel": "Unselect Channel",
+      "module_toggle_placeholder": "Select modules to enable/disable",
+      "modules_updated": "✅ Modules updated successfully"
     }
 }

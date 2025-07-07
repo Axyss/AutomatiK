@@ -87,6 +87,18 @@
       "generic_messages": ["{} se encuentra gratis en {}",
                            "Date prisa, {} se encuentra gratis en {}",
                            "{} puede ser encontrado gratis en {}",
-                           "{} se encuentra disponible de forma gratuita en {}"]
+                           "{} se encuentra disponible de forma gratuita en {}"],
+
+      "channel_management": "Gestión de Canal",
+      "channel_description": "Desde aquí puedes gestionar el canal de notificaciones para recibir juegos gratuitos.",
+      "channel_selected": "Canal Seleccionado",
+      "current_channel": "Canal Actual",
+      "channel_not_found": "Canal No Encontrado",
+      "no_channel_selected": "No hay canal seleccionado",
+      "select_channel_instruction": "Por favor, selecciona un canal para recibir notificaciones de juegos gratuitos.",
+      "select_channel_placeholder": "Selecciona un canal...",
+      "unselect_channel": "Deseleccionar Canal",
+      "module_toggle_placeholder": "Selecciona módulos para activar/desactivar",
+      "modules_updated": "✅ Módulos actualizados correctamente"
     }
 }
