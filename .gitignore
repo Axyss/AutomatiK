@@ -5,3 +5,4 @@ __pycache__/
 automatik/*.json
 automatik/*.yml
 automatik/*.db
+.env
