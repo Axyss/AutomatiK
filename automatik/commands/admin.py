@@ -14,34 +14,6 @@ class AdminSlash(commands.Cog):
 
     @app_commands.command()
     @app_commands.checks.has_permissions(administrator=True)
-    async def select(self, interaction, channel: discord.TextChannel):
-        """Select a Text Channel to start receiving freebies."""
-        guild_cfg = self.mongo.get_guild_config(interaction.guild)
-        guild_lang = guild_cfg["lang"]
-
-        self.mongo.update_guild_config(interaction.guild, {"selected_channel": channel.id})
-        await interaction.response.send_message(
-            self.lm.get_message(guild_lang, "select_success").format(channel.mention))
-
-    @app_commands.command()
-    @app_commands.checks.has_permissions(administrator=True)
-    async def unselect(self, interaction):
-        """Unselects the previously selected Text Channel."""
-        guild_cfg = self.mongo.get_guild_config(interaction.guild)
-        guild_lang = guild_cfg["lang"]
-        guild_selected_channel = guild_cfg["selected_channel"]
-
-        if guild_selected_channel is None:
-            await interaction.response.send_message(self.lm.get_message(guild_lang, "unselect_already")
-                                                    .format(guild_selected_channel))
-            return None
-
-        self.mongo.update_guild_config(interaction.guild, {"selected_channel": None})
-        await interaction.response.send_message(
-            self.lm.get_message(guild_lang, "unselect_success").format(guild_selected_channel))
-
-    @app_commands.command()
-    @app_commands.checks.has_permissions(administrator=True)
     async def channel(self, interaction):
         """Manage notification channel - select or unselect a channel to receive freebies."""
         guild_cfg = self.mongo.get_guild_config(interaction.guild)
@@ -100,7 +72,6 @@ class AdminSlash(commands.Cog):
     async def enable(self, interaction, choice: str):
         """Modify the list of services you are interested in."""
         guild_lang = self.mongo.get_guild_config(interaction.guild)["lang"]
-
         user_decision = True if choice == "enable" else False
 
         for module in ModuleLoader.modules:

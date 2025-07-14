@@ -1,4 +1,3 @@
-import psutil
 import discord
 from discord.ext import commands
 from discord import app_commands
@@ -75,9 +74,6 @@ class OwnerSlash(commands.Cog):
         embed_stats.add_field(name="Guilds", value=str(len(self.bot.guilds)))
         embed_stats.add_field(name=self.lm.get_message(guild_lang, "stats_owners_field"),
                               value="\n".join(self.cfg.bot_owner))
-        embed_stats.add_field(name=self.lm.get_message(guild_lang, "stats_server_load_field"),
-                              value="CPU: **{}%** \nRAM: **{}%**".format(
-                                  psutil.cpu_percent(), psutil.virtual_memory().percent))
         if message_queue_len:
             embed_stats.add_field(name=self.lm.get_message(guild_lang, "stats_message_queue_field"),
                                   value=self.lm.get_message(guild_lang, "stats_message_queue_value")
@@ -88,20 +84,3 @@ class OwnerSlash(commands.Cog):
                                   .format(message_queue_len))
 
         await interaction.response.send_message(embed=embed_stats)
-
-    @app_commands.command()
-    @app_commands.checks.has_permissions(administrator=True)
-    async def shutdown(self, interaction):
-        """Shuts down the bot process completely."""
-        guild_lang = self.mongo.get_guild_config(interaction.guild)["lang"]
-        message_queue_len = len(self.bot.guilds) * (len(self.bot.game_queue_cache) + self.bot.game_queue.qsize())
-
-        if not self.bot.empty() or self.bot.game_queue_cache:
-            await interaction.response.send_message(
-                self.lm.get_message(guild_lang, "shutdown_abort").format(message_queue_len))
-            return None
-
-        await interaction.response.send_message(self.lm.get_message(guild_lang, "shutdown_success"))
-        logger.info("Shutting down..")
-        self.bot.main_loop = False
-        await self.bot.close()
