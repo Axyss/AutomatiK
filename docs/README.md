@@ -2,7 +2,8 @@
   <img src="https://raw.githubusercontent.com/Axyss/AutomatiK/master/docs/assets/ak_logo.png" alt="automatik_logo" width="180" height="180">
 </div>
 
-> **IMPORTANT**: This project is currently undergoing major refactors. Consider waiting until version 2.0 is released for production use.
+> [!CAUTION]
+> **This project is currently undergoing major refactors**. Consider waiting until version 2.0 is released for production use.
 
 ## 📋 Overview
 
