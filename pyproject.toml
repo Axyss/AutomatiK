@@ -2,18 +2,18 @@
 name = "automatik"
 version = "0.1.0"
 description = ""
-authors = ["Axyss <alexnieto201@gmail.com>"]
+authors = ["Axyss <contact@axyss.dev>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.10"
 discord-py = "^2.5.2"
-requests = "^2.32.3"
-beautifulsoup4 = "^4.13.3"
+requests = "^2.32.4"
+beautifulsoup4 = "^4.13.4"
 pyyaml = "^6.0.2"
-pymongo = "^4.11.2"
+pymongo = "^4.13.2"
 dotenv = "^0.9.9"
-curl-cffi = "^0.10.0"
+curl-cffi = "^0.12.0"
 agno = "^1.7.5"
 
 
