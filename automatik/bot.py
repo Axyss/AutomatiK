@@ -1,8 +1,11 @@
 # coding=utf-8
+import json
 import os
 import random
 
 import discord
+from agno.agent import Agent
+from agno.models.google import Gemini
 from discord.ext import commands, tasks
 
 import automatik.utils.cli
@@ -14,6 +17,7 @@ from automatik.commands.public import PublicSlash
 from automatik.core.config import Config
 from automatik.core.db import Database
 from automatik.core.errors import InvalidGameDataException
+from automatik.core.game import GameAdapter
 from automatik.core.lang import LanguageLoader
 from automatik.core.modules import ModuleLoader
 
@@ -102,25 +106,24 @@ class AutomatikBot(commands.Bot):
         if not self.main_loop:
             return
         for module in ModuleLoader.modules:
+            stored_free_games = self.mongo.get_free_games_by_module_id(module.MODULE_ID)
             try:
                 retrieved_free_games = module.get_free_games()
-                stored_free_games = self.mongo.get_free_games_by_module_id(module.MODULE_ID)
-            except InvalidGameDataException as error:
-                logger.info(f"Ignoring latest results from module: {module.MODULE_ID}."
-                            f" Enable debug mode for more information")
-                logger.debug(f"InvalidGameDataException raised by module with MODULE_ID: '{module.MODULE_ID}'",
-                             exc_info=error)
+            except InvalidGameDataException:
+                api_request = module.make_request()
+                retrieved_free_games = [GameAdapter.to_object(game) for game in GameAdapter.to_dict_using_ai(api_request, module)]
             except:  # Any unhandled exception in any module would abruptly stop the current iteration without this
                 logger.exception("Unexpected error while retrieving game data")
-            else:
-                for game in retrieved_free_games:  # Looks for free games
-                    if game not in stored_free_games:
-                        self.mongo.create_free_game(game)
-                        free_games.append(game)
+                continue
 
-                for game in stored_free_games:  # Looks for games that are no longer free
-                    if game not in retrieved_free_games:
-                        self.mongo.move_to_past_free_games(game)
+            for game in retrieved_free_games:  # Looks for free games
+                if game not in stored_free_games:
+                    self.mongo.create_free_game(game)
+                    free_games.append(game)
+
+            for game in stored_free_games:  # Looks for games that are no longer free
+                if game not in retrieved_free_games:
+                    self.mongo.move_to_past_free_games(game)
         await self.broadcast_free_games(free_games)  # todo This is a blocking point for the method itself
 
     async def broadcast_free_games(self, free_games):
