@@ -41,7 +41,7 @@ class OwnerSlash(commands.Cog):
     @app_commands.command()
     @app_commands.checks.has_permissions(administrator=True)
     async def reload(self, interaction):
-        """Reloads configuration, modules and language packages."""
+        """Reloads configuration, services and language packages."""
         guild_lang = self.mongo.get_guild_config(interaction.guild)["lang"]
 
         logger.info("Reloading..")

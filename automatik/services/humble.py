@@ -10,9 +10,9 @@ from automatik.core.game import Game
 
 class Main:
     def __init__(self):
-        """Defines the module parameters."""
+        """Defines the service parameters."""
         self.SERVICE_NAME = "Humble Bundle"
-        self.MODULE_ID = "humble"
+        self.SERVICE_ID = "humble"
         self.AUTHOR = "Default"
         self.ENDPOINT = "https://www.humblebundle.com/store/api/search?sort=discount&filter=onsale&request=1"
         self.URL = "https://www.humblebundle.com/store/"
@@ -23,7 +23,7 @@ class Main:
         try:
             raw_data = requests.get(self.ENDPOINT, impersonate="chrome")
         except (HTTPError, Timeout, ConnectionError):
-            logger.error(f"Request to {self.SERVICE_NAME} by module \'{self.MODULE_ID}\' failed")
+            logger.error(f"Request to {self.SERVICE_NAME} by service \'{self.SERVICE_ID}\' failed")
             raise InvalidGameDataException
         else:
             return raw_data
@@ -36,7 +36,7 @@ class Main:
             processed_data = json.loads(raw_data.text)["results"]
             for i in processed_data:
                 if i["current_price"]["amount"] == 0:
-                    game = Game(i["human_name"], self.URL + i["human_url"], self.MODULE_ID)
+                    game = Game(i["human_name"], self.URL + i["human_url"], self.SERVICE_ID)
                     parsed_games.append(game)
         except (TypeError, KeyError, json.decoder.JSONDecodeError):
             raise InvalidGameDataException

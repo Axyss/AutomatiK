@@ -7,15 +7,15 @@ from requests import Response
 
 
 class Game:
-    def __init__(self, name, link, module_id, date=None):
+    def __init__(self, name, link, service_id, date=None):
         self.NAME = name
         self.LINK = link
-        self.MODULE_ID = module_id  # Module ID of the module which generated the instance
+        self.SERVICE_ID = service_id  # Service ID of the service which generated the instance
         self.DATE = str(datetime.datetime.now()) if date is None else date
 
     def __eq__(self, other):
-        """When comparing two Game objects only the link and module ID attributes will matter."""
-        return True if self.LINK == other.LINK and self.MODULE_ID == other.MODULE_ID else False
+        """When comparing two Game objects only the link and service ID attributes will matter."""
+        return True if self.LINK == other.LINK and self.SERVICE_ID == other.SERVICE_ID else False
 
 
 class GameAdapter:
@@ -40,16 +40,16 @@ class GameAdapter:
         """Converts a 'Game' instance into a dictionary."""
         return {"name": game_obj.NAME,
                 "link": game_obj.LINK,
-                "module_id": game_obj.MODULE_ID,
+                "service_id": game_obj.SERVICE_ID,
                 "date": game_obj.DATE}
 
     @staticmethod
-    def to_dict_using_ai(game_request: Response, module: Game):
+    def to_dict_using_ai(game_request: Response, service: Game):
         """Tries converting unstructured data into a dictionary using AI."""
         game_data = game_request.content.decode("utf-8")
         prompt = f"{GameAdapter.instructions}\n\nData to analyze:\n{game_data}"
         ai_data = GameAdapter.ai_agent.run(prompt).content
-        return [{**game, "module_id": module.MODULE_ID} for game in json.loads(ai_data)]
+        return [{**game, "service_id": service.SERVICE_ID} for game in json.loads(ai_data)]
 
     @staticmethod
     def to_object(game_dict):
@@ -57,4 +57,4 @@ class GameAdapter:
         if game_dict.get("date") is None:
             game_dict["date"] = str(datetime.datetime.now())
         return Game(name=game_dict["name"], link=game_dict["link"],
-                    module_id=game_dict["module_id"], date=game_dict["date"])
+                    service_id=game_dict["service_id"], date=game_dict["date"])

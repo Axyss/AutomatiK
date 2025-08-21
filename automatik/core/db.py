@@ -5,7 +5,7 @@ from pymongo.errors import DuplicateKeyError
 
 from automatik.core.game import GameAdapter
 from automatik.core.lang import logger
-from automatik.core.modules import ModuleLoader
+from automatik.core.services import ServiceLoader
 
 
 class Database:
@@ -18,7 +18,7 @@ class Database:
             "selected_channel": None,  # Structure: <#1234>
             "mention_role": None,  # Structure: <@&1234>
             "lang": "en",
-            "services": {},  # Services are represented by their MODULE_IDs
+            "services": {},  # Services are represented by their SERVICE_IDs
             "join_date": str(datetime.datetime.now())
         }
 
@@ -26,7 +26,7 @@ class Database:
         """Creates a new document in the 'configs' collection."""
         config = dict(self.CONFIG_TEMPLATE)
         config.update({"_id": str(guild.id), "name": guild.name, "members": guild.member_count,
-                       "services": dict.fromkeys(ModuleLoader.get_module_ids(), True)})
+                       "services": dict.fromkeys(ServiceLoader.get_service_ids(), True)})
         try:
             self._db["configs"].insert_one(config)
             return True
@@ -35,7 +35,7 @@ class Database:
 
     def insert_missing_or_new_services(self):
         """Inserts fields into the 'services' object of each document from the 'configs' collection."""
-        for service in ModuleLoader.get_module_ids():
+        for service in ServiceLoader.get_service_ids():
             self._db["configs"].update_many({f"services.{service}": {"$exists": False}},
                                             {"$set": {f"services.{service}": True}})
         return True
@@ -53,20 +53,20 @@ class Database:
     def create_free_game(self, game_obj):
         """Creates a new document in the 'free_games' collection."""
         self._db["free_games"].insert_one(GameAdapter.to_dict(game_obj))
-        logger.info(f"New game '{game_obj.NAME}' ({game_obj.MODULE_ID}) added to the database")
+        logger.info(f"New game '{game_obj.NAME}' ({game_obj.SERVICE_ID}) added to the database")
         return True
 
-    def get_free_games_by_module_id(self, module_id):
-        """Returns every document from the 'free_games' collection with a certain module ID."""
+    def get_free_games_by_service_id(self, service_id):
+        """Returns every document from the 'free_games' collection with a certain service ID."""
         free_games = []
-        for game_dict in self._db["free_games"].find({"module_id": module_id}):
+        for game_dict in self._db["free_games"].find({"service_id": service_id}):
             free_games.append(GameAdapter.to_object(game_dict))
         return free_games
 
     def move_to_past_free_games(self, game_obj):
         """Moves a document from the 'free_games' collection to 'past_free_games' collection."""
         past_free_game_dict = self._db["free_games"].find_one_and_delete({"link": game_obj.LINK,
-                                                                          "module_id": game_obj.MODULE_ID})
+                                                                          "service_id": game_obj.SERVICE_ID})
         self._db["past_free_games"].insert_one(past_free_game_dict)
-        logger.info(f"'{game_obj.NAME}' ({game_obj.MODULE_ID}) moved to the 'past_free_games' database")
+        logger.info(f"'{game_obj.NAME}' ({game_obj.SERVICE_ID}) moved to the 'past_free_games' database")
         return True

@@ -10,9 +10,9 @@ from automatik.core.game import Game
 
 class Main:
     def __init__(self):
-        """Defines the module parameters."""
+        """Defines the service parameters."""
         self.SERVICE_NAME = "Ubisoft Connect"
-        self.MODULE_ID = "ubisoft"
+        self.SERVICE_ID = "ubisoft"
         self.AUTHOR = "Default"
         self.ENDPOINT = "https://public-ubiservices.ubi.com/v1/spaces/news?spaceId=6d0af36b-8226-44b6-a03b" \
                         "-4660073a6349"
@@ -26,7 +26,7 @@ class Main:
         try:
             raw_data = requests.get(self.ENDPOINT, headers=self.HEADERS)
         except (HTTPError, Timeout, requests.exceptions.ConnectionError):
-            logger.error(f"Request to {self.SERVICE_NAME} by module \'{self.MODULE_ID}\' failed")
+            logger.error(f"Request to {self.SERVICE_NAME} by service \'{self.SERVICE_ID}\' failed")
             raise InvalidGameDataException
         else:
             return raw_data
@@ -39,7 +39,7 @@ class Main:
             processed_data = json.loads(raw_data.content)["news"]
             for i in processed_data:
                 if i["type"] == "freegame" and i["expirationDate"]:
-                    game = Game(i["title"], i["links"][0]["param"], self.MODULE_ID)
+                    game = Game(i["title"], i["links"][0]["param"], self.SERVICE_ID)
                     parsed_games.append(game)
         except (TypeError, KeyError, json.decoder.JSONDecodeError):
             raise InvalidGameDataException

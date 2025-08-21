@@ -1,11 +1,8 @@
 # coding=utf-8
-import json
 import os
 import random
 
 import discord
-from agno.agent import Agent
-from agno.models.google import Gemini
 from discord.ext import commands, tasks
 
 import automatik.utils.cli
@@ -19,7 +16,7 @@ from automatik.core.db import Database
 from automatik.core.errors import InvalidGameDataException
 from automatik.core.game import GameAdapter
 from automatik.core.lang import LanguageLoader
-from automatik.core.modules import ModuleLoader
+from automatik.core.services import ServiceLoader
 
 
 class AutomatikBot(commands.Bot):
@@ -51,8 +48,8 @@ class AutomatikBot(commands.Bot):
         await self.change_presence(status=discord.Status.online, activity=discord.Game("!mk help"))
 
     def load_resources(self):
-        """Loads configuration, modules and language packages."""
-        ModuleLoader.load_modules()
+        """Loads configuration, services and language packages."""
+        ServiceLoader.load_services()
         # todo Refactor
         # self.cfg.load_config()
         self.lm.load_lang_packages()
@@ -105,14 +102,14 @@ class AutomatikBot(commands.Bot):
 
         if not self.main_loop:
             return
-        for module in ModuleLoader.modules:
-            stored_free_games = self.mongo.get_free_games_by_module_id(module.MODULE_ID)
+        for service in ServiceLoader.services:
+            stored_free_games = self.mongo.get_free_games_by_service_id(service.SERVICE_ID)
             try:
-                retrieved_free_games = module.get_free_games()
+                retrieved_free_games = service.get_free_games()
             except InvalidGameDataException:
-                api_request = module.make_request()
-                retrieved_free_games = [GameAdapter.to_object(game) for game in GameAdapter.to_dict_using_ai(api_request, module)]
-            except:  # Any unhandled exception in any module would abruptly stop the current iteration without this
+                api_request = service.make_request()
+                retrieved_free_games = [GameAdapter.to_object(game) for game in GameAdapter.to_dict_using_ai(api_request, service)]
+            except:  # Any unhandled exception in any service would abruptly stop the current iteration without this
                 logger.exception("Unexpected error while retrieving game data")
                 continue
 
@@ -124,7 +121,7 @@ class AutomatikBot(commands.Bot):
             for game in stored_free_games:  # Looks for games that are no longer free
                 if game not in retrieved_free_games:
                     self.mongo.move_to_past_free_games(game)
-        await self.broadcast_free_games(free_games)  # todo This is a blocking point for the method itself
+        await self.broadcast_free_games(free_games)
 
     async def broadcast_free_games(self, free_games):
         success, fail = 0, 0
@@ -132,7 +129,7 @@ class AutomatikBot(commands.Bot):
         for guild in self.guilds:
             guild_config = self.mongo.get_guild_config(guild)
             for game in free_games:
-                if guild_config["selected_channel"] and guild_config["services"][game.MODULE_ID]:
+                if guild_config["selected_channel"] and guild_config["services"][game.SERVICE_ID]:
                     message = self.generate_message(guild_config, game)
                     try:
                         await guild.get_channel(guild_config["selected_channel"]).send(message)

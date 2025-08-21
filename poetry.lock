@@ -886,7 +886,7 @@ files = [
 
 [package.dependencies]
 cachetools = ">=2.0.0,<6.0"
-pyasn1-modules = ">=0.2.1"
+pyasn1-services = ">=0.2.1"
 rsa = ">=3.1.4,<5"
 
 [package.extras]
@@ -1279,14 +1279,14 @@ files = [
 ]
 
 [[package]]
-name = "pyasn1-modules"
+name = "pyasn1-services"
 version = "0.4.2"
-description = "A collection of ASN.1-based protocols modules"
+description = "A collection of ASN.1-based protocols services"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "pyasn1_modules-0.4.2-py3-none-any.whl", hash = "sha256:29253a9207ce32b64c3ac6600edc75368f98473906e8fd1043bd6b5b1de2c14a"},
-    {file = "pyasn1_modules-0.4.2.tar.gz", hash = "sha256:677091de870a80aae844b1ca6134f54652fa2c8c5a52aa396440ac3106e941e6"},
+    {file = "pyasn1_services-0.4.2-py3-none-any.whl", hash = "sha256:29253a9207ce32b64c3ac6600edc75368f98473906e8fd1043bd6b5b1de2c14a"},
+    {file = "pyasn1_services-0.4.2.tar.gz", hash = "sha256:677091de870a80aae844b1ca6134f54652fa2c8c5a52aa396440ac3106e941e6"},
 ]
 
 [package.dependencies]

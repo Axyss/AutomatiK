@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 from discord import app_commands, ui
 from automatik import __version__, LOGO_URL, SRC_DIR, AVATAR_URL, logger
-from automatik.core.modules import ModuleLoader
+from automatik.core.services import ServiceLoader
 
 
 class AdminSlash(commands.Cog):
@@ -46,40 +46,40 @@ class AdminSlash(commands.Cog):
 
     @app_commands.command()
     @app_commands.checks.has_permissions(administrator=True)
-    async def modules(self, interaction):
-        """Shows information about the loaded modules."""
+    async def services(self, interaction):
+        """Shows information about the loaded services."""
         guild_lang = self.mongo.get_guild_config(interaction.guild)["lang"]
 
-        embed_module = discord.Embed(title=self.lm.get_message(guild_lang, "modules"),
-                                     description=self.lm.get_message(guild_lang, "modules_description"),
+        embed_service = discord.Embed(title=self.lm.get_message(guild_lang, "services"),
+                                     description=self.lm.get_message(guild_lang, "services_description"),
                                      color=0x00BFFF)
 
-        embed_module.set_footer(text=self.lm.get_message(guild_lang, "help_footer"), icon_url=AVATAR_URL)
-        embed_module.set_thumbnail(url=LOGO_URL)
+        embed_service.set_footer(text=self.lm.get_message(guild_lang, "help_footer"), icon_url=AVATAR_URL)
+        embed_service.set_thumbnail(url=LOGO_URL)
 
-        embed_module.add_field(name="**ModuleID**", value="\n".join(ModuleLoader.get_module_ids()))
+        embed_service.add_field(name="**ServiceID**", value="\n".join(ServiceLoader.get_service_ids()))
 
-        embed_module.add_field(name=self.lm.get_message(guild_lang, "modules_service"),
-                               value="\n".join(ModuleLoader.get_service_names()))
+        embed_service.add_field(name=self.lm.get_message(guild_lang, "services_service"),
+                               value="\n".join(ServiceLoader.get_service_names()))
 
-        embed_module.add_field(name=self.lm.get_message(guild_lang, "modules_author"),
-                               value="\n".join(ModuleLoader.get_module_authors()))
+        embed_service.add_field(name=self.lm.get_message(guild_lang, "services_author"),
+                               value="\n".join(ServiceLoader.get_service_authors()))
 
-        await interaction.response.send_message(embed=embed_module)
+        await interaction.response.send_message(embed=embed_service)
 
-    @app_commands.command(name="module", )
+    @app_commands.command(name="service", )
     @app_commands.checks.has_permissions(administrator=True)
     async def enable(self, interaction, choice: str):
         """Modify the list of services you are interested in."""
         guild_lang = self.mongo.get_guild_config(interaction.guild)["lang"]
         user_decision = True if choice == "enable" else False
 
-        for module in ModuleLoader.modules:
-            if choice.lower() == module.MODULE_ID.lower():
+        for service in ServiceLoader.services:
+            if choice.lower() == service.SERVICE_ID.lower():
                 self.mongo.update_guild_config(interaction.guild, {"services." + choice.lower(): user_decision})
                 await interaction.response.send_message(
-                    self.lm.get_message(guild_lang, f"module_{choice}d").format(choice))
-                logger.info(f"{choice.capitalize()} module {choice}d by {interaction.author}")
+                    self.lm.get_message(guild_lang, f"service_{choice}d").format(choice))
+                logger.info(f"{choice.capitalize()} service {choice}d by {interaction.author}")
                 return True
 
         await interaction.response.send_message(self.lm.get_message(guild_lang, f"enable_unknown").format(choice))

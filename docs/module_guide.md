@@ -1,21 +1,21 @@
-# How to create AutomatiK modules (v1.3.X)
+# How to create AutomatiK services (v1.3.X)
 
 ## Introduction
 Even though AutomatiK can run perfectly fine without them, they bring the most important part to it, 
-which is adding support to platforms and services. In the example below, we will work on the creation of a module
+which is adding support to platforms and services. In the example below, we will work on the creation of a service
 that will scrape the free games from an imaginary platform called **Great Games**.
 
-### Structure of a module:
+### Structure of a service:
 
 ```python
 from core.logging import logger
-from core.module_manager import Game
+from core.service_manager import Game
 
 
 class Main:
     def __init__(self):
         self.SERVICE_NAME = "Great Games"
-        self.MODULE_ID = "ggames"
+        self.SERVICE_ID = "ggames"
         self.AUTHOR = "Axyss"
 
     def get_free_games(self):
@@ -24,14 +24,14 @@ class Main:
 ```
 
 ## Step 1: File creation
-The first step into the creation of a module would be cloning/downloading the repository and creating a file with 
-the .py extension inside the _modules_ folder. The name of the module **doesn't need to meet any special criteria**.
+The first step into the creation of a service would be cloning/downloading the repository and creating a file with 
+the .py extension inside the _services_ folder. The name of the service **doesn't need to meet any special criteria**.
 
 ## Step 2: Imports and dependencies
 Our second step is to import the **Game class**, and the **logger object**. 
 ``` python
 from core.log_manager import logger
-from core.module_manager import Game
+from core.service_manager import Game
 ```
 The **logger** object brings an organized and unified way to print all types of messages into the console and save
 them in **.log** files. It supports multiple **levels** that can be used depending on the context of the message (debug,
@@ -56,21 +56,21 @@ _Example:_
 ``` python
 Game("Counter-Strike: Global Offensive", "http://.../free-csgo")
 ```
-Tip: It is recommended to use the libraries default modules use to retrieve and parse data. You can consult the 
+Tip: It is recommended to use the libraries default services use to retrieve and parse data. You can consult the 
 entire list in the [requirements.txt](../requirements.txt "requirements.txt") file.
 
 ## Step 3: Methods and attributes
 
-There are some minimum elements a module needs to be loaded and integrated properly, those are:
+There are some minimum elements a service needs to be loaded and integrated properly, those are:
 
 1. A class named **Main**.
 2. The next attributes in the constructor of the **Main** class:
-     - **SERVICE_NAME** _(String)_ : Name of the platform/s the module provides support to.
-     - **AUTHOR** _(String)_ : Name/Nickname of the module's author.
-     - **MODULE_ID** _(String)_ : Short name of the module that will be used in commands, **it must be unique** and 
+     - **SERVICE_NAME** _(String)_ : Name of the platform/s the service provides support to.
+     - **AUTHOR** _(String)_ : Name/Nickname of the service's author.
+     - **SERVICE_ID** _(String)_ : Short name of the service that will be used in commands, **it must be unique** and 
        separated with underscores if contains more than one word. **It's not case-sensitive**.
        
-         |Examples of ModuleIDs||
+         |Examples of ServiceIDs||
          |----------|:-------------:|
          |"great games"|❌|
          |"Great_Games"|✔️|
@@ -78,14 +78,14 @@ There are some minimum elements a module needs to be loaded and integrated prope
    
 3. The next methods inside the **Main** class:
    - **get_free_games()** : Method that will be called by the AutomatiK core, it has to return a list of Game 
-     objects or **False** if no free games were found by the module.
+     objects or **False** if no free games were found by the service.
     
 
 There are also **optional** elements that can be used if needed:
 1. Attributes inside the **Main** class:
    - **THRESHOLD** _(Default: 6)_ _(int)_: The bot automatically detects if the **Game** objects retrieved from 
      a **get_free_games()** method have already been announced, to do so, it checks the last 6 registries added to
-     the database table of the module they come from. The **THRESHOLD** attribute brings the ability to change the
+     the database table of the service they come from. The **THRESHOLD** attribute brings the ability to change the
      number of registries that will be taken from the database to decide if the game should be notified or not.
      <br>
      <br>
@@ -97,9 +97,9 @@ There are also **optional** elements that can be used if needed:
     
 ## Step 4: That's all!🎉
 
-If you have followed all the steps correctly, you should have a fully working module similar to the one at
+If you have followed all the steps correctly, you should have a fully working service similar to the one at
 the beginning of this guide. The last step would be to create methods to scrape data from a web or an API and give the
-module a real purpose. 
+service a real purpose. 
 
 If you find any problems following this guide or with the bot itself, open a 
 [GitHub Issue](https://github.com/Axyss/AutomatiK/issues "GitHub Issue") or join the 

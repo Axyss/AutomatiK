@@ -10,9 +10,9 @@ from automatik.core.game import Game
 
 class Main:
     def __init__(self):
-        """Defines the module parameters."""
+        """Defines the service parameters."""
         self.SERVICE_NAME = "Epic Games"
-        self.MODULE_ID = "epic"
+        self.SERVICE_ID = "epic"
         self.AUTHOR = "Default"
         self.URL = "https://www.epicgames.com/store/us-US/p/"
         self.ENDPOINT = "https://store-site-backend-static.ak.epicgames.com/freeGamesPromotions"
@@ -22,7 +22,7 @@ class Main:
         try:
             raw_data = requests.get(self.ENDPOINT)
         except (HTTPError, Timeout, requests.exceptions.ConnectionError):
-            logger.error(f"Request to {self.SERVICE_NAME} by module \'{self.MODULE_ID}\' failed")
+            logger.error(f"Request to {self.SERVICE_NAME} by service \'{self.SERVICE_ID}\' failed")
             raise InvalidGameDataException
         else:
             return raw_data
@@ -41,7 +41,7 @@ class Main:
                 # The order of the next if statement is crucial since 'promotions' may be None
                 if current_price == 0 and promotions and promotions["promotionalOffers"]:
                     url_slug = element["productSlug"] if element["productSlug"] else element["offerMappings"][0]["pageSlug"]
-                    game = Game(element["title"], self.URL + url_slug, self.MODULE_ID)
+                    game = Game(element["title"], self.URL + url_slug, self.SERVICE_ID)
                     parsed_games.append(game)
         except (TypeError, KeyError, json.decoder.JSONDecodeError):
             raise InvalidGameDataException

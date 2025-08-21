@@ -11,9 +11,9 @@ from automatik.core.game import Game
 
 class Main:
     def __init__(self):
-        """Defines the module parameters."""
+        """Defines the service parameters."""
         self.SERVICE_NAME = "Steam"
-        self.MODULE_ID = "steam"
+        self.SERVICE_ID = "steam"
         self.AUTHOR = "Default"
         self.URL = "https://store.steampowered.com/app/"
         self.ENDPOINT = "https://store.steampowered.com/search/results/?query&start=0&count=25&sort_by=Price_ASC" \
@@ -37,7 +37,7 @@ class Main:
         try:
             raw_data = requests.get(endpoint)
         except (HTTPError, Timeout, requests.exceptions.ConnectionError):
-            logger.error(f"Request to {self.SERVICE_NAME} by module \'{self.MODULE_ID}\' failed")
+            logger.error(f"Request to {self.SERVICE_NAME} by service \'{self.SERVICE_ID}\' failed")
             raise InvalidGameDataException
         else:
             return raw_data
@@ -56,7 +56,7 @@ class Main:
                 if discount_tag is None:
                     continue
                 elif discount_tag.find("span").text == "-100%" and self.is_dlc(product_id) is False:
-                    game = Game(tag.find("span", {"class": "title"}).text, self.URL + product_id, self.MODULE_ID)
+                    game = Game(tag.find("span", {"class": "title"}).text, self.URL + product_id, self.SERVICE_ID)
                     parsed_games.append(game)
         except (AttributeError, TypeError, KeyError, json.decoder.JSONDecodeError):
             raise InvalidGameDataException

@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 from discord import app_commands
 from automatik import __version__, LOGO_URL, SRC_DIR, AVATAR_URL
-from automatik.core.modules import ModuleLoader
+from automatik.core.services import ServiceLoader
 
 
 class PublicSlash(commands.Cog):
@@ -50,8 +50,8 @@ class PublicSlash(commands.Cog):
         embed_status.add_field(name=self.lm.get_message(guild_lang, "status_main"),
                                value=self.lm.get_message(guild_lang, "status_active" if guild_cfg.get("selected_channel") else "status_inactive") + "\n" + str(guild_cfg["selected_channel"]))
 
-        for i in ModuleLoader.modules:
-            if guild_cfg["services"][i.MODULE_ID]:
+        for i in ServiceLoader.services:
+            if guild_cfg["services"][i.SERVICE_ID]:
                 value = self.lm.get_message(guild_lang, "status_active")
             else:
                 value = self.lm.get_message(guild_lang, "status_inactive")

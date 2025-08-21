@@ -63,9 +63,9 @@ AutomatiK uses the prefix `!mk`. View available commands with `!mk help`.
 
 ## 💡 Development
 
-### 🧩 Creating Custom Modules
+### 🧩 Creating Custom Services
 
-To develop your own modules for the bot, refer to the [module creation guide](https://github.com/Axyss/AutomatiK/blob/master/docs/module_guide.md).
+To develop your own services for the bot, refer to the [service creation guide](https://github.com/Axyss/AutomatiK/blob/master/docs/service_guide.md).
 
 ## 📜 License
 
