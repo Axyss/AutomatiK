@@ -14,7 +14,6 @@ class Main:
         """Defines the service parameters."""
         self.SERVICE_NAME = "Steam"
         self.SERVICE_ID = "steam"
-        self.AUTHOR = "Default"
         self.URL = "https://store.steampowered.com/app/"
         self.ENDPOINT = "https://store.steampowered.com/search/results/?query&start=0&count=25&sort_by=Price_ASC" \
                         "&specials=1&infinite=1"

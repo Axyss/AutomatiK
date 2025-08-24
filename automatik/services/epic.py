@@ -13,7 +13,6 @@ class Main:
         """Defines the service parameters."""
         self.SERVICE_NAME = "Epic Games"
         self.SERVICE_ID = "epic"
-        self.AUTHOR = "Default"
         self.URL = "https://www.epicgames.com/store/us-US/p/"
         self.ENDPOINT = "https://store-site-backend-static.ak.epicgames.com/freeGamesPromotions"
 

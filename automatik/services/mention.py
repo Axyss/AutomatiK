@@ -4,7 +4,6 @@ class Main:
     def __init__(self):
         self.SERVICE_NAME = "Mention"
         self.SERVICE_ID = "mention"
-        self.AUTHOR = "Default"
 
     def get_free_games(self):
         return []

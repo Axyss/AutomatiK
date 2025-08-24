@@ -13,7 +13,6 @@ class Main:
         """Defines the service parameters."""
         self.SERVICE_NAME = "Ubisoft Connect"
         self.SERVICE_ID = "ubisoft"
-        self.AUTHOR = "Default"
         self.ENDPOINT = "https://public-ubiservices.ubi.com/v1/spaces/news?spaceId=6d0af36b-8226-44b6-a03b" \
                         "-4660073a6349"
         self.HEADERS = {"ubi-appid": "314d4fef-e568-454a-ae06-43e3bece12a6",

@@ -1,5 +1,6 @@
 import importlib
 import os
+from importlib.metadata import Deprecated
 
 from automatik import logger, SRC_DIR
 
@@ -33,7 +34,3 @@ class ServiceLoader:
     @staticmethod
     def get_service_names():
         return [i.SERVICE_NAME for i in ServiceLoader.services]
-
-    @staticmethod
-    def get_service_authors():
-        return [i.AUTHOR for i in ServiceLoader.services]

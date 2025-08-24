@@ -13,7 +13,6 @@ class Main:
         """Defines the service parameters."""
         self.SERVICE_NAME = "Humble Bundle"
         self.SERVICE_ID = "humble"
-        self.AUTHOR = "Default"
         self.ENDPOINT = "https://www.humblebundle.com/store/api/search?sort=discount&filter=onsale&request=1"
         self.URL = "https://www.humblebundle.com/store/"
 

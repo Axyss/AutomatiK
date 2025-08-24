@@ -62,9 +62,6 @@ class AdminSlash(commands.Cog):
         embed_service.add_field(name=self.lm.get_message(guild_lang, "services_service"),
                                value="\n".join(ServiceLoader.get_service_names()))
 
-        embed_service.add_field(name=self.lm.get_message(guild_lang, "services_author"),
-                               value="\n".join(ServiceLoader.get_service_authors()))
-
         await interaction.response.send_message(embed=embed_service)
 
     @app_commands.command(name="service", )
@@ -72,7 +69,7 @@ class AdminSlash(commands.Cog):
     async def enable(self, interaction, choice: str):
         """Modify the list of services you are interested in."""
         guild_lang = self.mongo.get_guild_config(interaction.guild)["lang"]
-        user_decision = True if choice == "enable" else False
+        user_decision = choice == "enable"
 
         for service in ServiceLoader.services:
             if choice.lower() == service.SERVICE_ID.lower():
