@@ -5,21 +5,22 @@ from requests.exceptions import HTTPError, Timeout
 from bs4 import BeautifulSoup
 
 from automatik import logger
+from automatik.core.base_service import BaseService
 from automatik.core.errors import InvalidGameDataException
 from automatik.core.game import Game
 
 
-class Main:
-    def __init__(self):
-        """Defines the service parameters."""
-        self.SERVICE_NAME = "Steam"
-        self.SERVICE_ID = "steam"
-        self.URL = "https://store.steampowered.com/app/"
-        self.ENDPOINT = "https://store.steampowered.com/search/results/?query&start=0&count=25&sort_by=Price_ASC" \
-                        "&specials=1&infinite=1"
+class Service(BaseService):
+    SERVICE_NAME = "Steam"
+    SERVICE_ID = "steam"
+    EMBED_COLOR = "#1B2838"
+
+    _url = "https://store.steampowered.com/app/"
+    _endpoint = "https://store.steampowered.com/search/results/?query&start=0&count=25&sort_by=Price_ASC" \
+                "&specials=1&infinite=1"
 
     def is_dlc(self, app_id):
-        response = self.make_request(self.URL + app_id)
+        response = self.make_request(self._url + app_id)
         soup = BeautifulSoup(response.content, "html.parser")
         dlc_area = bool(soup.find("div", {"class": "game_area_dlc_bubble"}))
         purchase_area = bool(soup.find("div", {"class": "game_area_purchase_game_wrapper"}))
@@ -31,18 +32,17 @@ class Main:
         else:
             return None
 
-    def make_request(self, endpoint):
-        """Makes the HTTP request to the Steam's backend."""
+    def make_request(self, endpoint=None):
+        url = endpoint if endpoint else self._endpoint
         try:
-            raw_data = requests.get(endpoint)
+            raw_data = requests.get(url)
         except (HTTPError, Timeout, requests.exceptions.ConnectionError):
             logger.error(f"Request to {self.SERVICE_NAME} by service \'{self.SERVICE_ID}\' failed")
             raise InvalidGameDataException
         else:
             return raw_data
 
-    def process_request(self, raw_data):
-        """Returns a list of free games from the raw data."""
+    def _process_request(self, raw_data):
         parsed_games = []
 
         try:
@@ -55,7 +55,7 @@ class Main:
                 if discount_tag is None:
                     continue
                 elif discount_tag.find("span").text == "-100%" and self.is_dlc(product_id) is False:
-                    game = Game(tag.find("span", {"class": "title"}).text, self.URL + product_id, self.SERVICE_ID)
+                    game = Game(tag.find("span", {"class": "title"}).text, self._url + product_id, self.SERVICE_ID)
                     parsed_games.append(game)
         except (AttributeError, TypeError, KeyError, json.decoder.JSONDecodeError):
             raise InvalidGameDataException
@@ -63,5 +63,5 @@ class Main:
             return parsed_games
 
     def get_free_games(self):
-        free_games = self.process_request(self.make_request(self.ENDPOINT))
+        free_games = self._process_request(self.make_request())
         return free_games

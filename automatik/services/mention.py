@@ -1,9 +1,15 @@
 # This is not a removable service. If you wish to disable it use the '!mk disable' command.
 
-class Main:
-    def __init__(self):
-        self.SERVICE_NAME = "Mention"
-        self.SERVICE_ID = "mention"
+from automatik.core.base_service import BaseService
+
+
+class Service(BaseService):
+    SERVICE_NAME = "Mention"
+    SERVICE_ID = "mention"
+    EMBED_COLOR = "#7289DA"
+
+    def make_request(self):
+        pass
 
     def get_free_games(self):
         return []

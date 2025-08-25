@@ -1,6 +1,8 @@
 import importlib
+import inspect
 import os
 from importlib.metadata import Deprecated
+from inspect import getmembers
 
 from automatik import logger, SRC_DIR
 
@@ -19,7 +21,7 @@ class ServiceLoader:
                 try:
                     imported_service = importlib.import_module(f"automatik.services.{service_name}")
                     # Creates an instance of the Main class of the imported service
-                    Klass = getattr(imported_service, "Main")
+                    Klass = getattr(imported_service, "Service")
                     ServiceLoader.services.append(Klass())
                 except AttributeError:
                     logger.exception(f"Service '{service_name}' couldn't be loaded")
