@@ -1,7 +1,8 @@
 import discord
-from discord.ext import commands
 from discord import app_commands, ui
-from automatik import __version__, LOGO_URL, SRC_DIR, AVATAR_URL, logger
+from discord.ext import commands
+
+from automatik import LOGO_URL, AVATAR_URL, logger
 from automatik.core.services import ServiceLoader
 
 

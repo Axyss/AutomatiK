@@ -1,8 +1,8 @@
 import json
+from distutils.version import LooseVersion
 
 import requests
 from requests.exceptions import HTTPError, Timeout
-from distutils.version import LooseVersion
 
 from automatik import __version__, logger
 

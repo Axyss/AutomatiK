@@ -1,6 +1,7 @@
-import logging
 import os
 from logging.handlers import TimedRotatingFileHandler
+
+import logging
 
 
 def create_logs_folder():

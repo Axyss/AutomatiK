@@ -1,8 +1,8 @@
 import json
 
 import requests
-from requests.exceptions import HTTPError, Timeout
 from bs4 import BeautifulSoup
+from requests.exceptions import HTTPError, Timeout
 
 from automatik import logger
 from automatik.core.base_service import BaseService
