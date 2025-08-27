@@ -18,7 +18,6 @@ class Service(BaseService):
     _endpoint = "https://store-site-backend-static.ak.epicgames.com/freeGamesPromotions"
 
     def make_request(self):
-        """Makes the HTTP request to the Epic Games' backend."""
         try:
             raw_data = requests.get(self._endpoint)
         except (HTTPError, Timeout, requests.exceptions.ConnectionError):
@@ -27,8 +26,7 @@ class Service(BaseService):
         else:
             return raw_data
 
-    def process_request(self, raw_data):
-        """Returns a list of free games from the raw data."""
+    def _process_request(self, raw_data):
         parsed_games = []
 
         try:
@@ -49,5 +47,5 @@ class Service(BaseService):
             return parsed_games
 
     def get_free_games(self):
-        free_games = self.process_request(self.make_request())
+        free_games = self._process_request(self.make_request())
         return free_games
