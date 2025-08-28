@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import List
+import sys
 
 from requests import Request
 
@@ -13,9 +14,8 @@ class BaseService(ABC):
         pass
 
     @property
-    @abstractmethod
     def SERVICE_ID(self):
-        pass
+        return sys.modules[type(self).__module__].__name__
 
     @property
     @abstractmethod

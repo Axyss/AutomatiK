@@ -11,7 +11,6 @@ from automatik.core.game import Game
 
 class Service(BaseService):
     SERVICE_NAME = "Humble Bundle"
-    SERVICE_ID = "humble"
     EMBED_COLOR = "#CC2929"
 
     _endpoint = "https://www.humblebundle.com/store/api/search?sort=discount&filter=onsale&request=1"

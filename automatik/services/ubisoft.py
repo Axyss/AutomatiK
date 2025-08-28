@@ -11,7 +11,6 @@ from automatik.core.game import Game
 
 class Service(BaseService):
     SERVICE_NAME = "Ubisoft Connect"
-    SERVICE_ID = "ubisoft"
     EMBED_COLOR = "#0084FF"
 
     _endpoint = "https://public-ubiservices.ubi.com/v1/spaces/news?spaceId=6d0af36b-8226-44b6-a03b" \

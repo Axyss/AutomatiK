@@ -5,7 +5,6 @@ from automatik.core.base_service import BaseService
 
 class Service(BaseService):
     SERVICE_NAME = "Mention"
-    SERVICE_ID = "mention"
     EMBED_COLOR = "#7289DA"
 
     def make_request(self):
