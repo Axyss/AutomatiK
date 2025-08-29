@@ -15,7 +15,7 @@ class BaseService(ABC):
 
     @property
     def SERVICE_ID(self):
-        return sys.modules[type(self).__module__].__name__
+        return type(self).__module__.split('.')[-1]
 
     @property
     @abstractmethod
