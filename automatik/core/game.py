@@ -36,20 +36,20 @@ class GameAdapter:
     )
 
     @staticmethod
-    def to_dict(game_obj):
+    def to_dict(game: Game):
         """Converts a 'Game' instance into a dictionary."""
-        return {"name": game_obj.NAME,
-                "link": game_obj.LINK,
-                "service_id": game_obj.SERVICE_ID,
-                "date": game_obj.DATE}
+        return {"name": game.NAME,
+                "link": game.LINK,
+                "service_id": game.SERVICE_ID,
+                "date": game.DATE}
 
     @staticmethod
-    def to_dict_using_ai(game_request: Response, service: Game):
+    def to_dict_using_ai(game_request: Response, service_id):
         """Tries converting unstructured data into a dictionary using AI."""
         game_data = game_request.content.decode("utf-8")
         prompt = f"{GameAdapter.instructions}\n\nData to analyze:\n{game_data}"
         ai_data = GameAdapter.ai_agent.run(prompt).content
-        return [{**game, "service_id": service.SERVICE_ID} for game in json.loads(ai_data)]
+        return [{**game, "service_id": service_id} for game in json.loads(ai_data)]
 
     @staticmethod
     def to_object(game_dict):

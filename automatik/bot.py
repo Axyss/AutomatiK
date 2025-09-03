@@ -108,7 +108,7 @@ class AutomatikBot(commands.Bot):
                 retrieved_free_games = service.get_free_games()
             except InvalidGameDataException:
                 api_request = service.make_request()
-                retrieved_free_games = [GameAdapter.to_object(game) for game in GameAdapter.to_dict_using_ai(api_request, service)]
+                retrieved_free_games = [GameAdapter.to_object(game) for game in GameAdapter.to_dict_using_ai(api_request, service.SERVICE_ID)]
             except:  # Any unhandled exception in any service would abruptly stop the current iteration without this
                 logger.exception("Unexpected error while retrieving game data")
                 continue
