@@ -15,7 +15,7 @@ class Game:
 
     def __eq__(self, other):
         """When comparing two Game objects only the link and service ID attributes will matter."""
-        return True if self.LINK == other.LINK and self.SERVICE_ID == other.SERVICE_ID else False
+        return self.LINK == other.LINK and self.SERVICE_ID == other.SERVICE_ID
 
 
 class GameAdapter:
