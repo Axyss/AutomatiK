@@ -158,8 +158,7 @@ if __name__ == "__main__":
     logger.info("Loading..")
     automatik_bot = AutomatikBot(command_prefix="!mk ", intents=discord.Intents.default())
     automatik.utils.update.check_updates()
-
     try:
-        automatik_bot.run(automatik_bot.cfg.discord_token)
+        automatik_bot.run(automatik_bot.cfg.discord_token, log_handler=None)
     except discord.errors.LoginFailure:
         logger.error("Invalid 'discord_bot_token'. Press enter to exit..")
