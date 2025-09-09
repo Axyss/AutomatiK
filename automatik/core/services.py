@@ -2,6 +2,7 @@ import importlib
 import os
 
 from automatik import logger, SRC_DIR
+from automatik.core.base_service import BaseService
 
 
 class ServiceLoader:
@@ -33,3 +34,10 @@ class ServiceLoader:
     @staticmethod
     def get_service_names():
         return [i.SERVICE_NAME for i in ServiceLoader.services]
+
+    @staticmethod
+    def get_service(service_id) -> BaseService | None:
+        for service in ServiceLoader.services:
+            if service.SERVICE_ID == service_id:
+                return service
+        return None

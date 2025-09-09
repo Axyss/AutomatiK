@@ -12,7 +12,7 @@ from automatik.core.game import Game
 
 class Service(BaseService):
     SERVICE_NAME = "Steam"
-    EMBED_COLOR = "#1B2838"
+    EMBED_COLOR = 0x1B2838
 
     _url = "https://store.steampowered.com/app/"
     _endpoint = "https://store.steampowered.com/search/results/?query&start=0&count=25&sort_by=Price_ASC" \

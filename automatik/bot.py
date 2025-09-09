@@ -3,6 +3,8 @@ import os
 import random
 
 import discord
+import requests
+from bs4 import BeautifulSoup
 from discord.ext import commands, tasks
 
 import automatik.utils.cli
@@ -14,7 +16,7 @@ from automatik.commands.public import PublicSlash
 from automatik.core.config import Config
 from automatik.core.db import Database
 from automatik.core.errors import InvalidGameDataException
-from automatik.core.game import GameAdapter
+from automatik.core.game import GameAdapter, Game
 from automatik.core.lang import LanguageLoader
 from automatik.core.services import ServiceLoader
 
@@ -63,6 +65,17 @@ class AutomatikBot(commands.Bot):
         if guild_cfg["services"]["mention"] and guild_cfg["mention_role"]:
             message = guild_cfg["mention_role"] + " " + message
         return message
+
+    @staticmethod
+    def create_game_embed(game: Game):
+        service = ServiceLoader.get_service(game.SERVICE_ID)
+        embed = discord.Embed(
+            title=f"{game.NAME} is free!",
+            url=game.LINK,
+            color=service.EMBED_COLOR
+        )
+        embed.set_author(name=service.SERVICE_NAME)
+        return embed
 
     async def on_command_error(self, interaction, error):
         """Method used for error handling regarding the discord.py library."""
