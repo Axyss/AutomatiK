@@ -1,9 +1,11 @@
 import datetime
 import json
 
+from curl_cffi import requests
+from curl_cffi.requests import Response
 from agno.agent import Agent
 from agno.models.google import Gemini
-from requests import Response
+from bs4 import BeautifulSoup
 
 
 class Game:
@@ -16,6 +18,13 @@ class Game:
     def __eq__(self, other):
         """When comparing two Game objects only the link and service ID attributes will matter."""
         return self.LINK == other.LINK and self.SERVICE_ID == other.SERVICE_ID
+
+    @property
+    def promo_img_url(self):
+        response = requests.get(self.LINK, impersonate="chrome")
+        bs4 = BeautifulSoup(response.content, "html.parser")
+        img_tag = bs4.find("meta", property="og:image")
+        return img_tag["content"] if img_tag else None
 
 
 class GameAdapter:

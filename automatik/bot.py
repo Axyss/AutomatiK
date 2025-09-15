@@ -75,6 +75,7 @@ class AutomatikBot(commands.Bot):
             color=service.EMBED_COLOR
         )
         embed.set_author(name=service.SERVICE_NAME)
+        embed.set_image(url=game.promo_img_url)
         return embed
 
     async def on_command_error(self, interaction, error):
@@ -143,9 +144,9 @@ class AutomatikBot(commands.Bot):
             guild_config = self.mongo.get_guild_config(guild)
             for game in free_games:
                 if guild_config["selected_channel"] and guild_config["services"][game.SERVICE_ID]:
-                    message = self.generate_message(guild_config, game)
+                    game_embed = self.create_game_embed(game)
                     try:
-                        await guild.get_channel(guild_config["selected_channel"]).send(message)
+                        await guild.get_channel(guild_config["selected_channel"]).send(embed=game_embed)
                         success += 1
                     except (AttributeError, discord.errors.Forbidden):  # Channel id invalid or bot lacks permissions
                         fail += 1
