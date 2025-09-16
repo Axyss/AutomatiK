@@ -15,6 +15,7 @@ pymongo = "^4.15.1"
 dotenv = "^0.9.9"
 curl-cffi = "^0.13.0"
 google-genai = "^1.36.0"
+agno = "^2.0.4"
 
 
 [build-system]
