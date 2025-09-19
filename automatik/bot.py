@@ -28,6 +28,7 @@ class AutomatikBot(commands.Bot):
         self.lm = LanguageLoader(os.path.join(SRC_DIR, "lang"))
         self.cfg = Config(".env")
         self.mongo = Database(self.cfg.DB_URI)
+        self._debug_guild = None if not self.cfg.DEBUG_GUILD_ID else discord.Object(id=self.cfg.DEBUG_GUILD_ID)
 
         self.main_loop = True  # Variable used to start or stop the main loop
         self.load_resources()
@@ -35,17 +36,16 @@ class AutomatikBot(commands.Bot):
         self.init_commands()
 
     async def setup_hook(self):
-        # todo Refactor
-        self.tree.clear_commands(guild=discord.Object(id=649270300982247449))
-        await self.add_cog(PublicSlash(self, self.lm, self.cfg, self.mongo),guild=discord.Object(id=649270300982247449))
-        await self.add_cog(AdminSlash(self, self.lm, self.cfg, self.mongo), guild=discord.Object(id=649270300982247449))
-        await self.add_cog(OwnerSlash(self, self.lm, self.cfg, self.mongo), guild=discord.Object(id=649270300982247449))
+        self.tree.clear_commands(guild=self._debug_guild)
+        await self.add_cog(PublicSlash(self, self.lm, self.cfg, self.mongo),guild=self._debug_guild)
+        await self.add_cog(AdminSlash(self, self.lm, self.cfg, self.mongo), guild=self._debug_guild)
+        await self.add_cog(OwnerSlash(self, self.lm, self.cfg, self.mongo), guild=self._debug_guild)
 
     async def on_ready(self):
         if self.is_first_exec:
             self.is_first_exec = False
             self.look_for_free_games.start()
-            await self.tree.sync(guild=discord.Object(id=649270300982247449))
+            await self.tree.sync(guild=self._debug_guild)
             logger.info("Bot Online")
         await self.change_presence(status=discord.Status.online, activity=discord.Game("!mk help"))
 

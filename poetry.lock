@@ -2,13 +2,13 @@
 
 [[package]]
 name = "agno"
-version = "2.0.4"
+version = "2.0.7"
 description = "Agno: a lightweight library for building Multi-Agent Systems"
 optional = false
 python-versions = "<4,>=3.7"
 files = [
-    {file = "agno-2.0.4-py3-none-any.whl", hash = "sha256:4fe3db9e327217047006287a94de65d997bf7bbac3ad60711b8038a0b02e7d4f"},
-    {file = "agno-2.0.4.tar.gz", hash = "sha256:6494cb2804f1c1a71c490566dc126dea3dd0ea30829a5613302a3340c10378a4"},
+    {file = "agno-2.0.7-py3-none-any.whl", hash = "sha256:b9f3981847c546b2bbf19884aa489cc1a2691c6cab1ba094e9c338235a7583b2"},
+    {file = "agno-2.0.7.tar.gz", hash = "sha256:78a8588c7c8bba0d25158f1afa5c06d6deac1506e5c698372f6a3eaea19d77a3"},
 ]
 
 [package.dependencies]
@@ -108,6 +108,7 @@ psycopg = ["psycopg", "psycopg-binary"]
 pylance = ["pylance"]
 qdrant = ["qdrant-client"]
 redis = ["redis"]
+reportlab = ["reportlab"]
 singlestore = ["sqlalchemy"]
 sql = ["sqlalchemy"]
 sqlite = ["sqlalchemy"]
@@ -116,7 +117,7 @@ surrealdb = ["surrealdb (>=1.0.4)"]
 tests = ["agno[agui]", "agno[cookbooks]", "agno[dev]", "agno[embedders]", "agno[knowledge]", "agno[models]", "agno[performance]", "agno[storage]", "agno[tools]", "agno[vectordbs]", "build", "twine"]
 text = ["aiofiles"]
 todoist = ["todoist-api-python"]
-tools = ["agno[agentql]", "agno[apify]", "agno[arxiv]", "agno[brave]", "agno[browserbase]", "agno[cartesia]", "agno[confluence]", "agno[crawl4ai]", "agno[ddg]", "agno[duckdb]", "agno[elevenlabs]", "agno[evm]", "agno[exa]", "agno[fal]", "agno[firecrawl]", "agno[github]", "agno[gmail]", "agno[google-bigquery]", "agno[googlemaps]", "agno[matplotlib]", "agno[mcp]", "agno[mem0]", "agno[memori]", "agno[neo4j]", "agno[newspaper]", "agno[opencv]", "agno[oxylabs]", "agno[psycopg]", "agno[todoist]", "agno[trafilatura]", "agno[valyu]", "agno[webex]", "agno[youtube]", "agno[zep]"]
+tools = ["agno[agentql]", "agno[apify]", "agno[arxiv]", "agno[brave]", "agno[browserbase]", "agno[cartesia]", "agno[confluence]", "agno[crawl4ai]", "agno[ddg]", "agno[duckdb]", "agno[elevenlabs]", "agno[evm]", "agno[exa]", "agno[fal]", "agno[firecrawl]", "agno[github]", "agno[gmail]", "agno[google-bigquery]", "agno[googlemaps]", "agno[matplotlib]", "agno[mcp]", "agno[mem0]", "agno[memori]", "agno[neo4j]", "agno[newspaper]", "agno[opencv]", "agno[oxylabs]", "agno[psycopg]", "agno[reportlab]", "agno[todoist]", "agno[trafilatura]", "agno[valyu]", "agno[webex]", "agno[youtube]", "agno[zep]"]
 trafilatura = ["trafilatura"]
 upstash = ["upstash-vector"]
 valyu = ["valyu"]
@@ -611,13 +612,13 @@ files = [
 
 [[package]]
 name = "click"
-version = "8.2.1"
+version = "8.3.0"
 description = "Composable command line interface toolkit"
 optional = false
 python-versions = ">=3.10"
 files = [
-    {file = "click-8.2.1-py3-none-any.whl", hash = "sha256:61a3265b914e850b85317d0b3109c7f8cd35a670f963866005d6ef1d5175a12b"},
-    {file = "click-8.2.1.tar.gz", hash = "sha256:27c491cc05d968d271d5a1db13e3b5a184636d9d930f148c50b038f0d0646202"},
+    {file = "click-8.3.0-py3-none-any.whl", hash = "sha256:9b9f285302c6e3064f4330c05f05b81945b2a39544279343e6e7c5f27a9baddc"},
+    {file = "click-8.3.0.tar.gz", hash = "sha256:e7b8232224eba16f4ebe410c25ced9f7875cb5f3263ffc93cc3e8da705e229c4"},
 ]
 
 [package.dependencies]
@@ -924,13 +925,13 @@ urllib3 = ["packaging", "urllib3"]
 
 [[package]]
 name = "google-genai"
-version = "1.37.0"
+version = "1.38.0"
 description = "GenAI Python SDK"
 optional = false
 python-versions = ">=3.9"
 files = [
-    {file = "google_genai-1.37.0-py3-none-any.whl", hash = "sha256:4571c11cc556b523262d326e326612ba665eedee0d6222c931a0a9365303fa10"},
-    {file = "google_genai-1.37.0.tar.gz", hash = "sha256:1e9328aa9c0bde5fe2afd71694f9e6eaf77b59b458525d7a4a073117578189f4"},
+    {file = "google_genai-1.38.0-py3-none-any.whl", hash = "sha256:95407425132d42b3fa11bc92b3f5cf61a0fbd8d9add1f0e89aac52c46fbba090"},
+    {file = "google_genai-1.38.0.tar.gz", hash = "sha256:363272fc4f677d0be6a1aed7ebabe8adf45e1626a7011a7886a587e9464ca9ec"},
 ]
 
 [package.dependencies]
