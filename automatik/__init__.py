@@ -11,6 +11,6 @@ LOGO_URL = "https://raw.githubusercontent.com/Axyss/AutomatiK/master/docs/assets
 AVATAR_URL = "https://avatars3.githubusercontent.com/u/55812692"
 SRC_DIR = os.path.dirname(__file__)
 
-_logging_level = "DEBUG" if _Config(".env").debug else "INFO"
+_logging_level = "DEBUG" if _Config(".env").debug_messages else "INFO"
 _create_logs_folder()
 logger = _create_custom_logger("automatik_logger", _logging_level)
