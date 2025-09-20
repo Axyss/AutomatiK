@@ -2,6 +2,8 @@ version: "3.9"
 services:
   mongo:
     image: mongo
+    volumes:
+      - mongo-data:/data/db
   bot:
     build: .
     depends_on:
@@ -12,7 +14,5 @@ services:
       BOT_OWNER: "${BOT_OWNER}"
       DEBUG_MESSAGES: true
       DEBUG_GUILD_ID: "${DEBUG_GUILD_ID}"
-    volumes:
-      - automatik-mongo:/data
 volumes:
-  automatik-mongo:
+  mongo-data:
