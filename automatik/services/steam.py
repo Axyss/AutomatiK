@@ -49,11 +49,11 @@ class Service(BaseService):
             soup = BeautifulSoup(processed_data, "html.parser")
             for tag in soup.find_all("a", {"class": "search_result_row ds_collapse_flag"}):
                 product_id = tag.get("data-ds-appid") if tag.get("data-ds-appid") else tag.get("data-ds-bundleid")
-                discount_tag = tag.find("div", {"class": "col search_discount responsive_secondrow"})
+                discount_tag = tag.find("div", {"class": "discount_pct"})
                 # DLCs must be compared carefully since 'not None' is equal to 'True'.
                 if discount_tag is None:
                     continue
-                elif discount_tag.find("span").text == "-100%" and self.is_dlc(product_id) is False:
+                elif discount_tag.text == "-100%" and self.is_dlc(product_id) is False:
                     game = Game(tag.find("span", {"class": "title"}).text, self._url + product_id, self.SERVICE_ID)
                     parsed_games.append(game)
         except (AttributeError, TypeError, KeyError, json.decoder.JSONDecodeError):
