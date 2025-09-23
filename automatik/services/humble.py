@@ -18,12 +18,10 @@ class Service(BaseService):
 
     def make_request(self):
         try:
-            raw_data = requests.get(self._endpoint, impersonate="chrome")
+            return requests.get(self._endpoint, impersonate="chrome")
         except (HTTPError, Timeout, ConnectionError):
             logger.error(f"Request to {self.SERVICE_NAME} by service \'{self.SERVICE_ID}\' failed")
             raise InvalidGameDataException
-        else:
-            return raw_data
 
     def _process_request(self, raw_data):
         parsed_games = []
@@ -34,11 +32,9 @@ class Service(BaseService):
                 if i["current_price"]["amount"] == 0:
                     game = Game(i["human_name"], self._url + i["human_url"], self.SERVICE_ID)
                     parsed_games.append(game)
+            return parsed_games
         except (TypeError, KeyError, json.decoder.JSONDecodeError):
             raise InvalidGameDataException
-        else:
-            return parsed_games
 
     def get_free_games(self):
-        free_games = self._process_request(self.make_request())
-        return free_games
+        return self._process_request(self.make_request())

@@ -34,12 +34,10 @@ class Service(BaseService):
     def make_request(self, endpoint=None):
         url = endpoint if endpoint else self._endpoint
         try:
-            raw_data = requests.get(url)
+            return requests.get(url)
         except (HTTPError, Timeout, requests.exceptions.ConnectionError):
             logger.error(f"Request to {self.SERVICE_NAME} by service \'{self.SERVICE_ID}\' failed")
             raise InvalidGameDataException
-        else:
-            return raw_data
 
     def _process_request(self, raw_data):
         parsed_games = []
@@ -56,11 +54,9 @@ class Service(BaseService):
                 elif discount_tag.text == "-100%" and self.is_dlc(product_id) is False:
                     game = Game(tag.find("span", {"class": "title"}).text, self._url + product_id, self.SERVICE_ID)
                     parsed_games.append(game)
+            return parsed_games
         except (AttributeError, TypeError, KeyError, json.decoder.JSONDecodeError):
             raise InvalidGameDataException
-        else:
-            return parsed_games
 
     def get_free_games(self):
-        free_games = self._process_request(self.make_request())
-        return free_games
+        return self._process_request(self.make_request())

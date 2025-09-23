@@ -38,11 +38,7 @@ class GameAdapter:
         "The 'link' should be the URL to the game on the store's website and cannot be empty"
         "If you can't find any free games or no data is provided, then return an empty JSON array."
     )
-    ai_agent = Agent(
-        model=Gemini(
-            id="gemini-2.5-flash",  # Updated to a valid model ID
-        )
-    )
+    ai_agent = Agent(model=Gemini(id="gemini-2.5-flash"))
 
     @staticmethod
     def to_dict(game: Game):
