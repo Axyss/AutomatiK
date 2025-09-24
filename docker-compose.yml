@@ -12,6 +12,9 @@ services:
       DB_URI: "mongodb://mongo:27017"
       DISCORD_TOKEN: "${DISCORD_TOKEN}"
       BOT_OWNER: "${BOT_OWNER}"
+      GEMINI_API_KEY: "${GEMINI_API_KEY}"
+
+      # Development settings
       DEBUG_MESSAGES: true
       DEBUG_GUILD_ID: "${DEBUG_GUILD_ID}"
 volumes:
