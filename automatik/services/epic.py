@@ -12,6 +12,7 @@ from automatik.core.game import Game
 class Service(BaseService):
     SERVICE_NAME = "Epic Games"
     EMBED_COLOR = 0x202020
+    SERVICE_IMAGE = "epic_games_logo.png"
 
     _product_url = "https://www.epicgames.com/store/us-US/p/"
     _endpoint = "https://store-site-backend-static.ak.epicgames.com/freeGamesPromotions"

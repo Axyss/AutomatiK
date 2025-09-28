@@ -12,6 +12,7 @@ from automatik.core.game import Game
 class Service(BaseService):
     SERVICE_NAME = "Humble Bundle"
     EMBED_COLOR = 0xCC2929
+    SERVICE_IMAGE = "humble_bundle_logo.png"
 
     _endpoint = "https://www.humblebundle.com/store/api/search?sort=discount&filter=onsale&request=1"
     _url = "https://www.humblebundle.com/store/"

@@ -30,7 +30,7 @@ class AutomatikBot(commands.Bot):
         self.mongo = Database(self.cfg.DB_URI)
         self._debug_guild = None if not self.cfg.DEBUG_GUILD_ID else discord.Object(id=self.cfg.DEBUG_GUILD_ID)
 
-        self.main_loop = True  # Variable used to start or stop the main loop
+        self.main_loop = True
         self.load_resources()
         self.remove_command("help")  # There is a default 'help' command which shows docstrings
         self.init_commands()
@@ -74,9 +74,10 @@ class AutomatikBot(commands.Bot):
             url=game.LINK,
             color=service.EMBED_COLOR
         )
+        embed.set_thumbnail(url="attachment://thumbnail.png")
         embed.set_author(name=service.SERVICE_NAME)
         embed.set_image(url=game.promo_img_url)
-        return embed
+        return embed, discord.File(f"automatik/services/assets/{service.SERVICE_IMAGE}", filename="thumbnail.png")
 
     async def on_command_error(self, interaction, error):
         """Method used for error handling regarding the discord.py library."""
@@ -144,11 +145,11 @@ class AutomatikBot(commands.Bot):
             guild_config = self.mongo.get_guild_config(guild)
             for game in free_games:
                 if guild_config["selected_channel"] and guild_config["services"][game.SERVICE_ID]:
-                    game_embed = self.create_game_embed(game)
+                    game_embed, thumbnail = self.create_game_embed(game)
                     try:
-                        await guild.get_channel(guild_config["selected_channel"]).send(embed=game_embed)
+                        await guild.get_channel(guild_config["selected_channel"]).send(embed=game_embed, file=thumbnail)
                         success += 1
-                    except (AttributeError, discord.errors.Forbidden):  # Channel id invalid or bot lacks permissions
+                    except (AttributeError, discord.errors.Forbidden):  # Invalid channel id or bot lacks permissions
                         fail += 1
                     except:
                         fail += 1

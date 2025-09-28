@@ -22,6 +22,11 @@ class BaseService(ABC):
     def EMBED_COLOR(self):
         pass
 
+    @property
+    @abstractmethod
+    def SERVICE_IMAGE(self):
+        pass
+
     @abstractmethod
     def make_request(self) -> Request:
         """Makes the HTTP request to the service's backend."""
