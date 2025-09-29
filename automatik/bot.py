@@ -3,8 +3,6 @@ import os
 import random
 
 import discord
-import requests
-from bs4 import BeautifulSoup
 from discord.ext import commands, tasks
 
 import automatik.utils.cli
@@ -36,10 +34,15 @@ class AutomatikBot(commands.Bot):
         self.init_commands()
 
     async def setup_hook(self):
-        self.tree.clear_commands(guild=self._debug_guild)
         await self.add_cog(PublicSlash(self, self.lm, self.cfg, self.mongo),guild=self._debug_guild)
         await self.add_cog(AdminSlash(self, self.lm, self.cfg, self.mongo), guild=self._debug_guild)
         await self.add_cog(OwnerSlash(self, self.lm, self.cfg, self.mongo), guild=self._debug_guild)
+
+    async def close(self):
+        if self._debug_guild:
+            self.tree.clear_commands(guild=self._debug_guild)
+            await self.tree.sync(guild=self._debug_guild)
+        await super().close()
 
     async def on_ready(self):
         if self.is_first_exec:
