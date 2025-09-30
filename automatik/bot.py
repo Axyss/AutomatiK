@@ -31,7 +31,6 @@ class AutomatikBot(commands.Bot):
         self.main_loop = True
         self.load_resources()
         self.remove_command("help")  # There is a default 'help' command which shows docstrings
-        self.init_commands()
 
     async def setup_hook(self):
         await self.add_cog(PublicSlash(self, self.lm, self.cfg, self.mongo),guild=self._debug_guild)
@@ -55,8 +54,6 @@ class AutomatikBot(commands.Bot):
     def load_resources(self):
         """Loads configuration, services and language packages."""
         ServiceLoader.load_services()
-        # todo Refactor
-        # self.cfg.load_config()
         self.lm.load_lang_packages()
         # Services are added to the documents from the 'configs' collection on runtime
         self.mongo.insert_missing_or_new_services()
@@ -89,22 +86,13 @@ class AutomatikBot(commands.Bot):
         if isinstance(error, commands.CommandInvokeError):
             error = error.original  # CommandInvokeError is too generic, this gets the exception which raised it
 
-        if isinstance(error, commands.MissingPermissions):
-            # User lacks permissions
+        if isinstance(error, commands.MissingPermissions):  # User lacks permissions
             await interaction.response.send_message(self.lm.get_message(guild_lang, "missing_permissions"))
-
-        # todo Add MissingRequiredArgument
 
         elif isinstance(error, commands.errors.CommandNotFound):
             await interaction.response.send_message(self.lm.get_message(guild_lang, "invalid_command"))
 
-        # todo Plain unnecessary
-        elif isinstance(error, commands.errors.CommandOnCooldown):
-            await interaction.response.send_message(
-                self.lm.get_message(guild_lang, "cooldown_error").format(int(error.retry_after)))
-
-        elif isinstance(error, discord.errors.Forbidden):
-            # Bot kicked or lacks permissions to send messages
+        elif isinstance(error, discord.errors.Forbidden):  # Bot kicked or lacks permissions
             pass
 
         elif isinstance(error, commands.errors.CheckFailure):
@@ -167,8 +155,6 @@ class AutomatikBot(commands.Bot):
         logger.debug(f"{interaction.command.name} invoked by {str(interaction.author)} on {interaction.guild.id}")
         return True
 
-    def init_commands(self):
-        pass
 
 if __name__ == "__main__":
     automatik.utils.cli.clear_console()
