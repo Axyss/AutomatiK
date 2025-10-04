@@ -113,6 +113,9 @@ class AutomatikBot(commands.Bot):
             try:
                 retrieved_free_games = service.get_free_games()
             except InvalidGameDataException:
+                if not self.cfg.GEMINI_API_KEY:
+                    continue
+                logger.warning(f"Falling back to AI processing for service '{service.SERVICE_ID}'")
                 api_request = service.make_request()
                 retrieved_free_games = [GameAdapter.to_object(game) for game in GameAdapter.to_dict_using_ai(api_request, service.SERVICE_ID)]
             except:  # Any unhandled exception in any service would abruptly stop the current iteration without this
