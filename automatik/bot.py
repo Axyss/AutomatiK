@@ -10,7 +10,6 @@ import automatik.utils.update
 from automatik import logger, SRC_DIR
 from automatik.commands.admin import AdminSlash
 from automatik.commands.owner import OwnerSlash
-from automatik.commands.public import PublicSlash
 from automatik.core.config import Config
 from automatik.core.db import Database
 from automatik.core.errors import InvalidGameDataException
@@ -33,7 +32,6 @@ class AutomatikBot(commands.Bot):
         self.remove_command("help")  # There is a default 'help' command which shows docstrings
 
     async def setup_hook(self):
-        await self.add_cog(PublicSlash(self, self.lm, self.cfg, self.mongo),guild=self._debug_guild)
         await self.add_cog(AdminSlash(self, self.lm, self.cfg, self.mongo), guild=self._debug_guild)
         await self.add_cog(OwnerSlash(self, self.lm, self.cfg, self.mongo), guild=self._debug_guild)
 
