@@ -41,7 +41,7 @@
       "status_inactive": "DESACTIVADO \u274C",
 
       "select_invalid_channel": "\u274C Canal de texto no válido. Usa **!mk select [#canal-de-texto]**",
-      "select_success": "\u2705 Canal de texto {} seleccionado.",
+      "select_success": "✅ Canal {} seleccionado con éxito.",
 
       "unselect_already": "\u274C No hay ningún canal de texto seleccionado.",
       "unselect_success": "\u2705 Canal de texto {} deseleccionado.",
@@ -99,6 +99,12 @@
       "select_channel_placeholder": "Selecciona un canal...",
       "unselect_channel": "Deseleccionar Canal",
       "service_toggle_placeholder": "Selecciona módulos para activar/desactivar",
-      "services_updated": "✅ Módulos actualizados correctamente"
+      "services_updated": "✅ Módulos actualizados con éxito",
+      "services_management": "Gestión de Módulos",
+      "services_management_description": "Desde aquí puedes activar o desactivar módulos y ver su estado actual.",
+      "service_status": "Estado",
+      "service_enabled_status": "✅ Activado",
+      "service_disabled_status": "❌ Desactivado",
+      "current_services": "Estado Actual de los Módulos"
     }
 }

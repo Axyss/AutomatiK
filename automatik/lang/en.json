@@ -41,7 +41,7 @@
       "status_inactive": "DISABLED \u274C",
 
       "select_invalid_channel": "\u274C Invalid text channel. Use **!mk select [#text-channel]**",
-      "select_success": "\u2705 Text channel {} selected.",
+      "select_success": "✅ Channel {} selected successfully.",
 
       "unselect_already": "\u274C There is not a selected channel yet.",
       "unselect_success": "\u2705 Text channel {} unselected.",
@@ -99,6 +99,12 @@
       "select_channel_placeholder": "Select a channel...",
       "unselect_channel": "Unselect Channel",
       "service_toggle_placeholder": "Select services to enable/disable",
-      "services_updated": "✅ Services updated successfully"
+      "services_updated": "✅ Services updated successfully",
+      "services_management": "Services Management",
+      "services_management_description": "From here you can enable or disable services and view their current status.",
+      "service_status": "Status",
+      "service_enabled_status": "✅ Enabled",
+      "service_disabled_status": "❌ Disabled",
+      "current_services": "Status of Current Services"
     }
 }

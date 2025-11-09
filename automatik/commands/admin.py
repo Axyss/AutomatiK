@@ -48,39 +48,27 @@ class AdminSlash(commands.Cog):
     @app_commands.command()
     @app_commands.checks.has_permissions(administrator=True)
     async def services(self, interaction):
-        """Shows information about the loaded services."""
-        guild_lang = self.mongo.get_guild_config(interaction.guild)["lang"]
+        """Manage services - enable or disable services and view their current status."""
+        guild_cfg = self.mongo.get_guild_config(interaction.guild)
+        guild_lang = guild_cfg["lang"]
+        guild_services = guild_cfg["services"]
 
-        embed_service = discord.Embed(title=self.lm.get_message(guild_lang, "services"),
-                                     description=self.lm.get_message(guild_lang, "services_description"),
-                                     color=0x00BFFF)
+        embed = discord.Embed(
+            title=self.lm.get_message(guild_lang, "services_management"),
+            description=self.lm.get_message(guild_lang, "services_management_description"),
+            color=0x00BFFF
+        )
+        embed.set_footer(text=self.lm.get_message(guild_lang, "help_footer"), icon_url=AVATAR_URL)
+        embed.set_thumbnail(url=LOGO_URL)
 
-        embed_service.set_footer(text=self.lm.get_message(guild_lang, "help_footer"), icon_url=AVATAR_URL)
-        embed_service.set_thumbnail(url=LOGO_URL)
-
-        embed_service.add_field(name="**ServiceID**", value="\n".join(ServiceLoader.get_service_ids()))
-
-        embed_service.add_field(name=self.lm.get_message(guild_lang, "services_service"),
-                               value="\n".join(ServiceLoader.get_service_names()))
-
-        await interaction.response.send_message(embed=embed_service)
-
-    @app_commands.command(name="service", )
-    @app_commands.checks.has_permissions(administrator=True)
-    async def enable(self, interaction, choice: str):
-        """Modify the list of services you are interested in."""
-        guild_lang = self.mongo.get_guild_config(interaction.guild)["lang"]
-        user_decision = choice == "enable"
-
+        services_status = []
         for service in ServiceLoader.services:
-            if choice.lower() == service.SERVICE_ID.lower():
-                self.mongo.update_guild_config(interaction.guild, {"services." + choice.lower(): user_decision})
-                await interaction.response.send_message(
-                    self.lm.get_message(guild_lang, f"service_{choice}d").format(choice))
-                logger.info(f"{choice.capitalize()} service {choice}d by {interaction.author}")
-                return True
+            status = guild_services.get(service.SERVICE_ID, True)
+            status_text = self.lm.get_message(guild_lang, "service_enabled_status" if status else "service_disabled_status")
+            services_status.append(f"**{service.SERVICE_NAME}** (`{service.SERVICE_ID}`): {status_text}")
 
-        await interaction.response.send_message(self.lm.get_message(guild_lang, f"enable_unknown").format(choice))
+        view = ServicesManagementView(self.lm, self.mongo, interaction.guild, guild_services)
+        await interaction.response.send_message(embed=embed, view=view)
 
     @app_commands.command()
     @app_commands.checks.has_permissions(administrator=True)
@@ -229,3 +217,57 @@ class ChannelSelector(ui.Select):
             ephemeral=True
         )
         logger.info(f"Channel selected: {channel.name} in {self.guild.name}")
+
+
+class ServicesManagementView(ui.View):
+    def __init__(self, lm, mongo, guild, services_status):
+        super().__init__(timeout=300)
+        self.lm = lm
+        self.mongo = mongo
+        self.guild = guild
+        self.services_status = services_status
+
+        for service in ServiceLoader.services[:20]:  # Limit to 20 to be safe with Discord limits
+            is_enabled = services_status.get(service.SERVICE_ID, True)
+            button = ui.Button(
+                style=discord.ButtonStyle.success if is_enabled else discord.ButtonStyle.danger,
+                label=service.SERVICE_NAME,
+                emoji="✅" if is_enabled else "❌",
+                custom_id=f"toggle_{service.SERVICE_ID}"
+            )
+            button.callback = self.create_toggle_callback(service.SERVICE_ID, service.SERVICE_NAME)
+            self.add_item(button)
+
+    async def interaction_check(self, interaction):
+        """Verify that the user has administrator permissions"""
+        return interaction.user.guild_permissions.administrator
+
+    def create_toggle_callback(self, service_id, service_name):
+        """Create a callback function for toggling a specific service."""
+        async def toggle_callback(interaction):
+            guild_lang = self.mongo.get_guild_config(self.guild)["lang"]
+            current_status = self.services_status.get(service_id, True)
+            new_status = not current_status
+
+            self.mongo.update_guild_config(self.guild, {f"services.{service_id}": new_status})
+            self.services_status[service_id] = new_status
+
+            button = discord.utils.get(self.children, custom_id=f"toggle_{service_id}")
+            if button:
+                button.style = discord.ButtonStyle.success if new_status else discord.ButtonStyle.danger
+                button.emoji = "✅" if new_status else "❌"
+
+            embed = discord.Embed(
+                title=self.lm.get_message(guild_lang, "services_management"),
+                description=self.lm.get_message(guild_lang, "services_management_description"),
+                color=0x00BFFF
+            )
+            embed.set_footer(text=self.lm.get_message(guild_lang, "help_footer"), icon_url=AVATAR_URL)
+            embed.set_thumbnail(url=LOGO_URL)
+
+            await interaction.response.edit_message(embed=embed, view=self)
+
+            status_msg = "enabled" if new_status else "disabled"
+            logger.info(f"Service '{service_name}' ({service_id}) {status_msg} in {self.guild.name} by {interaction.user}")
+
+        return toggle_callback
