@@ -26,8 +26,7 @@ class LanguageLoader:
         """Retrieves metadata from the language packages."""
         lang_codes = [id_ for id_ in self.lang_pkgs]
         lang_names = [self.lang_pkgs[id_].language for id_ in self.lang_pkgs]
-        lang_authors = [self.lang_pkgs[id_].author for id_ in self.lang_pkgs]
-        return lang_codes, lang_names, lang_authors
+        return lang_codes, lang_names
 
     def get_message(self, lang_code, message_id):
         try:
@@ -40,7 +39,6 @@ class LanguageLoader:
 class Language:
     def __init__(self, lang_data):
         self.language = lang_data["language"]
-        self.author = lang_data["author"]
         self.emoji = lang_data["emoji"]
         self._messages = lang_data["messages"]
 

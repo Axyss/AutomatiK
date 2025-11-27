@@ -13,7 +13,6 @@ class LanguageSelector(ui.Select):
                 label=lang.language,
                 value=lang_id,
                 emoji=lang.emoji,
-                description=f"Author: {lang.author}"
             )
             options.append(option)
 
