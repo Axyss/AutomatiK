@@ -10,12 +10,12 @@ services:
       - mongo
     environment:
       DB_URI: "mongodb://mongo:27017"
-      DISCORD_TOKEN: "${DISCORD_TOKEN}"
-      BOT_OWNER: "${BOT_OWNER}"
-      GEMINI_API_KEY: "${GEMINI_API_KEY}"
+      #DISCORD_TOKEN: "YOUR_DISCORD_TOKEN_HERE"
+      #BOT_OWNER: "YOUR_DISCORD_USER_ID_HERE"
+      #GEMINI_API_KEY: "YOUR_GEMINI_API_KEY_HERE"
 
-      # Development settings
-      DEBUG_MESSAGES: true
-      DEBUG_GUILD_ID: "${DEBUG_GUILD_ID}"
+      # Developer settings
+      #DEBUG_MESSAGES: true
+      #DEBUG_GUILD_ID: "${DEBUG_GUILD_ID}"
 volumes:
   mongo-data:
