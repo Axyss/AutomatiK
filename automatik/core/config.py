@@ -13,5 +13,7 @@ class Config:
         attr = attr.upper()
         try:
             return ast.literal_eval(self._config[attr])
-        except (ValueError, SyntaxError, KeyError):
+        except (ValueError, SyntaxError):
+            return self._config[attr]
+        except KeyError:
             return None
