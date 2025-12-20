@@ -1,6 +1,7 @@
 # coding=utf-8
 import os
 import random
+from datetime import datetime
 
 import discord
 from discord.ext import commands, tasks
@@ -8,6 +9,7 @@ from discord.ext import commands, tasks
 import automatik.utils.cli
 import automatik.utils.update
 from automatik import logger, SRC_DIR
+from automatik.utils.igdb_client import IGDBClient
 from automatik.commands.admin import AdminSlash
 from automatik.commands.owner import OwnerSlash
 from automatik.core.config import Config
@@ -26,6 +28,7 @@ class AutomatikBot(commands.Bot):
         self.cfg = Config(".env")
         self.mongo = Database(self.cfg.DB_URI)
         self._debug_guild = None if not self.cfg.DEBUG_GUILD_ID else discord.Object(id=self.cfg.DEBUG_GUILD_ID)
+        self.igdb = IGDBClient(self.cfg.IGDB_CLIENT_ID, self.cfg.IGDB_CLIENT_SECRET) if self.cfg.IGDB_CLIENT_ID and self.cfg.IGDB_CLIENT_SECRET else None
 
         self.main_loop = True
         self.load_resources()
@@ -64,8 +67,7 @@ class AutomatikBot(commands.Bot):
             message = guild_cfg["mention_role"] + " " + message
         return message
 
-    @staticmethod
-    def create_game_embed(game: Game):
+    def create_game_embed(self, game: Game):
         service = ServiceLoader.get_service(game.SERVICE_ID)
         embed = discord.Embed(
             title=f"{game.NAME} is free!",
@@ -75,6 +77,31 @@ class AutomatikBot(commands.Bot):
         embed.set_thumbnail(url="attachment://thumbnail.png")
         embed.set_author(name=service.SERVICE_NAME)
         embed.set_image(url=game.promo_img_url)
+
+        if igdb_data := self.igdb.get_game_data(game.NAME):
+            # Game summary
+            if igdb_data.get("summary"):
+                summary = igdb_data["summary"]
+                if len(summary) > 300:
+                    summary = summary[:297] + "..."
+                embed.description = summary
+
+            # Game rating
+            rating = igdb_data.get("total_rating") or igdb_data.get("aggregated_rating") or igdb_data.get("rating")
+            if rating:
+                rating_stars = IGDBClient.rating_to_stars(rating)
+                embed.add_field(name="Rating", value=f"{rating_stars} ({rating/10:.1f}/10)", inline=True)
+
+            # Game genres
+            if igdb_data.get("genres"):
+                genres = ", ".join([g["name"] for g in igdb_data["genres"][:3]])
+                embed.add_field(name="Genres", value=genres, inline=True)
+
+            # Game release year
+            if igdb_data.get("first_release_date"):
+                release_year = datetime.fromtimestamp(igdb_data["first_release_date"]).year
+                embed.add_field(name="Released", value=str(release_year), inline=True)
+
         return embed, discord.File(f"automatik/services/assets/{service.SERVICE_IMAGE}", filename="thumbnail.png")
 
     async def on_command_error(self, interaction, error):

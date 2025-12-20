@@ -16,6 +16,7 @@ dotenv = "^0.9.9"
 curl-cffi = "^0.13.0"
 google-genai = "^1.36.0"
 agno = "^2.2.2"
+igdb-api-v4 = "^0.3.3"
 
 
 [build-system]
