@@ -14,7 +14,7 @@ class Service(BaseService):
     EMBED_COLOR = 0x202020
     SERVICE_IMAGE = "epic_games_logo.png"
 
-    _product_url = "https://www.epicgames.com/store/us-US/p/"
+    _base_url = "https://store.epicgames.com/store/us-US/"
     _endpoint = "https://store-site-backend-static.ak.epicgames.com/freeGamesPromotions"
 
     def make_request(self):
@@ -31,14 +31,19 @@ class Service(BaseService):
             processed_data = json.loads(raw_data.content)["data"]["Catalog"]["searchStore"]["elements"]
             for element in processed_data:
                 promotions = element["promotions"]  # None if there aren't any, so there's no need to use 'get'
-                current_price = element["price"]["totalPrice"]["originalPrice"] - \
-                                element["price"]["totalPrice"]["discount"]
+                current_price = element["price"]["totalPrice"]["originalPrice"] - element["price"]["totalPrice"]["discount"]
 
-                # The order of the next if statement is crucial since 'promotions' may be None
-                if current_price == 0 and promotions and promotions["promotionalOffers"]:
-                    url_slug = element["productSlug"] if element["productSlug"] else element["offerMappings"][0]["pageSlug"]
-                    game = Game(element["title"], self._product_url + url_slug, self.SERVICE_ID)
-                    parsed_games.append(game)
+                if current_price != 0 or not promotions or not promotions["promotionalOffers"]:
+                    continue
+
+                url_slug = element["productSlug"] if element["productSlug"] else element["offerMappings"][0]["pageSlug"]
+                if element["offerType"] in ("BUNDLE", "OTHERS"):
+                    product_url = self._base_url + "bundles/" + url_slug
+                else:
+                    product_url = self._base_url + "p/" + url_slug
+
+                game = Game(element["title"], product_url, self.SERVICE_ID)
+                parsed_games.append(game)
             return parsed_games
         except (TypeError, KeyError, json.decoder.JSONDecodeError):
             raise InvalidGameDataException
