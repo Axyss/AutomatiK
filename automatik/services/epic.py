@@ -37,7 +37,7 @@ class Service(BaseService):
                     continue
 
                 url_slug = element["productSlug"] if element["productSlug"] else element["offerMappings"][0]["pageSlug"]
-                if element["offerType"] in ("BUNDLE", "OTHERS"):
+                if element["offerType"] == "BUNDLE":
                     product_url = self._base_url + "bundles/" + url_slug
                 else:
                     product_url = self._base_url + "p/" + url_slug
