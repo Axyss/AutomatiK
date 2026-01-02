@@ -90,7 +90,7 @@ class AutomatikBot(commands.Bot):
             rating = igdb_data.get("total_rating") or igdb_data.get("aggregated_rating") or igdb_data.get("rating")
             if rating:
                 rating_stars = IGDBClient.rating_to_stars(rating)
-                embed.add_field(name="Rating", value=f"{rating_stars} ({rating/10:.1f}/10)", inline=True)
+                embed.add_field(name="Rating", value=f"{rating_stars} ({rating/20:.1f}/5)", inline=True)
 
             # Game genres
             if igdb_data.get("genres"):
