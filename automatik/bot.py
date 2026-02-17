@@ -23,20 +23,20 @@ from automatik.core.services import ServiceLoader
 class AutomatikBot(commands.Bot):
     def __init__(self, command_prefix, intents):
         commands.Bot.__init__(self, command_prefix=command_prefix, intents=intents)
-        self.is_first_exec = True
-        self.lm = LanguageLoader(os.path.join(SRC_DIR, "lang"))
-        self.cfg = Config(".env")
-        self.mongo = Database(self.cfg.DB_URI)
-        self._debug_guild = None if not self.cfg.DEBUG_GUILD_ID else discord.Object(id=self.cfg.DEBUG_GUILD_ID)
-        self.igdb = IGDBClient(self.cfg.IGDB_CLIENT_ID, self.cfg.IGDB_CLIENT_SECRET) if self.cfg.IGDB_CLIENT_ID and self.cfg.IGDB_CLIENT_SECRET else None
+        self.is_first_execution = True
+        self.languages = LanguageLoader(os.path.join(SRC_DIR, "lang"))
+        self.config = Config(".env")
+        self.database = Database(self.config.DB_URI)
+        self._debug_guild = None if not self.config.DEBUG_GUILD_ID else discord.Object(id=self.config.DEBUG_GUILD_ID)
+        self.igdb = IGDBClient(self.config.IGDB_CLIENT_ID, self.config.IGDB_CLIENT_SECRET) if self.config.IGDB_CLIENT_ID and self.config.IGDB_CLIENT_SECRET else None
 
         self.main_loop = True
         self.load_resources()
         self.remove_command("help")  # There is a default 'help' command which shows docstrings
 
     async def setup_hook(self):
-        await self.add_cog(AdminSlash(self, self.lm, self.cfg, self.mongo), guild=self._debug_guild)
-        await self.add_cog(OwnerSlash(self, self.lm, self.cfg, self.mongo), guild=self._debug_guild)
+        await self.add_cog(AdminSlash(self, self.languages, self.config, self.database), guild=self._debug_guild)
+        await self.add_cog(OwnerSlash(self, self.languages, self.config, self.database), guild=self._debug_guild)
 
     async def close(self):
         if self._debug_guild:
@@ -45,8 +45,8 @@ class AutomatikBot(commands.Bot):
         await super().close()
 
     async def on_ready(self):
-        if self.is_first_exec:
-            self.is_first_exec = False
+        if self.is_first_execution:
+            self.is_first_execution = False
             self.look_for_free_games.start()
             await self.tree.sync(guild=self._debug_guild)
             logger.info("Bot Online")
@@ -55,16 +55,16 @@ class AutomatikBot(commands.Bot):
     def load_resources(self):
         """Loads configuration, services and language packages."""
         ServiceLoader.load_services()
-        self.lm.load_lang_packages()
+        self.languages.load_lang_packages()
         # Services are added to the documents from the 'configs' collection on runtime
-        self.mongo.insert_missing_or_new_services()
+        self.database.insert_missing_or_new_services()
 
-    def generate_message(self, guild_cfg, game):
+    def generate_message(self, guild_config, game):
         """Generates a 'X free on Y' type message."""
-        message = random.choice(self.lm.get_message(guild_cfg["lang"], "generic_messages")).format(game.NAME, game.LINK)
+        message = random.choice(self.languages.get_message(guild_config["lang"], "generic_messages")).format(game.NAME, game.LINK)
 
-        if guild_cfg["services"]["mention"] and guild_cfg["mention_role"]:
-            message = guild_cfg["mention_role"] + " " + message
+        if guild_config["services"]["mention"] and guild_config["mention_role"]:
+            message = guild_config["mention_role"] + " " + message
         return message
 
     def create_game_embed(self, game: Game):
@@ -107,15 +107,15 @@ class AutomatikBot(commands.Bot):
     async def on_command_error(self, interaction, error):
         """Method used for error handling regarding the discord.py library."""
 
-        guild_lang = self.mongo.get_guild_config(interaction.guild)["lang"]
+        guild_lang = self.database.get_guild_config(interaction.guild)["lang"]
         if isinstance(error, commands.CommandInvokeError):
             error = error.original  # CommandInvokeError is too generic, this gets the exception which raised it
 
         if isinstance(error, commands.MissingPermissions):  # User lacks permissions
-            await interaction.response.send_message(self.lm.get_message(guild_lang, "missing_permissions"))
+            await interaction.response.send_message(self.languages.get_message(guild_lang, "missing_permissions"))
 
         elif isinstance(error, commands.errors.CommandNotFound):
-            await interaction.response.send_message(self.lm.get_message(guild_lang, "invalid_command"))
+            await interaction.response.send_message(self.languages.get_message(guild_lang, "invalid_command"))
 
         elif isinstance(error, discord.errors.Forbidden):  # Bot kicked or lacks permissions
             pass
@@ -134,11 +134,11 @@ class AutomatikBot(commands.Bot):
         if not self.main_loop:
             return
         for service in ServiceLoader.services:
-            stored_free_games = self.mongo.get_free_games_by_service_id(service.SERVICE_ID)
+            stored_free_games = self.database.get_free_games_by_service_id(service.SERVICE_ID)
             try:
                 retrieved_free_games = service.get_free_games()
             except InvalidGameDataException:
-                if not self.cfg.GEMINI_API_KEY:
+                if not self.config.GEMINI_API_KEY:
                     continue
                 logger.warning(f"Falling back to AI processing for service '{service.SERVICE_ID}'")
                 api_request = service.make_request()
@@ -149,19 +149,19 @@ class AutomatikBot(commands.Bot):
 
             for game in retrieved_free_games:  # Looks for free games
                 if game not in stored_free_games:
-                    self.mongo.create_free_game(game)
+                    self.database.create_free_game(game)
                     free_games.append(game)
 
             for game in stored_free_games:  # Looks for games that are no longer free
                 if game not in retrieved_free_games:
-                    self.mongo.move_to_past_free_games(game)
+                    self.database.move_to_past_free_games(game)
         await self.broadcast_free_games(free_games)
 
     async def broadcast_free_games(self, free_games):
         success, fail = 0, 0
 
         for guild in self.guilds:
-            guild_config = self.mongo.get_guild_config(guild)
+            guild_config = self.database.get_guild_config(guild)
             for game in free_games:
                 if guild_config["selected_channel"] and guild_config["services"][game.SERVICE_ID]:
                     game_embed, thumbnail = self.create_game_embed(game)
@@ -177,7 +177,7 @@ class AutomatikBot(commands.Bot):
             logger.info(f"Messages sent to all guilds. Success: {success} | Fail: {fail}")
 
     async def is_an_owner(self, interaction):
-        return str(interaction) in self.cfg.bot_owner
+        return str(interaction) in self.config.bot_owner
 
     async def is_invoked(self, interaction):
         logger.debug(f"{interaction.command.name} invoked by {str(interaction.author)} on {interaction.guild.id}")
@@ -191,6 +191,6 @@ if __name__ == "__main__":
     automatik_bot = AutomatikBot(command_prefix="!mk ", intents=discord.Intents.default())
     automatik.utils.update.check_updates()
     try:
-        automatik_bot.run(automatik_bot.cfg.discord_token, log_handler=None)
+        automatik_bot.run(automatik_bot.config.discord_token, log_handler=None)
     except discord.errors.LoginFailure:
         logger.error("Invalid 'discord_bot_token'. Press enter to exit..")
