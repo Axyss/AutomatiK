@@ -83,11 +83,6 @@
       "shutdown_success": "\u2705 Shutting down...",
       "shutdown_abort": "\u274C There are still **{}** messages waiting to be delivered. Try again later.",
 
-      "generic_messages": ["{} is currently free on {}",
-                           "Hurry, {} is now free on {}",
-                           "{} can be found for free on {}",
-                           "{} is available for free on {}"],
-
       "channel_management": "Channel Management",
       "channel_description": "From here you can manage the notification channel for free games.",
       "channel_selected": "Channel Selected",

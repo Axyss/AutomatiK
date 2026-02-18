@@ -1,6 +1,5 @@
 # coding=utf-8
 import os
-import random
 from datetime import datetime
 
 import discord
@@ -58,14 +57,6 @@ class AutomatikBot(commands.Bot):
         self.languages.load_lang_packages()
         # Services are added to the documents from the 'configs' collection on runtime
         self.database.insert_missing_or_new_services()
-
-    def generate_message(self, guild_config, game):
-        """Generates a 'X free on Y' type message."""
-        message = random.choice(self.languages.get_message(guild_config["lang"], "generic_messages")).format(game.NAME, game.LINK)
-
-        if guild_config["services"]["mention"] and guild_config["mention_role"]:
-            message = guild_config["mention_role"] + " " + message
-        return message
 
     def create_game_embed(self, game: Game):
         service = ServiceLoader.get_service(game.SERVICE_ID)
