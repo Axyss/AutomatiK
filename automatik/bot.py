@@ -15,7 +15,7 @@ from automatik.core.config import Config
 from automatik.core.db import Database
 from automatik.core.errors import InvalidGameDataException
 from automatik.core.game import GameAdapter, Game
-from automatik.core.lang import LanguageLoader
+from automatik.core.lang import LanguageManager
 from automatik.core.services import ServiceLoader
 
 
@@ -23,7 +23,7 @@ class AutomatikBot(commands.Bot):
     def __init__(self, command_prefix, intents):
         commands.Bot.__init__(self, command_prefix=command_prefix, intents=intents)
         self.is_first_execution = True
-        self.languages = LanguageLoader(os.path.join(SRC_DIR, "lang"))
+        self.languages = LanguageManager(os.path.join(SRC_DIR, "lang"))
         self.config = Config(".env")
         self.database = Database(self.config.DB_URI)
         self._debug_guild = None if not self.config.DEBUG_GUILD_ID else discord.Object(id=self.config.DEBUG_GUILD_ID)
@@ -54,7 +54,7 @@ class AutomatikBot(commands.Bot):
     def load_resources(self):
         """Loads configuration, services and language packages."""
         ServiceLoader.load_services()
-        self.languages.load_lang_packages()
+        self.languages.load_language_files()
         # Services are added to the documents from the 'configs' collection on runtime
         self.database.insert_missing_or_new_services()
 

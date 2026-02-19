@@ -103,13 +103,13 @@ class AdminSlash(commands.Cog):
         )
         embed_langs.set_thumbnail(url=LOGO_URL)
 
-        current_language = self.lm.lang_pkgs[guild_lang].language
+        current_language = self.lm.languages_data[guild_lang].language
         embed_langs.add_field(
             name="📌 " + self.lm.get_message(guild_lang, "language") + " " + "(actual)",
-            value=f"{self.lm.lang_pkgs[guild_lang].emoji} **{current_language}** (`{guild_lang}`)",
+            value=f"{self.lm.languages_data[guild_lang].emoji} **{current_language}** (`{guild_lang}`)",
             inline=False
         )
 
-        view = LanguageView(self.lm.lang_pkgs, self.lm, self.mongo)
+        view = LanguageView(self.lm.languages_data, self.lm, self.mongo)
         await interaction.response.send_message(embed=embed_langs, view=view)
 
