@@ -6,10 +6,10 @@ from automatik.core.services import ServiceLoader
 
 
 class ServicesManagementView(ui.View):
-    def __init__(self, lm, mongo, guild, services_status):
+    def __init__(self, languages, database, guild, services_status):
         super().__init__(timeout=300)
-        self.lm = lm
-        self.mongo = mongo
+        self.languages = languages
+        self.database = database
         self.guild = guild
         self.services_status = services_status
 
@@ -31,11 +31,11 @@ class ServicesManagementView(ui.View):
     def create_toggle_callback(self, service_id, service_name):
         """Create a callback function for toggling a specific service."""
         async def toggle_callback(interaction):
-            guild_lang = self.mongo.get_guild_config(self.guild)["lang"]
+            guild_lang = self.database.get_guild_config(self.guild)["lang"]
             current_status = self.services_status.get(service_id, True)
             new_status = not current_status
 
-            self.mongo.update_guild_config(self.guild, {f"services.{service_id}": new_status})
+            self.database.update_guild_config(self.guild, {f"services.{service_id}": new_status})
             self.services_status[service_id] = new_status
 
             button = discord.utils.get(self.children, custom_id=f"toggle_{service_id}")
@@ -44,11 +44,11 @@ class ServicesManagementView(ui.View):
                 button.emoji = "✅" if new_status else "❌"
 
             embed = discord.Embed(
-                title=self.lm.get_message(guild_lang, "services_management"),
-                description=self.lm.get_message(guild_lang, "services_management_description"),
+                title=self.languages.get_message(guild_lang, "services_management"),
+                description=self.languages.get_message(guild_lang, "services_management_description"),
                 color=0x00BFFF
             )
-            embed.set_footer(text=self.lm.get_message(guild_lang, "help_footer"), icon_url=AVATAR_URL)
+            embed.set_footer(text=self.languages.get_message(guild_lang, "help_footer"), icon_url=AVATAR_URL)
             embed.set_thumbnail(url=LOGO_URL)
 
             await interaction.response.edit_message(embed=embed, view=self)

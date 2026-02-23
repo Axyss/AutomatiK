@@ -5,11 +5,11 @@ from automatik import logger
 
 
 class ChannelSelector(ui.Select):
-    def __init__(self, channels, lm, mongo, guild):
-        self.lm = lm
-        self.mongo = mongo
+    def __init__(self, channels, languages, database, guild):
+        self.languages = languages
+        self.database = database
         self.guild = guild
-        guild_lang = self.mongo.get_guild_config(guild)["lang"]
+        guild_lang = self.database.get_guild_config(guild)["lang"]
 
         options = []
         for channel in channels[:25]:
@@ -21,42 +21,42 @@ class ChannelSelector(ui.Select):
             options.append(option)
 
         super().__init__(
-            placeholder=self.lm.get_message(guild_lang, "select_channel_placeholder"),
+            placeholder=self.languages.get_message(guild_lang, "select_channel_placeholder"),
             min_values=1,
             max_values=1,
             options=options
         )
 
     async def callback(self, interaction):
-        guild_lang = self.mongo.get_guild_config(self.guild)["lang"]
+        guild_lang = self.database.get_guild_config(self.guild)["lang"]
         channel_id = int(self.values[0])
         channel = self.guild.get_channel(channel_id)
 
-        self.mongo.update_guild_config(self.guild, {"selected_channel": channel_id})
+        self.database.update_guild_config(self.guild, {"selected_channel": channel_id})
         await interaction.response.send_message(
-            self.lm.get_message(guild_lang, "select_success").format(channel.mention),
+            self.languages.get_message(guild_lang, "select_success").format(channel.mention),
             ephemeral=True
         )
         logger.info(f"Channel selected: {channel.name} in {self.guild.name}")
 
 
 class ChannelManagementView(ui.View):
-    def __init__(self, lm, mongo, guild, channel_id=None):
+    def __init__(self, languages, database, guild, channel_id=None):
         super().__init__(timeout=300)
-        self.lm = lm
-        self.mongo = mongo
+        self.languages = languages
+        self.database = database
         self.guild = guild
         self.channel_id = channel_id
-        guild_lang = self.mongo.get_guild_config(guild)["lang"]
+        guild_lang = self.database.get_guild_config(guild)["lang"]
 
         # Add channel selector dropdown
-        self.add_item(ChannelSelector(guild.text_channels, lm, mongo, guild))
+        self.add_item(ChannelSelector(guild.text_channels, languages, database, guild))
 
         # Add unselect button only if there's a channel selected
         if channel_id:
             unselect_btn = ui.Button(
                 style=discord.ButtonStyle.danger,
-                label=self.lm.get_message(guild_lang, "unselect_channel"),
+                label=self.languages.get_message(guild_lang, "unselect_channel"),
                 emoji="❌"
             )
             unselect_btn.callback = self.unselect_channel
@@ -67,12 +67,11 @@ class ChannelManagementView(ui.View):
         return interaction.user.guild_permissions.administrator
 
     async def unselect_channel(self, interaction):
-        guild_lang = self.mongo.get_guild_config(self.guild)["lang"]
-        self.mongo.update_guild_config(self.guild, {"selected_channel": None})
+        guild_lang = self.database.get_guild_config(self.guild)["lang"]
+        self.database.update_guild_config(self.guild, {"selected_channel": None})
         await interaction.response.send_message(
-            self.lm.get_message(guild_lang, "unselect_success").format(self.channel_id),
+            self.languages.get_message(guild_lang, "unselect_success").format(self.channel_id),
             ephemeral=True
         )
         logger.info(f"Channel unselected in {self.guild.name}")
         self.stop()
-

@@ -3,9 +3,9 @@ from discord import ui
 
 
 class LanguageSelector(ui.Select):
-    def __init__(self, lang_options, lm, mongo):
-        self.lm = lm
-        self.mongo = mongo
+    def __init__(self, lang_options, languages, database):
+        self.languages = languages
+        self.database = database
 
         options = []
         for lang_id, lang in lang_options.items():
@@ -25,15 +25,14 @@ class LanguageSelector(ui.Select):
 
     async def callback(self, interaction):
         lang_code = self.values[0]
-        self.mongo.update_guild_config(interaction.guild, {"lang": lang_code})
+        self.database.update_guild_config(interaction.guild, {"lang": lang_code})
         await interaction.response.send_message(
-            self.lm.get_message(lang_code, "language_changed"),
+            self.languages.get_message(lang_code, "language_changed"),
             ephemeral=True
         )
 
 
 class LanguageView(ui.View):
-    def __init__(self, lang_options, lm, mongo):
+    def __init__(self, lang_options, languages, database):
         super().__init__(timeout=300)
-        self.add_item(LanguageSelector(lang_options, lm, mongo))
-
+        self.add_item(LanguageSelector(lang_options, languages, database))
