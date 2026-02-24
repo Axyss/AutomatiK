@@ -1,5 +1,6 @@
 import json
 import os
+from pathlib import Path
 
 import discord
 
@@ -9,13 +10,12 @@ from automatik import logger
 class LanguageManager:
     def __init__(self, language_directory):
         self.languages_data = {}
-        self._language_directory = language_directory if language_directory[-1] == "/" else language_directory + "/"
+        self._language_directory = Path(language_directory) / language_directory
 
     def load_language_files(self):
-        """Loads all the language packages into memory."""
         for filename in os.listdir(self._language_directory):
             lang_id = os.path.splitext(filename)[0]
-            with open(f"{self._language_directory + filename}", encoding="utf-8") as package:
+            with open(f"{self._language_directory / filename}", encoding="utf-8") as package:
                 self.languages_data[lang_id] = Language(json.load(package))
         logger.info(str(len(self.languages_data.keys())) + f" language packages loaded")
 

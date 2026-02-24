@@ -1,5 +1,4 @@
 import json
-from distutils.version import LooseVersion
 
 import requests
 from requests.exceptions import HTTPError, Timeout
@@ -23,5 +22,6 @@ def _get_remote_version_data():
 def check_updates():
     """Looks for newer versions."""
     remote_version, remote_version_url = _get_remote_version_data()
-    if LooseVersion(remote_version) > LooseVersion(__version__):
+    _parse_version = lambda v: tuple(map(int, v.lstrip("v").split(".")))
+    if _parse_version(remote_version) > _parse_version(__version__):
         logger.info(f"New version ({remote_version}) available at {remote_version_url}")
