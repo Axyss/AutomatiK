@@ -1,4 +1,4 @@
-FROM python:3.14.3
+FROM python:3.14-slim
 WORKDIR /data
 ADD . .
 RUN pip3 install --no-cache-dir -r requirements.txt
