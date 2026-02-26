@@ -106,7 +106,7 @@ class AdminSlash(commands.Cog):
         current_language = self.languages.languages_data[guild_lang].language
         embed_langs.add_field(
             name="📌 " + self.languages.get_message(guild_lang, "language") + " " + "(actual)",
-            value=f"{self.languages.languages_data[guild_lang].emoji} **{current_language}** (`{guild_lang}`)",
+            value=f"{self.languages.get_language_emoji(guild_lang)} **{current_language}** (`{guild_lang}`)",
             inline=False
         )
 

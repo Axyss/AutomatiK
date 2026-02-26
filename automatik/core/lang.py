@@ -19,21 +19,14 @@ class LanguageManager:
                 self.languages_data[lang_id] = Language(json.load(package))
         logger.info(str(len(self.languages_data.keys())) + f" language packages loaded")
 
-    def get_languages(self):
-        return self.languages_data.values()
-
-    def get_languages_metadata(self):
-        """Retrieves metadata from the language packages."""
-        lang_codes = [id_ for id_ in self.languages_data]
-        lang_names = [self.languages_data[id_].language for id_ in self.languages_data]
-        return lang_codes, lang_names
+    def get_language_emoji(self, lang_code):
+        return self.languages_data[lang_code].emoji
 
     def get_message(self, lang_code, message_id):
         try:
             return self.languages_data[lang_code].get_message(message_id)
         except KeyError:  # Fallback if the message in the selected language package does not exist
-            logger.debug(f"Message '{message_id}' could not be found on '{lang_code}.json'. " +
-                         "Falling back to english..")
+            logger.debug(f"Message '{message_id}' could not be found on '{lang_code}.json'. Falling back to english..")
             return self.languages_data["en"].get_message(message_id)
 
 class Language:
