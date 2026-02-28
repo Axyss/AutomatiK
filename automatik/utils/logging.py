@@ -17,7 +17,7 @@ def create_custom_logger(logger_name, logging_level):
     formatter = logging.Formatter("%(asctime)s[%(levelname)s]: %(message)s.", "[%H:%M]")
     # Logger handlers
     stream_h = logging.StreamHandler()
-    file_h = TimedRotatingFileHandler("./automatik/logs/latest.log", when="midnight", backupCount=365)
+    file_h = TimedRotatingFileHandler("./automatik/logs/latest.log", when="midnight", backupCount=90)
     stream_h.setFormatter(formatter)
     file_h.setFormatter(formatter)
     logger.addHandler(stream_h)

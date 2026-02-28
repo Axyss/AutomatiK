@@ -32,10 +32,6 @@ class ServiceLoader:
         return [i.SERVICE_ID for i in ServiceLoader.services]
 
     @staticmethod
-    def get_service_names():
-        return [i.SERVICE_NAME for i in ServiceLoader.services]
-
-    @staticmethod
     def get_service(service_id) -> BaseService | None:
         for service in ServiceLoader.services:
             if service.SERVICE_ID == service_id:
