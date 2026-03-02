@@ -88,7 +88,7 @@ class AdminSlash(commands.Cog):
     @app_commands.command()
     @app_commands.checks.has_permissions(administrator=True)
     async def language(self, interaction):
-        """Shows a list of the available languages with interactive components."""
+        """Manage language - select the language for the bot's messages."""
         guild_lang = self.database.get_guild_config(interaction.guild)["lang"]
 
         embed_langs = discord.Embed(

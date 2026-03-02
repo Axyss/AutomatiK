@@ -34,6 +34,8 @@ class AutomatikBot(commands.Bot):
         self.remove_command("help")  # There is a default 'help' command which shows docstrings
 
     async def setup_hook(self):
+        if self._debug_guild:
+            self.tree.clear_commands(guild=self._debug_guild)
         await self.add_cog(AdminSlash(self, self.languages, self.config, self.database), guild=self._debug_guild)
         await self.add_cog(OwnerSlash(self, self.languages, self.config, self.database), guild=self._debug_guild)
 
