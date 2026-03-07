@@ -29,16 +29,14 @@ class Database:
                        "services": dict.fromkeys(ServiceLoader.get_service_ids(), True)})
         try:
             self._db["configs"].insert_one(config)
-            return True
         except DuplicateKeyError:
-            return False
+            pass
 
     def insert_missing_or_new_services(self):
         """Inserts fields into the 'services' object of each document from the 'configs' collection."""
         for service in ServiceLoader.get_service_ids():
             self._db["configs"].update_many({f"services.{service}": {"$exists": False}},
                                             {"$set": {f"services.{service}": True}})
-        return True
 
     def get_guild_config(self, guild):
         """Returns the configuration from a guild, creates said config if it didn't already exist."""
@@ -48,13 +46,11 @@ class Database:
     def update_guild_config(self, guild, update):
         """Updates the value of a determined field."""
         self._db["configs"].update_one({"_id": str(guild.id)}, {"$set": update})
-        return True
 
     def create_free_game(self, game_obj):
         """Creates a new document in the 'free_games' collection."""
         self._db["free_games"].insert_one(GameAdapter.to_dict(game_obj))
         logger.info(f"New game '{game_obj.NAME}' ({game_obj.SERVICE_ID}) added to the database")
-        return True
 
     def get_free_games_by_service_id(self, service_id):
         """Returns every document from the 'free_games' collection with a certain service ID."""
@@ -69,4 +65,3 @@ class Database:
                                                                           "service_id": game_obj.SERVICE_ID})
         self._db["past_free_games"].insert_one(past_free_game_dict)
         logger.info(f"'{game_obj.NAME}' ({game_obj.SERVICE_ID}) moved to the 'past_free_games' database")
-        return True
