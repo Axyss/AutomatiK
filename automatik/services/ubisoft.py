@@ -1,6 +1,7 @@
 import json
 
 import requests
+from bs4 import BeautifulSoup
 from requests.exceptions import HTTPError, Timeout
 
 from automatik import logger
@@ -14,16 +15,12 @@ class Service(BaseService):
     EMBED_COLOR = 0x0084FF
     SERVICE_IMAGE = "ubisoft_logo.png"
 
-    _endpoint = "https://public-ubiservices.ubi.com/v1/spaces/news?spaceId=6d0af36b-8226-44b6-a03b" \
-                "-4660073a6349"
-    _headers = {"ubi-appid": "314d4fef-e568-454a-ae06-43e3bece12a6",
-                "ubi-localecode": "en-US",
-                "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, "
-                              "like Gecko) Chrome/70.0.3538.77 Safari/537.36"}
+    _base_url = "https://store.ubisoft.com"
+    _endpoint = "https://store.ubisoft.com/us/free-games?lang=en_US"
 
     def make_request(self):
         try:
-            return requests.get(self._endpoint, headers=self._headers)
+            return requests.get(self._endpoint)
         except (HTTPError, Timeout, requests.exceptions.ConnectionError):
             logger.error(f"Request to {self.SERVICE_NAME} by service \'{self.SERVICE_ID}\' failed")
             raise InvalidGameDataException
@@ -32,10 +29,12 @@ class Service(BaseService):
         parsed_games = []
 
         try:
-            processed_data = json.loads(raw_data.content)["news"]
-            for i in processed_data:
-                if i["type"] == "freegame" and i["expirationDate"]:
-                    game = Game(i["title"], i["links"][0]["param"], self.SERVICE_ID)
+            soup = BeautifulSoup(raw_data.content, "html.parser")
+            for game in soup.find_all("div", {"class": "product-tile"}):
+                if game.find("div", {"class": "card-subtitle"}).text.strip() == "Free":
+                    game_title = game.find("div", {"class": "prod-title"}).text.strip()
+                    game_link = self._base_url + game.find("a")["href"]
+                    game = Game(game_title, game_link, self.SERVICE_ID)
                     parsed_games.append(game)
             return parsed_games
         except (TypeError, KeyError, json.decoder.JSONDecodeError):
