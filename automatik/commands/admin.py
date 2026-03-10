@@ -32,8 +32,6 @@ class AdminSlash(commands.Cog):
             description=self.languages.get_message(guild_lang, "channel_description"),
             color=0x00BFFF
         )
-        embed.set_footer(text=self.languages.get_message(guild_lang, "help_footer"), icon_url=AVATAR_URL)
-        embed.set_thumbnail(url=LOGO_URL)
 
         if current_channel:
             embed.add_field(
@@ -63,8 +61,6 @@ class AdminSlash(commands.Cog):
             description=self.languages.get_message(guild_lang, "services_management_description"),
             color=0x00BFFF
         )
-        embed.set_footer(text=self.languages.get_message(guild_lang, "help_footer"), icon_url=AVATAR_URL)
-        embed.set_thumbnail(url=LOGO_URL)
 
         services_status = []
         for service in ServiceLoader.services:
@@ -96,12 +92,6 @@ class AdminSlash(commands.Cog):
             description=self.languages.get_message(guild_lang, "languages_description"),
             color=0x5865F2
         )
-
-        embed_langs.set_footer(
-            text=self.languages.get_message(guild_lang, "help_footer"),
-            icon_url=AVATAR_URL
-        )
-        embed_langs.set_thumbnail(url=LOGO_URL)
 
         current_language = self.languages.languages_data[guild_lang].language
         embed_langs.add_field(

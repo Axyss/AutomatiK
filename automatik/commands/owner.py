@@ -68,9 +68,6 @@ class OwnerSlash(commands.Cog):
         embed_stats = discord.Embed(title="\U0001f4c8 " + self.languages.get_message(guild_lang, "stats"),
                                     description=self.languages.get_message(guild_lang, "stats_description"),
                                     color=0x00BFFF)
-        embed_stats.set_footer(text=self.languages.get_message(guild_lang, "help_footer"),
-                               icon_url=AVATAR_URL)
-        embed_stats.set_thumbnail(url=LOGO_URL)
 
         embed_stats.add_field(name="Guilds", value=str(len(self.bot.guilds)))
         embed_stats.add_field(name=self.languages.get_message(guild_lang, "stats_owners_field"),

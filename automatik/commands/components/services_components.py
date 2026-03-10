@@ -48,8 +48,6 @@ class ServicesManagementView(ui.View):
                 description=self.languages.get_message(guild_lang, "services_management_description"),
                 color=0x00BFFF
             )
-            embed.set_footer(text=self.languages.get_message(guild_lang, "help_footer"), icon_url=AVATAR_URL)
-            embed.set_thumbnail(url=LOGO_URL)
 
             await interaction.response.edit_message(embed=embed, view=self)
 
