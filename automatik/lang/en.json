@@ -36,14 +36,14 @@
       "stats_message_queue_empty_value": "No messages are waiting to be delivered.",
 
       "channel_management": "Channel Management",
-      "channel_description": "From here you can manage the notification channel for free games.",
+      "channel_description": "Set up the channel where free game notifications will be sent.",
       "current_channel": "Current Channel",
       "no_channel_selected": "No Channel Selected",
       "select_channel_instruction": "Please select a channel to receive free game notifications.",
       "select_channel_placeholder": "Select a channel...",
       "unselect_channel": "Unselect Channel",
       "services_management": "Services Management",
-      "services_management_description": "From here you can enable or disable services and view their current status.",
+      "services_management_description": "Toggle which services are active and check their current status.",
       "service_enabled_status": "✅ Enabled",
       "service_disabled_status": "❌ Disabled"
     }

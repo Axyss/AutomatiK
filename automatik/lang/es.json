@@ -36,14 +36,14 @@
       "stats_message_queue_empty_value": "No hay mensajes esperando a ser enviados.",
 
       "channel_management": "Gestión de Canal",
-      "channel_description": "Desde aquí puedes gestionar el canal de notificaciones para recibir juegos gratuitos.",
+      "channel_description": "Configura el canal donde se enviarán las notificaciones de juegos gratuitos.",
       "current_channel": "Canal Actual",
       "no_channel_selected": "No hay canal seleccionado",
       "select_channel_instruction": "Por favor, selecciona un canal para recibir notificaciones de juegos gratuitos.",
       "select_channel_placeholder": "Selecciona un canal...",
       "unselect_channel": "Deseleccionar Canal",
       "services_management": "Gestión de Módulos",
-      "services_management_description": "Desde aquí puedes activar o desactivar módulos y ver su estado actual.",
+      "services_management_description": "Activa o desactiva módulos y consulta su estado actual.",
       "service_enabled_status": "✅ Activado",
       "service_disabled_status": "❌ Desactivado"
     }
