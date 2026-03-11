@@ -4,7 +4,7 @@ import pymongo
 from pymongo.errors import DuplicateKeyError
 
 from automatik.core.game import GameAdapter
-from automatik.core.lang import logger
+from automatik.core.language import logger
 from automatik.core.services import ServiceLoader
 
 

@@ -10,11 +10,15 @@ services:
       - mongo
     environment:
       DB_URI: "mongodb://mongo:27017"
-      #DISCORD_TOKEN: "YOUR_DISCORD_TOKEN_HERE"
-      #BOT_OWNER: "YOUR_DISCORD_USER_ID_HERE"
-      #GEMINI_API_KEY: "YOUR_GEMINI_API_KEY_HERE"
-      #IGDB_CLIENT_ID: "YOUR_IGDB_CLIENT_ID_HERE"
-      #IGDB_CLIENT_SECRET: "YOUR_IGDB_API_KEY_HERE"
+      DISCORD_TOKEN: "YOUR_DISCORD_TOKEN_HERE"
+      BOT_OWNER: "YOUR_DISCORD_USER_ID_HERE"
+
+      # Optional settings
+      LLM_MODEL: "provider:model" # Examples: google:gemini-2.5-flash, openai:gpt-5-mini
+      LLM_API_KEY: "YOUR_LLM_API_KEY_HERE"
+
+      IGDB_CLIENT_ID: "YOUR_IGDB_CLIENT_ID_HERE"
+      IGDB_CLIENT_SECRET: "YOUR_IGDB_API_KEY_HERE"
 
       # Developer settings
       #DEBUG_MESSAGES: true

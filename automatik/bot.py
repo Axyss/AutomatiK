@@ -8,14 +8,15 @@ from discord.ext import commands, tasks
 import automatik.utils.cli
 import automatik.utils.update
 from automatik import logger, SRC_DIR
+from automatik.core.llm import LLMParser
 from automatik.utils.igdb_client import IGDBClient
 from automatik.commands.admin import AdminSlash
 from automatik.commands.owner import OwnerSlash
 from automatik.core.config import Config
-from automatik.core.db import Database
+from automatik.core.database import Database
 from automatik.core.errors import InvalidGameDataException
 from automatik.core.game import GameAdapter, Game
-from automatik.core.lang import LanguageManager
+from automatik.core.language import LanguageManager
 from automatik.core.services import ServiceLoader
 
 
@@ -26,7 +27,8 @@ class AutomatikBot(commands.Bot):
         self.languages = LanguageManager(os.path.join(SRC_DIR, "lang"))
         self.config = Config(".env")
         self.database = Database(self.config.DB_URI)
-        self._debug_guild = None if not self.config.DEBUG_GUILD_ID else discord.Object(id=self.config.DEBUG_GUILD_ID)
+        self.llm_parser = LLMParser(self.config.LLM_MODEL) if self.config.LLM_MODEL else None
+        self._debug_guild = discord.Object(id=self.config.DEBUG_GUILD_ID) if self.config.DEBUG_GUILD_ID else None
         self.igdb = IGDBClient(self.config.IGDB_CLIENT_ID, self.config.IGDB_CLIENT_SECRET) if self.config.IGDB_CLIENT_ID and self.config.IGDB_CLIENT_SECRET else None
 
         self.main_loop = True
@@ -128,11 +130,11 @@ class AutomatikBot(commands.Bot):
             try:
                 retrieved_free_games = service.get_free_games()
             except InvalidGameDataException:
-                if not self.config.GEMINI_API_KEY:
+                if self.llm_parser is None:
                     continue
                 logger.warning(f"Falling back to AI processing for service '{service.SERVICE_ID}'")
                 api_request = service.make_request()
-                retrieved_free_games = [GameAdapter.to_object(game) for game in GameAdapter.to_dict_using_ai(api_request, service.SERVICE_ID)]
+                retrieved_free_games = [GameAdapter.to_object(game) for game in self.llm_parser.to_dict(api_request, service.SERVICE_ID)]
             except:  # Any unhandled exception in any service would abruptly stop the current iteration without this
                 logger.exception("Unexpected error while retrieving game data")
                 continue
