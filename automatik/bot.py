@@ -119,7 +119,7 @@ class AutomatikBot(commands.Bot):
         else:  # Unexpected errors wouldn't show up without this, yep, I made the mistake once
             logger.exception("Unexpected error", exc_info=error)
 
-    @tasks.loop(minutes=5)
+    @tasks.loop(minutes=15)
     async def look_for_free_games(self):
         free_games = []
 
