@@ -130,6 +130,7 @@ class AutomatikBot(commands.Bot):
             try:
                 retrieved_free_games = service.get_free_games()
             except InvalidGameDataException:
+                logger.debug(f"Invalid game data received from service '{service.SERVICE_ID}'")
                 if self.llm_parser is None:
                     continue
                 logger.warning(f"Falling back to AI processing for service '{service.SERVICE_ID}'")
