@@ -2,12 +2,12 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
-from automatik import LOGO_URL, AVATAR_URL, logger
 from automatik.core.services import ServiceLoader
 from automatik.commands.components import (
     LanguageView,
     ChannelManagementView,
-    ServicesManagementView
+    ServicesManagementView,
+    MentionManagementView
 )
 
 
@@ -73,13 +73,33 @@ class AdminSlash(commands.Cog):
 
     @app_commands.command()
     @app_commands.checks.has_permissions(administrator=True)
-    async def mention(self, interaction, role: discord.Role):
-        """Select which role will be notified freebies."""
-        guild_lang = self.database.get_guild_config(interaction.guild)["lang"]
+    async def mention(self, interaction):
+        """Manage mention role - select or unset the role that will be notified about freebies."""
+        guild_cfg = self.database.get_guild_config(interaction.guild)
+        guild_lang = guild_cfg["lang"]
+        current_role_mention = guild_cfg["mention_role"]
 
-        self.database.update_guild_config(interaction.guild, {"mention_role": role.mention})
-        await interaction.response.send_message(self.languages.get_message(guild_lang, "mention_established"))
-        logger.info(f"AutomatiK will now mention '{role}'")
+        embed = discord.Embed(
+            title=self.languages.get_message(guild_lang, "mention_management"),
+            description=self.languages.get_message(guild_lang, "mention_description"),
+            color=0x00BFFF
+        )
+
+        if current_role_mention:
+            embed.add_field(
+                name=self.languages.get_message(guild_lang, "current_mention_role"),
+                value=current_role_mention,
+                inline=False
+            )
+        else:
+            embed.add_field(
+                name=self.languages.get_message(guild_lang, "no_mention_role"),
+                value=self.languages.get_message(guild_lang, "select_role_instruction"),
+                inline=False
+            )
+
+        view = MentionManagementView(self.languages, self.database, interaction.guild, current_role_mention)
+        await interaction.response.send_message(embed=embed, view=view)
 
     @app_commands.command()
     @app_commands.checks.has_permissions(administrator=True)

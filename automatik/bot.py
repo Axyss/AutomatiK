@@ -158,8 +158,11 @@ class AutomatikBot(commands.Bot):
             for game in free_games:
                 if guild_config["selected_channel"] and guild_config["services"][game.SERVICE_ID]:
                     game_embed, thumbnail = self.create_game_embed(game)
+                    mention_content = guild_config.get("mention_role", "")
                     try:
-                        await guild.get_channel(guild_config["selected_channel"]).send(embed=game_embed, file=thumbnail)
+                        await guild.get_channel(guild_config["selected_channel"]).send(
+                            content=mention_content, embed=game_embed, file=thumbnail
+                        )
                         success += 1
                     except (AttributeError, discord.errors.Forbidden):  # Invalid channel id or bot lacks permissions
                         fail += 1

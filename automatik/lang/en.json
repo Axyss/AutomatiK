@@ -13,7 +13,16 @@
 
       "unselect_success": "\u2705 Text channel {} unselected.",
 
-      "mention_established": "\u2705 Role successfully established.",
+      "mention_established": "\u2705 Role {} successfully established.",
+
+      "mention_management": "Mention Management",
+      "mention_description": "Set up the role that will be mentioned when free game notifications are sent.",
+      "current_mention_role": "Current Role",
+      "no_mention_role": "No Role Selected",
+      "select_role_instruction": "Please select a role to be mentioned for free game notifications.",
+      "select_role_placeholder": "Select a role...",
+      "unset_mention_role": "Unset Role",
+      "mention_role_unset": "✅ Mention role has been unset.",
 
       "language": "Language",
       "languages": "Languages",

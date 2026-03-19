@@ -13,7 +13,16 @@
 
       "unselect_success": "\u2705 Canal de texto {} deseleccionado.",
 
-      "mention_established": "\u2705 Rol establecido con éxito.",
+      "mention_established": "\u2705 Rol {} establecido con éxito.",
+
+      "mention_management": "Gestión de Mención",
+      "mention_description": "Configura el rol que será mencionado cuando se envíen notificaciones de juegos gratuitos.",
+      "current_mention_role": "Rol Actual",
+      "no_mention_role": "No hay rol seleccionado",
+      "select_role_instruction": "Por favor, selecciona un rol para ser mencionado en las notificaciones de juegos gratuitos.",
+      "select_role_placeholder": "Selecciona un rol...",
+      "unset_mention_role": "Quitar Rol",
+      "mention_role_unset": "✅ El rol de mención ha sido eliminado.",
 
       "language": "Idioma",
       "languages": "Idiomas",
