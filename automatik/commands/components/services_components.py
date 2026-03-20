@@ -18,7 +18,7 @@ class ServicesManagementView(ui.View):
             button = ui.Button(
                 style=discord.ButtonStyle.success if is_enabled else discord.ButtonStyle.danger,
                 label=service.SERVICE_NAME,
-                emoji="✅" if is_enabled else "❌",
+                emoji="✅" if is_enabled else "✖️",
                 custom_id=f"toggle_{service.SERVICE_ID}"
             )
             button.callback = self.create_toggle_callback(service.SERVICE_ID, service.SERVICE_NAME)
@@ -41,7 +41,7 @@ class ServicesManagementView(ui.View):
             button = discord.utils.get(self.children, custom_id=f"toggle_{service_id}")
             if button:
                 button.style = discord.ButtonStyle.success if new_status else discord.ButtonStyle.danger
-                button.emoji = "✅" if new_status else "❌"
+                button.emoji = "✅" if new_status else "✖️"
 
             embed = discord.Embed(
                 title=self.languages.get_message(guild_lang, "services_management"),

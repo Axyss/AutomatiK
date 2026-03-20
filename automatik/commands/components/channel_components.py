@@ -57,7 +57,7 @@ class ChannelManagementView(ui.View):
             unselect_btn = ui.Button(
                 style=discord.ButtonStyle.danger,
                 label=self.languages.get_message(guild_lang, "unselect_channel"),
-                emoji="❌"
+                emoji="✖️"
             )
             unselect_btn.callback = self.unselect_channel
             self.add_item(unselect_btn)

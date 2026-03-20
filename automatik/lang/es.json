@@ -54,6 +54,6 @@
       "services_management": "Gestión de Módulos",
       "services_management_description": "Activa o desactiva módulos y consulta su estado actual.",
       "service_enabled_status": "✅ Activado",
-      "service_disabled_status": "❌ Desactivado"
+      "service_disabled_status": "✖️ Desactivado"
     }
 }

@@ -54,6 +54,6 @@
       "services_management": "Services Management",
       "services_management_description": "Toggle which services are active and check their current status.",
       "service_enabled_status": "✅ Enabled",
-      "service_disabled_status": "❌ Disabled"
+      "service_disabled_status": "✖️ Disabled"
     }
 }

@@ -44,7 +44,7 @@ class MentionManagementView(ui.View):
             unset_btn = ui.Button(
                 style=discord.ButtonStyle.danger,
                 label=languages.get_message(guild_lang, "unset_mention_role"),
-                emoji="❌"
+                emoji="✖️"
             )
             unset_btn.callback = self.unset_role
             self.add_item(unset_btn)
