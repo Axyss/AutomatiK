@@ -35,12 +35,11 @@ class MentionManagementView(ui.View):
         self.languages = languages
         self.database = database
         self.guild = guild
-        self.current_role_mention = current_role_mention
+        guild_lang = self.database.get_guild_config(guild)["lang"]
 
         self.add_item(RoleSelector(languages, database, guild))
 
         if current_role_mention:
-            guild_lang = self.database.get_guild_config(guild)["lang"]
             unset_btn = ui.Button(
                 style=discord.ButtonStyle.danger,
                 label=languages.get_message(guild_lang, "unset_mention_role"),
@@ -62,4 +61,3 @@ class MentionManagementView(ui.View):
         )
         logger.info(f"Mention role unset in {self.guild.name} by {interaction.user}")
         self.stop()
-
