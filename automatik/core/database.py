@@ -3,8 +3,8 @@ import datetime
 import pymongo
 from pymongo.errors import DuplicateKeyError
 
+from automatik import logger
 from automatik.core.game import GameAdapter
-from automatik.core.language import logger
 from automatik.core.services import ServiceLoader
 
 
@@ -50,7 +50,7 @@ class Database:
     def create_free_game(self, game_obj):
         """Creates a new document in the 'free_games' collection."""
         self._db["free_games"].insert_one(GameAdapter.to_dict(game_obj))
-        logger.info(f"New game '{game_obj.NAME}' ({game_obj.SERVICE_ID}) added to the database")
+        logger.debug(f"Inserted free game '{game_obj.NAME}' ({game_obj.SERVICE_ID}) into 'free_games'")
 
     def get_free_games_by_service_id(self, service_id):
         """Returns every document from the 'free_games' collection with a certain service ID."""
@@ -64,4 +64,4 @@ class Database:
         past_free_game_dict = self._db["free_games"].find_one_and_delete({"link": game_obj.LINK,
                                                                           "service_id": game_obj.SERVICE_ID})
         self._db["past_free_games"].insert_one(past_free_game_dict)
-        logger.info(f"'{game_obj.NAME}' ({game_obj.SERVICE_ID}) moved to the 'past_free_games' database")
+        logger.debug(f"Moved '{game_obj.NAME}' ({game_obj.SERVICE_ID}) from 'free_games' to 'past_free_games'")

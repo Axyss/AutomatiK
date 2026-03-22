@@ -21,11 +21,12 @@ class ServiceLoader:
                     # Creates an instance of the Main class of the imported service
                     Klass = getattr(imported_service, "Service")
                     ServiceLoader.services.append(Klass())
+                    logger.debug(f"Service '{service_name}' loaded successfully")
                 except AttributeError:
-                    logger.exception(f"Service '{service_name}' couldn't be loaded")
+                    logger.exception(f"Service '{service_name}' could not be loaded (missing 'Service' class)")
                 except:
-                    logger.exception(f"Unexpected error while loading service {service_name}")
-        logger.info(f"{len(ServiceLoader.services)} services loaded")
+                    logger.exception(f"Service '{service_name}' could not be loaded due to an unexpected error")
+        logger.info(f"{len(ServiceLoader.services)} service(s) loaded: {[s.SERVICE_ID for s in ServiceLoader.services]}")
 
     @staticmethod
     def get_service_ids():

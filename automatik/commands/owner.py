@@ -23,7 +23,10 @@ class OwnerSlash(commands.Cog):
 
         self.bot.main_loop = True
         await interaction.response.send_message(self.languages.get_message(guild_lang, "start_success"))
-        logger.info(f"Main service was started globally by {str(interaction.user)}")
+        logger.info(
+            f"Main loop started by {interaction.user} ({interaction.user.id}) "
+            f"from guild '{interaction.guild.name}' ({interaction.guild.id})"
+        )
 
     @app_commands.command()
     @app_commands.checks.has_permissions(administrator=True)
@@ -37,7 +40,10 @@ class OwnerSlash(commands.Cog):
 
         self.bot.main_loop = False
         await interaction.response.send_message(self.languages.get_message(guild_lang, "stop_success"))
-        logger.info(f"Main service was stopped globally by {str(interaction.author)}")
+        logger.info(
+            f"Main loop stopped by {interaction.user} ({interaction.user.id}) "
+            f"from guild '{interaction.guild.name}' ({interaction.guild.id})"
+        )
 
     @app_commands.command()
     @app_commands.checks.has_permissions(administrator=True)
@@ -45,16 +51,19 @@ class OwnerSlash(commands.Cog):
         """Reloads configuration, services and language packages."""
         guild_lang = self.database.get_guild_config(interaction.guild)["lang"]
 
-        logger.info("Reloading..")
+        logger.info(
+            f"Reload triggered by {interaction.user} ({interaction.user.id}) "
+            f"from guild '{interaction.guild.name}' ({interaction.guild.id})"
+        )
         was_started = bool(self.bot.main_loop)
         self.bot.main_loop = False
         try:
             self.bot.load_resources()
             await interaction.response.send_message(self.languages.get_message(guild_lang, "reload_completed"))
-            logger.info("Reload completed")
+            logger.info("Reload completed successfully")
         except:
             await interaction.response.send_message(self.languages.get_message(guild_lang, "unexpected_error"))
-            logger.error("An error ocurred while reloading")
+            logger.exception("Reload failed with an unexpected error")
         finally:
             self.bot.main_loop = bool(was_started)
 

@@ -17,7 +17,9 @@ class LanguageManager:
             lang_id = os.path.splitext(filename)[0]
             with open(f"{self._language_directory / filename}", encoding="utf-8") as package:
                 self.languages_data[lang_id] = Language(json.load(package))
-        logger.info(str(len(self.languages_data.keys())) + f" language packages loaded")
+        logger.info(
+            f"{len(self.languages_data)} language package(s) loaded: {list(self.languages_data.keys())}"
+        )
 
     def get_language_emoji(self, lang_code):
         return self.languages_data[lang_code].emoji
@@ -26,7 +28,7 @@ class LanguageManager:
         try:
             return self.languages_data[lang_code].get_message(message_id)
         except KeyError:  # Fallback if the message in the selected language package does not exist
-            logger.debug(f"Message '{message_id}' could not be found on '{lang_code}.json'. Falling back to english..")
+            logger.debug(f"Message ID '{message_id}' not found in '{lang_code}.json', falling back to 'en'")
             return self.languages_data["en"].get_message(message_id)
 
 class Language:

@@ -3,8 +3,8 @@ __all__ = ["logger", "__version__", "LOGO_URL", "AVATAR_URL", "SRC_DIR"]
 
 import os
 
-from automatik.utils.logging import create_custom_logger as _create_custom_logger
-from automatik.utils.logging import create_logs_folder as _create_logs_folder
+from automatik.utils.log_setup import create_custom_logger as _create_custom_logger
+from automatik.utils.log_setup import create_logs_folder as _create_logs_folder
 from .core.config import Config as _Config
 
 LOGO_URL = "https://raw.githubusercontent.com/Axyss/AutomatiK/master/docs/assets/ak_logo.png"

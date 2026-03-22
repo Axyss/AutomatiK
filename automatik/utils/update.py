@@ -12,9 +12,9 @@ def _get_remote_version_data():
         req = requests.get("https://api.github.com/repos/Axyss/AutomatiK/releases")
         remote_version_data = json.loads(req.content)[0]
     except (HTTPError, Timeout, requests.exceptions.ConnectionError):
-        logger.error("Version request to GitHub failed")
+        logger.warning("Could not check for updates: GitHub API request failed (network error)")
     except AttributeError:
-        logger.error("Version parsing from GitHub failed")
+        logger.warning("Could not check for updates: failed to parse GitHub API response")
     else:
         return remote_version_data["tag_name"], remote_version_data["html_url"]
 
@@ -24,4 +24,6 @@ def check_updates():
     remote_version, remote_version_url = _get_remote_version_data()
     _parse_version = lambda v: tuple(map(int, v.lstrip("v").split(".")))
     if _parse_version(remote_version) > _parse_version(__version__):
-        logger.info(f"New version ({remote_version}) available at {remote_version_url}")
+        logger.warning(
+            f"A new version is available: {remote_version} (current: {__version__}), see {remote_version_url}"
+        )

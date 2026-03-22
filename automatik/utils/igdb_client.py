@@ -46,9 +46,9 @@ class IGDBClient:
             # Refresh 60s before expiry for safety
             self.token_expiry = time.time() + expires_in - 60
             self.wrapper = IGDBWrapper(self.client_id, token)
-            logger.debug("IGDB token refreshed successfully")
+            logger.debug("IGDB OAuth token refreshed successfully")
         except Exception as e:
-            logger.error(f"Failed to refresh IGDB token: {e}")
+            logger.error(f"Failed to refresh IGDB OAuth token: {e}")
             self.wrapper = None
             self.token_expiry = 0
 
@@ -60,7 +60,7 @@ class IGDBClient:
             games = json.loads(response)
             return games[0] if games else None
         except Exception as e:
-            logger.warning(f"Failed to fetch IGDB data for '{game_name}': {e}")
+            logger.warning(f"IGDB lookup failed for '{game_name}': {e}")
             return None
 
     @staticmethod
