@@ -51,7 +51,10 @@ class AutomatikBot(commands.Bot):
             self.is_first_execution = False
             self.look_for_free_games.start()
             await self.tree.sync(guild=self._debug_guild)
-            logger.info("Bot Online")
+            logger.info(
+                f"Bot ready, logged in as {self.user} ({self.user.id}), "
+                f"serving {len(self.guilds)} guild(s)"
+            )
         await self.change_presence(status=discord.Status.online, activity=discord.Game("!mk help"))
 
     def load_resources(self):
@@ -120,7 +123,11 @@ class AutomatikBot(commands.Bot):
             pass
 
         else:  # Unexpected errors wouldn't show up without this, yep, I made the mistake once
-            logger.exception("Unexpected error", exc_info=error)
+            logger.exception(
+                f"Unhandled error in command '{getattr(interaction.command, 'name', 'unknown')}' "
+                f"invoked by {interaction.author} in guild '{interaction.guild.name}' ({interaction.guild.id})",
+                exc_info=error
+            )
 
     @tasks.loop(minutes=15)
     async def look_for_free_games(self):
@@ -133,27 +140,38 @@ class AutomatikBot(commands.Bot):
             try:
                 retrieved_free_games = service.get_free_games()
             except InvalidGameDataException:
-                logger.debug(f"Invalid game data received from service '{service.SERVICE_ID}'")
+                logger.warning(
+                    f"Malformed data from '{service.SERVICE_ID}'"
+                    + (", retrying with AI fallback" if self.llm_parser else ", skipping (no LLM configured)")
+                )
                 if self.llm_parser is None:
                     continue
-                logger.warning(f"Falling back to AI processing for service '{service.SERVICE_ID}'")
                 api_request = service.make_request()
                 retrieved_free_games = [GameAdapter.to_object(game) for game in self.llm_parser.to_dict(api_request, service.SERVICE_ID)]
             except:  # Any unhandled exception in any service would abruptly stop the current iteration without this
-                logger.exception("Unexpected error while retrieving game data")
+                logger.exception(f"Unexpected error while fetching data from '{service.SERVICE_ID}'")
                 continue
 
-            for game in retrieved_free_games:  # Looks for free games
-                if game not in stored_free_games:
-                    self.database.create_free_game(game)
-                    free_games.append(game)
+            new_games = [game for game in retrieved_free_games if game not in stored_free_games]
+            expired_games = [game for game in stored_free_games if game not in retrieved_free_games]
 
-            for game in stored_free_games:  # Looks for games that are no longer free
-                if game not in retrieved_free_games:
-                    self.database.move_to_past_free_games(game)
+            for game in new_games:
+                self.database.create_free_game(game)
+                free_games.append(game)
+                logger.info(f"New free game detected on '{service.SERVICE_ID}': '{game.NAME}'")
+
+            for game in expired_games:
+                self.database.move_to_past_free_games(game)
+                logger.info(f"Game no longer free on '{service.SERVICE_ID}': '{game.NAME}'")
+
+        if free_games:
+            logger.info(f"Cycle complete: {len(free_games)} new free game(s) queued for broadcast")
         await self.broadcast_free_games(free_games)
 
     async def broadcast_free_games(self, free_games):
+        if not free_games:
+            return
+
         success, fail = 0, 0
 
         for guild in self.guilds:
@@ -163,33 +181,38 @@ class AutomatikBot(commands.Bot):
                     game_embed, thumbnail = self.create_game_embed(game)
                     mention_content = guild_config.get("mention_role", "")
                     try:
-                        await guild.get_channel(guild_config["selected_channel"]).send(
-                            content=mention_content, embed=game_embed, file=thumbnail
-                        )
+                        await guild.get_channel(guild_config["selected_channel"]).send(content=mention_content, embed=game_embed, file=thumbnail)
                         success += 1
                     except (AttributeError, discord.errors.Forbidden):  # Invalid channel id or bot lacks permissions
+                        logger.warning(f"Could not deliver '{game.NAME}' to guild '{guild.name}' ({guild.id}): invalid channel or missing permissions")
                         fail += 1
                     except:
+                        logger.exception(f"Unexpected error delivering '{game.NAME}' to guild '{guild.name}' ({guild.id})")
                         fail += 1
-                        logger.exception("Unexpected error")
-        if success or fail:
-            logger.info(f"Messages sent to all guilds. Success: {success} | Fail: {fail}")
+
+        logger.info(
+            f"Broadcast complete: {success} succeeded, {fail} failed "
+            f"across {len(self.guilds)} guild(s)"
+        )
 
     async def is_an_owner(self, interaction):
         return str(interaction) in self.config.bot_owner
 
     async def is_invoked(self, interaction):
-        logger.debug(f"{interaction.command.name} invoked by {str(interaction.author)} on {interaction.guild.id}")
+        logger.debug(
+            f"Command '/{interaction.command.name}' invoked by {interaction.author} "
+            f"in guild '{interaction.guild.name}' ({interaction.guild.id})"
+        )
         return True
 
 
 if __name__ == "__main__":
     automatik.utils.cli.clear_console()
     automatik.utils.cli.print_ascii_art()
-    logger.info("Loading..")
+    logger.info("Starting AutomatiK...")
     automatik_bot = AutomatikBot(command_prefix="!mk ", intents=discord.Intents.default())
     automatik.utils.update.check_updates()
     try:
         automatik_bot.run(automatik_bot.config.discord_token, log_handler=None)
     except discord.errors.LoginFailure:
-        logger.error("Invalid 'discord_bot_token'. Press enter to exit..")
+        logger.error("Login failed: 'DISCORD_TOKEN' is invalid or expired.")
