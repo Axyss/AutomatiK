@@ -12,6 +12,9 @@ class OwnerSlash(commands.Cog):
         self.config = config
         self.database = database
 
+    async def interaction_check(self, interaction) -> bool:
+        return await self.bot.is_invoked(interaction)
+
     @app_commands.command()
     async def start(self, interaction):
         """Starts the main service globally."""

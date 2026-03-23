@@ -18,6 +18,9 @@ class AdminSlash(commands.Cog):
         self.config = config
         self.database = database
 
+    async def interaction_check(self, interaction) -> bool:
+        return await self.bot.is_invoked(interaction)
+
     @app_commands.command()
     @app_commands.checks.has_permissions(administrator=True)
     async def channel(self, interaction):

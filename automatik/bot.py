@@ -198,9 +198,9 @@ class AutomatikBot(commands.Bot):
     async def is_an_owner(self, interaction):
         return str(interaction) in self.config.bot_owner
 
-    async def is_invoked(self, interaction):
+    async def is_invoked(self, interaction: discord.Interaction):
         logger.debug(
-            f"Command '/{interaction.command.name}' invoked by {interaction.author} "
+            f"Command '/{interaction.command.name}' invoked by {interaction.user.name} "
             f"in guild '{interaction.guild.name}' ({interaction.guild.id})"
         )
         return True
