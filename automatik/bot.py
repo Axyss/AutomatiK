@@ -195,8 +195,6 @@ class AutomatikBot(commands.Bot):
             f"across {len(self.guilds)} guild(s)"
         )
 
-    async def is_an_owner(self, interaction):
-        return str(interaction) in self.config.bot_owner
 
     async def is_invoked(self, interaction: discord.Interaction):
         logger.debug(

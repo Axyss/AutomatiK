@@ -82,8 +82,6 @@ class OwnerSlash(commands.Cog):
                                     color=0x00BFFF)
 
         embed_stats.add_field(name="Guilds", value=str(len(self.bot.guilds)))
-        embed_stats.add_field(name=self.languages.get_message(guild_lang, "stats_owners_field"),
-                              value="\n".join(self.config.bot_owner))
         if message_queue_len:
             embed_stats.add_field(name=self.languages.get_message(guild_lang, "stats_message_queue_field"),
                                   value=self.languages.get_message(guild_lang, "stats_message_queue_value")
