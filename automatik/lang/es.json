@@ -39,9 +39,6 @@
 
       "stats": "Estadísticas",
       "stats_description": "Muestra información y estadísticas adicionales sobre esta instancia del bot.",
-      "stats_message_queue_field": "Cola de mensajes",
-      "stats_message_queue_value": "Hay aproximadamente **{}** mensajes esperando a ser enviados.",
-      "stats_message_queue_empty_value": "No hay mensajes esperando a ser enviados.",
 
       "channel_management": "Gestión de Canal",
       "channel_description": "Configura el canal donde se enviarán las notificaciones de juegos gratuitos.",

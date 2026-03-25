@@ -2,7 +2,7 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
-from automatik import LOGO_URL, AVATAR_URL, logger
+from automatik import logger
 
 
 class OwnerSlash(commands.Cog):
@@ -75,20 +75,11 @@ class OwnerSlash(commands.Cog):
     async def stats(self, interaction):
         """Shows some overall statistics of the bot."""
         guild_lang = self.database.get_guild_config(interaction.guild)["lang"]
-        message_queue_len = len(self.bot.guilds) * (len(self.bot.game_queue_cache) + self.bot.game_queue.qsize())
 
         embed_stats = discord.Embed(title="\U0001f4c8 " + self.languages.get_message(guild_lang, "stats"),
                                     description=self.languages.get_message(guild_lang, "stats_description"),
                                     color=0x00BFFF)
 
         embed_stats.add_field(name="Guilds", value=str(len(self.bot.guilds)))
-        if message_queue_len:
-            embed_stats.add_field(name=self.languages.get_message(guild_lang, "stats_message_queue_field"),
-                                  value=self.languages.get_message(guild_lang, "stats_message_queue_value")
-                                  .format(message_queue_len))
-        else:  # No messages in the queues
-            embed_stats.add_field(name=self.languages.get_message(guild_lang, "stats_message_queue_field"),
-                                  value=self.languages.get_message(guild_lang, "stats_message_queue_empty_value")
-                                  .format(message_queue_len))
 
         await interaction.response.send_message(embed=embed_stats)

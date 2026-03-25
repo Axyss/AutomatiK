@@ -39,9 +39,6 @@
 
       "stats": "Statistics",
       "stats_description": "Shows additional information and stats about this bot's instance.",
-      "stats_message_queue_field": "Message queue",
-      "stats_message_queue_value": "There are approximated **{}** messages waiting to be delivered.",
-      "stats_message_queue_empty_value": "No messages are waiting to be delivered.",
 
       "channel_management": "Channel Management",
       "channel_description": "Set up the channel where free game notifications will be sent.",
