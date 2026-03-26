@@ -1,4 +1,3 @@
-import discord
 from discord import app_commands
 from discord.ext import commands
 
@@ -70,16 +69,4 @@ class OwnerSlash(commands.Cog):
         finally:
             self.bot.main_loop = bool(was_started)
 
-    @app_commands.command()
-    @app_commands.checks.has_permissions(administrator=True)
-    async def stats(self, interaction):
-        """Shows some overall statistics of the bot."""
-        guild_lang = self.database.get_guild_config(interaction.guild)["lang"]
 
-        embed_stats = discord.Embed(title="\U0001f4c8 " + self.languages.get_message(guild_lang, "stats"),
-                                    description=self.languages.get_message(guild_lang, "stats_description"),
-                                    color=0x00BFFF)
-
-        embed_stats.add_field(name="Guilds", value=str(len(self.bot.guilds)))
-
-        await interaction.response.send_message(embed=embed_stats)
