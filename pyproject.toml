@@ -8,7 +8,7 @@ readme = "docs/README.md"
 [tool.poetry.dependencies]
 python = "^3.10"
 discord-py = "^2.6.3"
-requests = "^2.32.5"
+requests = "^2.33.0"
 beautifulsoup4 = "^4.13.5"
 pyyaml = "^6.0.2"
 pymongo = "^4.15.1"
