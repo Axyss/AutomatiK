@@ -20,9 +20,9 @@ class Service(BaseService):
     def make_request(self):
         try:
             return requests.get(self._endpoint)
-        except (HTTPError, Timeout, requests.exceptions.ConnectionError):
+        except (HTTPError, Timeout, requests.exceptions.ConnectionError) as e:
             logger.error(f"Request to {self.SERVICE_NAME} by service \'{self.SERVICE_ID}\' failed")
-            raise InvalidGameDataException
+            raise InvalidGameDataException(e)
 
     def _process_request(self, raw_data):
         parsed_games = []
@@ -45,8 +45,8 @@ class Service(BaseService):
                 game = Game(element["title"], product_url, self.SERVICE_ID)
                 parsed_games.append(game)
             return parsed_games
-        except (TypeError, KeyError, json.decoder.JSONDecodeError):
-            raise InvalidGameDataException
+        except (TypeError, KeyError, json.decoder.JSONDecodeError) as e:
+            raise InvalidGameDataException(e)
 
     def get_free_games(self):
         return self._process_request(self.make_request())

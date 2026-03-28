@@ -142,7 +142,8 @@ class AutomatikBot(commands.Bot):
             except InvalidGameDataException:
                 logger.warning(
                     f"Malformed data from '{service.SERVICE_ID}'"
-                    + (", retrying with AI fallback" if self.llm_parser else ", skipping (no LLM configured)")
+                    + (", retrying with AI fallback" if self.llm_parser else ", skipping (no LLM configured)"),
+                    exc_info=True
                 )
                 if self.llm_parser is None:
                     continue

@@ -16,8 +16,7 @@ class Service(BaseService):
     SERVICE_IMAGE = "steam_logo.png"
 
     _url = "https://store.steampowered.com/app/"
-    _endpoint = "https://store.steampowered.com/search/results/?query&start=0&count=25&sort_by=Price_ASC" \
-                "&specials=1&infinite=1"
+    _endpoint = "https://store.steampowered.com/search/results/?query&start=0&count=25&sort_by=Price_ASC&specials=1&infinite=1"
 
     def is_dlc(self, app_id):
         response = self.make_request(self._url + app_id)
@@ -36,9 +35,9 @@ class Service(BaseService):
         url = endpoint if endpoint else self._endpoint
         try:
             return requests.get(url)
-        except (HTTPError, Timeout, requests.exceptions.ConnectionError):
+        except (HTTPError, Timeout, requests.exceptions.ConnectionError) as e:
             logger.error(f"Request to {self.SERVICE_NAME} by service \'{self.SERVICE_ID}\' failed")
-            raise InvalidGameDataException
+            raise InvalidGameDataException(e)
 
     def _process_request(self, raw_data):
         parsed_games = []
@@ -56,8 +55,8 @@ class Service(BaseService):
                     game = Game(tag.find("span", {"class": "title"}).text, self._url + product_id, self.SERVICE_ID)
                     parsed_games.append(game)
             return parsed_games
-        except (AttributeError, TypeError, KeyError, json.decoder.JSONDecodeError):
-            raise InvalidGameDataException
+        except (AttributeError, TypeError, KeyError, json.decoder.JSONDecodeError) as e:
+            raise InvalidGameDataException(e)
 
     def get_free_games(self):
         return self._process_request(self.make_request())
