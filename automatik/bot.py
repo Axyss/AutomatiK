@@ -14,7 +14,7 @@ from automatik.commands.admin import AdminSlash
 from automatik.commands.owner import OwnerSlash
 from automatik.core.config import Config
 from automatik.core.database import Database
-from automatik.core.errors import InvalidGameDataException
+from automatik.core.errors import GameRetrievalException, InvalidGameDataException
 from automatik.core.game import GameAdapter, Game
 from automatik.core.language import LanguageManager
 from automatik.core.services import ServiceLoader
@@ -139,6 +139,9 @@ class AutomatikBot(commands.Bot):
             stored_free_games = self.database.get_free_games_by_service_id(service.SERVICE_ID)
             try:
                 retrieved_free_games = service.get_free_games()
+            except GameRetrievalException:
+                logger.warning(f"Failed to retrieve data from '{service.SERVICE_ID}', skipping", exc_info=True)
+                continue
             except InvalidGameDataException:
                 logger.warning(
                     f"Malformed data from '{service.SERVICE_ID}'"

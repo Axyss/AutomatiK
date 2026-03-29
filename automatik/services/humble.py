@@ -5,7 +5,7 @@ from requests.exceptions import HTTPError, Timeout, ConnectionError
 
 from automatik import logger
 from automatik.core.base_service import BaseService
-from automatik.core.errors import InvalidGameDataException
+from automatik.core.errors import GameRetrievalException, InvalidGameDataException
 from automatik.core.game import Game
 
 
@@ -22,7 +22,7 @@ class Service(BaseService):
             return requests.get(self._endpoint, impersonate="chrome")
         except (HTTPError, Timeout, ConnectionError) as e:
             logger.error(f"Request to {self.SERVICE_NAME} by service \'{self.SERVICE_ID}\' failed")
-            raise InvalidGameDataException(e)
+            raise GameRetrievalException(e)
 
     def _process_request(self, raw_data):
         parsed_games = []
