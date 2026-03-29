@@ -14,7 +14,6 @@ class Database:
         self.CONFIG_TEMPLATE = {
             "_id": None,
             "name": None,
-            "members": None,
             "selected_channel": None,  # Structure: <#1234>
             "mention_role": None,  # Structure: <@&1234>
             "lang": "en",
@@ -25,8 +24,7 @@ class Database:
     def _create_guild_config(self, guild):
         """Creates a new document in the 'configs' collection."""
         config = dict(self.CONFIG_TEMPLATE)
-        config.update({"_id": str(guild.id), "name": guild.name, "members": guild.member_count,
-                       "services": dict.fromkeys(ServiceLoader.get_service_ids(), True)})
+        config.update({"_id": str(guild.id), "name": guild.name, "services": dict.fromkeys(ServiceLoader.get_service_ids(), True)})
         try:
             self._db["configs"].insert_one(config)
         except DuplicateKeyError:
