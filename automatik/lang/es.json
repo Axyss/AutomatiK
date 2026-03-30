@@ -16,17 +16,17 @@
       "mention_established": "\u2705 Rol {} establecido con éxito.",
 
       "mention_management": "Gestión de Mención",
-      "mention_description": "Configura el rol que será mencionado cuando se envíen notificaciones de juegos gratuitos.",
+      "mention_description": "Elige el rol que será mencionado cuando se encuentren juegos gratuitos.",
       "current_mention_role": "Rol Actual",
-      "no_mention_role": "No hay rol seleccionado",
-      "select_role_instruction": "Por favor, selecciona un rol para ser mencionado en las notificaciones de juegos gratuitos.",
+      "no_mention_role": "Ningún rol configurado aún.",
       "select_role_placeholder": "Selecciona un rol...",
       "unset_mention_role": "Quitar Rol",
       "mention_role_unset": "✅ El rol de mención ha sido eliminado.",
 
       "language": "Idioma",
       "languages": "Idiomas",
-      "languages_description": "La columna **LangID** contiene el nombre con el que cada paquete de idioma debe ser llamado en los comandos.",
+      "current_language": "Idioma Actual",
+      "languages_description": "Elige el idioma para los mensajes y notificaciones.",
       "language_changed": "\u2705 Idioma cambiado a español (España).",
 
       "start_already": "\u274C El servicio principal ya se encuentra iniciado.",
@@ -37,14 +37,10 @@
 
       "reload_completed": "\u2705 **Reload** completado.",
 
-      "stats": "Estadísticas",
-      "stats_description": "Muestra información y estadísticas adicionales sobre esta instancia del bot.",
-
       "channel_management": "Gestión de Canal",
-      "channel_description": "Configura el canal donde se enviarán las notificaciones de juegos gratuitos.",
+      "channel_description": "Selecciona el canal donde se publicarán las notificaciones de juegos gratuitos.",
       "current_channel": "Canal Actual",
-      "no_channel_selected": "No hay canal seleccionado",
-      "select_channel_instruction": "Por favor, selecciona un canal para recibir notificaciones de juegos gratuitos.",
+      "no_channel_selected": "Ningún canal configurado aún.",
       "select_channel_placeholder": "Selecciona un canal...",
       "unselect_channel": "Deseleccionar Canal",
       "services_management": "Gestión de Módulos",

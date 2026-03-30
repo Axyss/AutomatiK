@@ -16,17 +16,17 @@
       "mention_established": "\u2705 Role {} successfully established.",
 
       "mention_management": "Mention Management",
-      "mention_description": "Set up the role that will be mentioned when free game notifications are sent.",
+      "mention_description": "Choose the role to be pinged when free games are found.",
       "current_mention_role": "Current Role",
-      "no_mention_role": "No Role Selected",
-      "select_role_instruction": "Please select a role to be mentioned for free game notifications.",
+      "no_mention_role": "No role configured yet.",
       "select_role_placeholder": "Select a role...",
       "unset_mention_role": "Unset Role",
       "mention_role_unset": "✅ Mention role has been unset.",
 
       "language": "Language",
       "languages": "Languages",
-      "languages_description": "The **LangID** column contains the way each language package must be called by in commands.",
+      "current_language": "Current Language",
+      "languages_description": "Choose the language for messages and notifications.",
       "language_changed": "\u2705 Language changed to English (England).",
 
       "start_already": "\u274C Main service is already started.",
@@ -37,14 +37,10 @@
 
       "reload_completed": "\u2705 **Reload** completed.",
 
-      "stats": "Statistics",
-      "stats_description": "Shows additional information and stats about this bot's instance.",
-
       "channel_management": "Channel Management",
-      "channel_description": "Set up the channel where free game notifications will be sent.",
+      "channel_description": "Select the channel where free game notifications will be posted.",
       "current_channel": "Current Channel",
-      "no_channel_selected": "No Channel Selected",
-      "select_channel_instruction": "Please select a channel to receive free game notifications.",
+      "no_channel_selected": "No channel configured yet.",
       "select_channel_placeholder": "Select a channel...",
       "unselect_channel": "Unselect Channel",
       "services_management": "Services Management",

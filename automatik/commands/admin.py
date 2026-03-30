@@ -43,11 +43,7 @@ class AdminSlash(commands.Cog):
                 inline=False
             )
         else:
-            embed.add_field(
-                name=self.languages.get_message(guild_lang, "no_channel_selected"),
-                value=self.languages.get_message(guild_lang, "select_channel_instruction"),
-                inline=False
-            )
+            embed.description += "\n" + self.languages.get_message(guild_lang, "no_channel_selected")
         view = ChannelManagementView(self.languages, self.database, interaction.guild, guild_selected_channel)
         await interaction.response.send_message(embed=embed, view=view)
 
@@ -95,11 +91,7 @@ class AdminSlash(commands.Cog):
                 inline=False
             )
         else:
-            embed.add_field(
-                name=self.languages.get_message(guild_lang, "no_mention_role"),
-                value=self.languages.get_message(guild_lang, "select_role_instruction"),
-                inline=False
-            )
+            embed.description += "\n" + self.languages.get_message(guild_lang, "no_mention_role")
 
         view = MentionManagementView(self.languages, self.database, interaction.guild, current_role_mention)
         await interaction.response.send_message(embed=embed, view=view)
@@ -107,18 +99,18 @@ class AdminSlash(commands.Cog):
     @app_commands.command()
     @app_commands.checks.has_permissions(administrator=True)
     async def language(self, interaction):
-        """Manage language - select the language for the bot's messages."""
+        """Manage language - select the language for messages and notifications."""
         guild_lang = self.database.get_guild_config(interaction.guild)["lang"]
 
         embed_langs = discord.Embed(
-            title=f"{self.languages.get_message(guild_lang, 'languages')} 🌐",
+            title=self.languages.get_message(guild_lang, "languages"),
             description=self.languages.get_message(guild_lang, "languages_description"),
-            color=0x5865F2
+            color=0x00BFFF
         )
 
         current_language = self.languages.languages_data[guild_lang].language
         embed_langs.add_field(
-            name="📌 " + self.languages.get_message(guild_lang, "language") + " " + "(actual)",
+            name=self.languages.get_message(guild_lang, "current_language"),
             value=f"{self.languages.get_language_emoji(guild_lang)} **{current_language}** (`{guild_lang}`)",
             inline=False
         )
