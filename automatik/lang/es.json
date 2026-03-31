@@ -7,7 +7,6 @@
       "invalid_command": "\u274C Comando desconocido. Usa **!mk help** para ver los comandos disponibles.",
       "unexpected_error": "\u274C Error inesperado.",
 
-      "help_footer": "Página del proyecto: github.com/Axyss/AutomatiK",
 
       "select_success": "✅ Canal {} seleccionado con éxito.",
 
@@ -23,7 +22,6 @@
       "unset_mention_role": "Quitar Rol",
       "mention_role_unset": "✅ El rol de mención ha sido eliminado.",
 
-      "language": "Idioma",
       "languages": "Idiomas",
       "current_language": "Idioma Actual",
       "languages_description": "Elige el idioma para los mensajes y notificaciones.",
