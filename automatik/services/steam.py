@@ -24,12 +24,7 @@ class Service(BaseService):
         dlc_area = bool(soup.find("div", {"class": "game_area_dlc_bubble"}))
         purchase_area = bool(soup.find("div", {"class": "game_area_purchase_game_wrapper"}))
 
-        if dlc_area and purchase_area:
-            return True
-        elif not dlc_area and purchase_area:
-            return False
-        else:
-            return None
+        return dlc_area and purchase_area
 
     def make_request(self, endpoint=None):
         url = endpoint if endpoint else self._endpoint
@@ -46,14 +41,12 @@ class Service(BaseService):
             processed_data = json.loads(raw_data.content)["results_html"]
             soup = BeautifulSoup(processed_data, "html.parser")
             for tag in soup.find_all("a", {"class": "search_result_row ds_collapse_flag"}):
-                product_id = tag.get("data-ds-appid") if tag.get("data-ds-appid") else tag.get("data-ds-bundleid")
-                discount_tag = tag.find("div", {"class": "discount_pct"})
-                # DLCs must be compared carefully since 'not None' is equal to 'True'.
-                if discount_tag is None:
+                product_id = tag.get("data-ds-appid") or tag.get("data-ds-bundleid")
+                price_div = tag.find("div", {"class": "search_price_discount_combined"})
+                if price_div is None or price_div.get("data-price-final") != "0" or self.is_dlc(product_id):
                     continue
-                elif discount_tag.text == "-100%" and self.is_dlc(product_id) is False:
-                    game = Game(tag.find("span", {"class": "title"}).text, self._url + product_id, self.SERVICE_ID)
-                    parsed_games.append(game)
+                game = Game(tag.find("span", {"class": "title"}).text, self._url + product_id, self.SERVICE_ID)
+                parsed_games.append(game)
             return parsed_games
         except (AttributeError, TypeError, KeyError, json.decoder.JSONDecodeError) as e:
             raise InvalidGameDataException(e)
