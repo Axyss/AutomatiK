@@ -41,9 +41,8 @@ class AutomatikBot(commands.Bot):
             await self.add_cog(OwnerSlash(self, self.languages, self.config, self.database), guild=self._debug_guild)
 
     async def close(self):
-        if self._debug_guild:
-            self.tree.clear_commands(guild=self._debug_guild)
-            await self.tree.sync(guild=self._debug_guild)
+        self.tree.clear_commands(guild=self._debug_guild)
+        await self.tree.sync(guild=self._debug_guild)
         await super().close()
 
     async def on_ready(self):
