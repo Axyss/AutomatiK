@@ -25,7 +25,7 @@
       "languages": "Idiomas",
       "current_language": "Idioma Actual",
       "languages_description": "Elige el idioma para los mensajes y notificaciones.",
-      "language_changed": "\u2705 Idioma cambiado a español (España).",
+      "language_changed": "\u2705 Idioma cambiado a español.",
 
       "start_already": "\u274C El servicio principal ya se encuentra iniciado.",
       "start_success": "\u2705 Se ha iniciado el servicio principal.",

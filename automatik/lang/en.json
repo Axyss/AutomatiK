@@ -25,7 +25,7 @@
       "languages": "Languages",
       "current_language": "Current Language",
       "languages_description": "Choose the language for messages and notifications.",
-      "language_changed": "\u2705 Language changed to English (England).",
+      "language_changed": "\u2705 Language changed to English.",
 
       "start_already": "\u274C Main service is already started.",
       "start_success": "\u2705 Main service started.",
