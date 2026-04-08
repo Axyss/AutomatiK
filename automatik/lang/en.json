@@ -14,17 +14,17 @@
 
       "mention_established": "\u2705 Role {} successfully established.",
 
-      "mention_management": "Mention Management",
-      "mention_description": "Choose the role to be pinged when free games are found.",
-      "current_mention_role": "Current Role",
-      "no_mention_role": "No role configured yet.",
+      "mention_management": "Notification Mentions",
+      "mention_description": "Choose who gets pinged when free games are found.",
+      "current_mention_role": "Active",
+      "no_mention_role": "Not configured yet.",
       "select_role_placeholder": "Select a role...",
-      "unset_mention_role": "Unset Role",
-      "mention_role_unset": "✅ Mention role has been unset.",
+      "unset_mention_role": "Remove",
+      "mention_role_unset": "✅ Mentions have been disabled.",
 
-      "languages": "Languages",
-      "current_language": "Current Language",
-      "languages_description": "Choose the language for messages and notifications.",
+      "languages": "Language Settings",
+      "current_language": "Active",
+      "languages_description": "Choose your preferred language for bot messages and notifications.",
       "language_changed": "\u2705 Language changed to English.",
 
       "start_already": "\u274C Main service is already started.",
@@ -35,14 +35,14 @@
 
       "reload_completed": "\u2705 **Reload** completed.",
 
-      "channel_management": "Channel Management",
-      "channel_description": "Select the channel where free game notifications will be posted.",
-      "current_channel": "Current Channel",
-      "no_channel_selected": "No channel configured yet.",
+      "channel_management": "Notification Channel",
+      "channel_description": "Choose where free game alerts will be posted.",
+      "current_channel": "Active",
+      "no_channel_selected": "Not configured yet.",
       "select_channel_placeholder": "Select a channel...",
-      "unselect_channel": "Unselect Channel",
-      "services_management": "Services Management",
-      "services_management_description": "Toggle which services are active and check their current status.",
+      "unselect_channel": "Remove",
+      "services_management": "Active Services",
+      "services_management_description": "Toggle platforms and view their current status.",
       "service_enabled_status": "✅ Enabled",
       "service_disabled_status": "✖️ Disabled"
     }

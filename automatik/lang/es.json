@@ -14,17 +14,17 @@
 
       "mention_established": "\u2705 Rol {} establecido con éxito.",
 
-      "mention_management": "Gestión de Mención",
-      "mention_description": "Elige el rol que será mencionado cuando se encuentren juegos gratuitos.",
-      "current_mention_role": "Rol Actual",
-      "no_mention_role": "Ningún rol configurado aún.",
+      "mention_management": "Menciones de Notificación",
+      "mention_description": "Elige quién será notificado cuando se encuentren juegos gratuitos.",
+      "current_mention_role": "Activo",
+      "no_mention_role": "No configurado aún.",
       "select_role_placeholder": "Selecciona un rol...",
-      "unset_mention_role": "Quitar Rol",
-      "mention_role_unset": "✅ El rol de mención ha sido eliminado.",
+      "unset_mention_role": "Quitar",
+      "mention_role_unset": "✅ Las menciones han sido desactivadas.",
 
-      "languages": "Idiomas",
-      "current_language": "Idioma Actual",
-      "languages_description": "Elige el idioma para los mensajes y notificaciones.",
+      "languages": "Configuración de Idioma",
+      "current_language": "Activo",
+      "languages_description": "Elige tu idioma preferido para los mensajes y notificaciones del bot.",
       "language_changed": "\u2705 Idioma cambiado a español.",
 
       "start_already": "\u274C El servicio principal ya se encuentra iniciado.",
@@ -35,14 +35,14 @@
 
       "reload_completed": "\u2705 **Reload** completado.",
 
-      "channel_management": "Gestión de Canal",
-      "channel_description": "Selecciona el canal donde se publicarán las notificaciones de juegos gratuitos.",
-      "current_channel": "Canal Actual",
-      "no_channel_selected": "Ningún canal configurado aún.",
+      "channel_management": "Canal de Notificaciones",
+      "channel_description": "Elige dónde se publicarán las alertas de juegos gratuitos.",
+      "current_channel": "Activo",
+      "no_channel_selected": "No configurado aún.",
       "select_channel_placeholder": "Selecciona un canal...",
-      "unselect_channel": "Deseleccionar Canal",
-      "services_management": "Gestión de Módulos",
-      "services_management_description": "Activa o desactiva módulos y consulta su estado actual.",
+      "unselect_channel": "Quitar",
+      "services_management": "Plataformas Activas",
+      "services_management_description": "Activa o desactiva plataformas y consulta su estado.",
       "service_enabled_status": "✅ Activado",
       "service_disabled_status": "✖️ Desactivado"
     }
