@@ -25,13 +25,7 @@
       "languages": "Language Settings",
       "current_language": "Active",
       "languages_description": "Choose your preferred language for bot messages and notifications.",
-      "language_changed": "\u2705 Language changed to English.",
-
-      "start_already": "\u274C Main service is already started.",
-      "start_success": "\u2705 Main service started.",
-
-      "stop_already": "\u274C Main service is already stopped.",
-      "stop_success": "\u2705 Main service stopped.",
+      "language_changed": "\u2705 Language changed to english.",
 
       "reload_completed": "\u2705 **Reload** completed.",
 

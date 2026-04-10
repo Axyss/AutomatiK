@@ -27,12 +27,6 @@
       "languages_description": "Elige tu idioma preferido para los mensajes y notificaciones del bot.",
       "language_changed": "\u2705 Idioma cambiado a español.",
 
-      "start_already": "\u274C El servicio principal ya se encuentra iniciado.",
-      "start_success": "\u2705 Se ha iniciado el servicio principal.",
-
-      "stop_already": "\u274C El servicio principal ya se encuentra parado.",
-      "stop_success": "\u2705 Se ha parado el servicio principal.",
-
       "reload_completed": "\u2705 **Reload** completado.",
 
       "channel_management": "Canal de Notificaciones",
@@ -42,7 +36,7 @@
       "select_channel_placeholder": "Selecciona un canal...",
       "unselect_channel": "Quitar",
       "services_management": "Plataformas Activas",
-      "services_management_description": "Activa o desactiva plataformas y consulta su estado.",
+      "services_management_description": "Activa o desactiva plataformas y consulta sus estados.",
       "service_enabled_status": "✅ Activado",
       "service_disabled_status": "✖️ Desactivado"
     }
