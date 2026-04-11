@@ -54,7 +54,7 @@ class AutomatikBot(commands.Bot):
                 f"Bot ready, logged in as {self.user} ({self.user.id}), "
                 f"serving {len(self.guilds)} guild(s)"
             )
-        await self.change_presence(status=discord.Status.online, activity=discord.Game("!mk help"))
+        # await self.change_presence(status=discord.Status.online, activity=discord.Game("!mk help"))
 
     def load_resources(self):
         """Loads configuration, services and language packages."""

@@ -1,4 +1,4 @@
-__version__ = "v1.4"
+__version__ = "v2.0"
 __all__ = ["logger", "__version__", "LOGO_URL", "AVATAR_URL", "SRC_DIR"]
 
 import os
