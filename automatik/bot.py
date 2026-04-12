@@ -176,7 +176,6 @@ class AutomatikBot(commands.Bot):
             return
 
         success, fail = 0, 0
-
         for guild in self.guilds:
             guild_config = self.database.get_guild_config(guild)
             for game in free_games:
@@ -210,7 +209,7 @@ class AutomatikBot(commands.Bot):
 if __name__ == "__main__":
     automatik.utils.cli.clear_console()
     automatik.utils.cli.print_ascii_art()
-    logger.info("Starting AutomatiK...")
+    logger.info("Starting...")
     automatik_bot = AutomatikBot(command_prefix="!mk ", intents=discord.Intents.default())
     automatik.utils.update.check_updates()
     try:

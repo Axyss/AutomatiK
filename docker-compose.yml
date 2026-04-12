@@ -11,7 +11,6 @@ services:
     environment:
       DB_URI: "mongodb://mongo:27017"
       DISCORD_TOKEN: ""
-      BOT_OWNER: "" # Your Discord user ID, e.g., 123456789012345678
 
       # Optional settings
       LLM_MODEL: "" # Examples: google:gemini-2.5-flash, openai:gpt-5-mini
