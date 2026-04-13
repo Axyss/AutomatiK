@@ -22,6 +22,7 @@ class AdminSlash(commands.Cog):
         return await self.bot.is_invoked(interaction)
 
     @app_commands.command()
+    @app_commands.guild_only()
     @app_commands.checks.has_permissions(administrator=True)
     async def channel(self, interaction):
         """Manage notification channel - select or unselect a channel to receive freebies."""
@@ -48,6 +49,7 @@ class AdminSlash(commands.Cog):
         await interaction.response.send_message(embed=embed, view=view)
 
     @app_commands.command()
+    @app_commands.guild_only()
     @app_commands.checks.has_permissions(administrator=True)
     async def services(self, interaction):
         """Manage services - enable or disable services and view their current status."""
@@ -71,6 +73,7 @@ class AdminSlash(commands.Cog):
         await interaction.response.send_message(embed=embed, view=view)
 
     @app_commands.command()
+    @app_commands.guild_only()
     @app_commands.checks.has_permissions(administrator=True)
     async def mention(self, interaction):
         """Manage mention role - select or unset the role that will be notified about freebies."""
@@ -97,6 +100,7 @@ class AdminSlash(commands.Cog):
         await interaction.response.send_message(embed=embed, view=view)
 
     @app_commands.command()
+    @app_commands.guild_only()
     @app_commands.checks.has_permissions(administrator=True)
     async def language(self, interaction):
         """Manage language - select the language for messages and notifications."""
@@ -117,4 +121,3 @@ class AdminSlash(commands.Cog):
 
         view = LanguageView(self.languages.languages_data, self.languages, self.database)
         await interaction.response.send_message(embed=embed_langs, view=view)
-

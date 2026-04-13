@@ -15,6 +15,7 @@ class OwnerSlash(commands.Cog):
         return await self.bot.is_invoked(interaction)
 
     @app_commands.command()
+    @app_commands.guild_only()
     @app_commands.checks.has_permissions(administrator=True)
     async def reload(self, interaction):
         """Reloads configuration, services and language packages."""
@@ -35,5 +36,3 @@ class OwnerSlash(commands.Cog):
             logger.exception("Reload failed with an unexpected error")
         finally:
             self.bot.main_loop = bool(was_started)
-
-
