@@ -5,7 +5,7 @@ services:
     volumes:
       - mongo-data:/data/db
   bot:
-    build: .
+    image: ghcr.io/axyss/automatik:latest
     depends_on:
       - mongo
     environment:
@@ -22,5 +22,6 @@ services:
       # Developer settings
       #DEBUG_MESSAGES: true
       #DEBUG_GUILD_ID: ""
+
 volumes:
   mongo-data:
