@@ -74,8 +74,7 @@ class AutomatikBot(commands.Bot):
         embed.set_author(name=service.SERVICE_NAME)
         embed.set_image(url=game.promo_img_url)
 
-        if self.igdb is not None:
-            igdb_data = self.igdb.get_game_data(game.NAME)
+        if igdb_data := self.igdb.get_game_data(game.NAME) is not None:
             # Game summary
             if igdb_data.get("summary"):
                 summary = igdb_data["summary"]
