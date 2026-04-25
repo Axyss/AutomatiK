@@ -25,7 +25,7 @@ class AdminSlash(commands.Cog):
     @app_commands.guild_only()
     @app_commands.checks.has_permissions(administrator=True)
     async def channel(self, interaction):
-        """Manage notification channel - select or unselect a channel to receive freebies."""
+        """Select/unselect the channel where notifications will be sent."""
         guild_cfg = self.database.get_guild_config(interaction.guild)
         guild_lang = guild_cfg["lang"]
         guild_selected_channel = guild_cfg["selected_channel"]
@@ -52,7 +52,7 @@ class AdminSlash(commands.Cog):
     @app_commands.guild_only()
     @app_commands.checks.has_permissions(administrator=True)
     async def services(self, interaction):
-        """Manage services - enable or disable services and view their current status."""
+        """Enable/disable specific platform notifications for your server."""
         guild_cfg = self.database.get_guild_config(interaction.guild)
         guild_lang = guild_cfg["lang"]
         guild_services = guild_cfg["services"]
@@ -76,7 +76,7 @@ class AdminSlash(commands.Cog):
     @app_commands.guild_only()
     @app_commands.checks.has_permissions(administrator=True)
     async def mention(self, interaction):
-        """Manage mention role - select or unset the role that will be notified about freebies."""
+        """Set/unset the role mentioned on notifications."""
         guild_cfg = self.database.get_guild_config(interaction.guild)
         guild_lang = guild_cfg["lang"]
         current_role_mention = guild_cfg["mention_role"]
@@ -103,7 +103,7 @@ class AdminSlash(commands.Cog):
     @app_commands.guild_only()
     @app_commands.checks.has_permissions(administrator=True)
     async def language(self, interaction):
-        """Manage language - select the language for messages and notifications."""
+        """Switch between languages."""
         guild_lang = self.database.get_guild_config(interaction.guild)["lang"]
 
         embed_langs = discord.Embed(
