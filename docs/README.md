@@ -1,72 +1,95 @@
 <div align="center">
-  <img src="https://raw.githubusercontent.com/Axyss/AutomatiK/master/docs/assets/ak_logo.png" alt="automatik_logo" width="180" height="180">
+  <img src="assets/ak_logo.png" alt="AutomatiK logo" width="180" height="180">
+  <p>Discord bot that tracks free game offers across multiple platforms and notifies your server.</p>
 </div>
 
-> [!CAUTION]
-> **This project is currently undergoing major refactors**. Consider waiting until version 2.0 is released for production use.
+> [!IMPORTANT]
+> 🎉v2.0 is now out!  Check out the [release notes](https://github.com/Axyss/AutomatiK/releases/tag/v2.0.0)
 
-## 📋 Overview
+## Features
 
-AutomatiK is a Discord bot that notifies users about free games from multiple platforms. It features an autonomous operation system, configuration options, an integrated database for game data storage, and a modular architecture that allows for easy extension.
+- **Rich Embeds**: Game metadata powered by the **IGDB API**. [_Example_](assets/embed.png)
+- **AI Fallback**: Resilient parsing by relying on LLMs when standard methods fail. _Currently supporting Google, Anthropic, and OpenAI models._
+- **Minimal Permissions**: No need for admin rights nor privileged intents.
 
-### 🎮 Supported Platforms
+### Supported Platforms
 
-- Steam
-- Epic Games
-- Humble Bundle
-- Ubisoft Connect
+&nbsp;
+<img src="assets/steam_logo.png" width=40 alt="Steam Logo" />
+&nbsp;
+<img src="assets/epic_games_logo.png" width=35 alt="Epic Games Logo" />
+&nbsp;
+<img src="assets/humble_bundle_logo.png" width=45 alt="Humble Bundle Logo" />
+&nbsp;
+<img src="assets/ubisoft_logo.png" width=40 alt="Ubisoft Logo" />
 
-## 🚀 Installation
+## Commands
+`/channel`: Select/unselect the channel where notifications will be sent.<br>
+`/services`: Enable/disable specific platform notifications for your server.<br>
+`/mention`: Set/unset the role mentioned on notifications.<br>
+`/language`: Switch between languages.
 
-### ⚙️ Prerequisites
+## Deployment
 
-- Python 3.6+
-- Dependencies: discord.py, beautifulsoup4, requests
+There's an existing bot instance that you can [invite to your server](https://github.com/Axyss/AutomatiK/releases/tag/v2.0.0). But in case you prefer to host your own, you can do so either via:
 
-### 💻 Standard Installation
+### Docker (Recommended)
 
-```bash
-# Clone and enter repository
-git clone https://github.com/Axyss/AutomatiK.git && cd AutomatiK
+1. Create a `docker-compose.yml` file with the following content:
+   ```yaml
+   version: "3.9"
+   services:
+     mongo:
+       image: mongo
+       volumes:
+         - mongo-data:/data/db
+     bot:
+       image: ghcr.io/axyss/automatik:latest
+       depends_on:
+         - mongo
+       environment:
+         DB_URI: "mongodb://mongo:27017"
+         DISCORD_TOKEN: ""
 
-# Install dependencies
-pip install -r requirements.txt
+         # Optional settings
+         LLM_MODEL: "" # Examples: google:gemini-2.5-flash, openai:gpt-5-mini
+         LLM_API_KEY: ""
 
-# Run the bot
-python3 bot.py
-```
+         IGDB_CLIENT_ID: ""
+         IGDB_CLIENT_SECRET: ""
 
-Enter your Discord bot token when prompted, invite the bot to your server with admin privileges, and run `!mk start` in your desired notification channel.
+         # Developer settings
+         #DEBUG_MESSAGES: true
+         #DEBUG_GUILD_ID: ""
 
-### 🐳 Docker Installation
+   volumes:
+     mongo-data:
+   ```
 
-AutomatiK can also be run using Docker:
-
-1. Configure environment variables:
-   - Set `DISCORD_TOKEN` with your bot token
-   - Set `BOT_OWNER` with your Discord user ID
-
-2. Run with docker-compose:
+2. Fill `DISCORD_TOKEN` with your own token from the Discord Developer Portal.
+3. Launch the containers:
    ```bash
    docker-compose up -d
    ```
 
-3. Invite the bot to your server and use `!mk start` to initialize as with the standard installation.
+### Manual Installation
+**Requirements:** Python 3.12.10 and a MongoDB instance.
 
-## 📝 Usage
+1. Clone and install dependencies:
+   ```bash
+   git clone https://github.com/Axyss/AutomatiK.git && cd AutomatiK
+   pip install -r requirements.txt
+   ```
+2. Prepare your own .env file:
+   ```bash
+   cp .env.template .env
+   ```
+   Fill in your `DISCORD_TOKEN` and `DB_URI` in your newly `.env` file.
+3. Run the bot:
+   ```bash
+   python -m automatik.bot
+   ```
 
-### 🤖 Commands
+## License
 
-AutomatiK uses the prefix `!mk`. View available commands with `!mk help`.
-
-![Help Command Example](https://raw.githubusercontent.com/Axyss/AutomatiK/master/docs/assets/help.png)
-
-## 💡 Development
-
-### 🧩 Creating Custom Services
-
-To develop your own services for the bot, refer to the [service creation guide](https://github.com/Axyss/AutomatiK/blob/master/docs/service_guide.md).
-
-## 📜 License
-
-All software in this repository is licensed under the MIT license. The graphical content and logos are licensed under Creative Commons Attribution-ShareAlike 4.0 International.
+This project is licensed under the [MIT license](https://github.com/Axyss/AutomatiK/blob/master/LICENSE).
