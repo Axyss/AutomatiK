@@ -31,7 +31,7 @@
 
 ## Deployment
 
-There's an existing bot instance that you can [invite to your server](https://github.com/Axyss/AutomatiK/releases/tag/v2.0.0). But in case you prefer to host your own, you can do so either via:
+There's an existing bot instance that you can [invite to your server](https://automatik.axyss.dev). But in case you prefer to host your own, you can do so either via:
 
 ### Docker (Recommended)
 
