@@ -15,13 +15,13 @@
 ### Supported Platforms
 
 &nbsp;
-<img src="assets/steam_logo.png" width=40 alt="Steam Logo" />
+<img src="../automatik/services/assets/steam_logo.png" width=40 alt="Steam Logo" />
 &nbsp;
-<img src="assets/epic_games_logo.png" width=35 alt="Epic Games Logo" />
+<img src="../automatik/services/assets/epic_games_logo.png" width=35 alt="Epic Games Logo" />
 &nbsp;
-<img src="assets/humble_bundle_logo.png" width=45 alt="Humble Bundle Logo" />
+<img src="../automatik/services/assets/humble_bundle_logo.png" width=45 alt="Humble Bundle Logo" />
 &nbsp;
-<img src="assets/ubisoft_logo.png" width=40 alt="Ubisoft Logo" />
+<img src="../automatik/services/assets/ubisoft_logo.png" width=40 alt="Ubisoft Logo" />
 
 ## Commands
 `/channel`: Select/unselect the channel where notifications will be sent.<br>
