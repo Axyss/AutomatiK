@@ -80,3 +80,7 @@ jobs:
             --tag ${{ env.IMAGE }}:${{ github.event.release.tag_name }} \
             ${{ env.IMAGE }}:latest-amd64 \
             ${{ env.IMAGE }}:latest-arm64
+
+      - name: Trigger deployment
+        run: | 
+         curl --request GET '${{ secrets.DEPLOY_WEBHOOK }}' --header 'Authorization: Bearer ${{ secrets.DEPLOY_TOKEN }}'
