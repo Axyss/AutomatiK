@@ -8,6 +8,8 @@ services:
     image: ghcr.io/axyss/automatik:latest
     depends_on:
       - mongo
+    volumes:
+      - ./automatik/logs:/data/automatik/logs
     environment:
       DB_URI: "mongodb://mongo:27017"
       DISCORD_TOKEN: ""
