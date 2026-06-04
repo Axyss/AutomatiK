@@ -121,7 +121,7 @@ class AutomatikBot(commands.Bot):
                 exc_info=error
             )
 
-    @tasks.loop(minutes=15)
+    @tasks.loop(minutes=30)
     async def look_for_free_games(self):
         free_games = []
 
