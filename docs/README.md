@@ -3,9 +3,6 @@
   <p>Discord bot that tracks free game offers across multiple platforms and notifies your server.</p>
 </div>
 
-> [!IMPORTANT]
-> 🎉v2.0 is now out!  Check out the [release notes](https://github.com/Axyss/AutomatiK/releases/tag/v2.0)
-
 ## Features
 
 - **Rich Embeds**: Game metadata powered by the **IGDB API**. [_Example_](assets/embed.png)
