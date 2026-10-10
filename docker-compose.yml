@@ -4,6 +4,7 @@ services:
     image: mongo
     volumes:
       - mongo-data:/data/db
+    restart: unless-stopped
   bot:
     image: ghcr.io/axyss/automatik:latest
     depends_on:
@@ -24,6 +25,6 @@ services:
       # Developer settings
       #DEBUG_MESSAGES: true
       #DEBUG_GUILD_ID: ""
-
+    restart: unless-stopped
 volumes:
   mongo-data:
